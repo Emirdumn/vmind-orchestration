@@ -1,0 +1,177 @@
+<svg width="100%" viewBox="0 0 840 790" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>Çalışma masalı final optimal salon</title>
+  <desc>3.16 x 8.33 m salon için büyük çalışma masası, ana koltuk, tekli koltuk, lambader ve TV ünitesiyle pufsuz, sehpasız modern yerleşim.</desc>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <pattern id="outside" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#b9b1a0" stroke-width="0.6" opacity="0.45"/>
+    </pattern>
+    <linearGradient id="floor" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#f4efe7"/>
+      <stop offset="1" stop-color="#dfd4c7"/>
+    </linearGradient>
+    <linearGradient id="rug" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#efe5d2"/>
+      <stop offset="0.52" stop-color="#c7b59c"/>
+      <stop offset="1" stop-color="#6f7f55"/>
+    </linearGradient>
+    <filter id="shadow" x="-12%" y="-12%" width="124%" height="124%">
+      <feDropShadow dx="0" dy="3" stdDeviation="2.2" flood-color="#000000" flood-opacity="0.23"/>
+    </filter>
+    <style>
+      .label { font-family: Inter, Arial, sans-serif; fill: #f8f2e9; font-size: 12px; }
+      .small { font-family: Inter, Arial, sans-serif; fill: #d6cbbb; font-size: 11px; }
+      .dark { font-family: Inter, Arial, sans-serif; fill: #24221f; font-size: 11px; }
+      .title { font-family: Inter, Arial, sans-serif; fill: #f8f2e9; font-size: 18px; font-weight: 800; }
+      .panel-title { font-family: Inter, Arial, sans-serif; fill: #f8f2e9; font-size: 13px; font-weight: 800; }
+      .wall { stroke: #f8f2e9; stroke-width: 5; stroke-linecap: square; }
+    </style>
+  </defs>
+
+  <rect width="840" height="790" fill="#242320"/>
+  <text x="420" y="31" text-anchor="middle" class="title">Çalışma masalı final optimal salon</text>
+  <text x="420" y="52" text-anchor="middle" class="small">Büyük pencere önü masa + ana koltuk + tekli lounge + lambader + TV ünitesi</text>
+
+  <!-- Fixed shell. Same base proportions: 3.16 x 8.33 m salon. -->
+  <rect x="230" y="50" width="221" height="583" fill="url(#floor)" opacity="0.18"/>
+  <rect x="230" y="508" width="90" height="125" fill="url(#outside)" stroke="none"/>
+  <text x="275" y="558" text-anchor="middle" class="small" font-style="italic">Hol</text>
+  <text x="275" y="575" text-anchor="middle" class="small" font-style="italic">salon dışı</text>
+
+  <line x1="230" y1="50" x2="451" y2="50" class="wall"/>
+  <line x1="232" y1="50" x2="449" y2="50" stroke="#2d2c29" stroke-width="1.5"/>
+  <line x1="451" y1="50" x2="451" y2="633" class="wall"/>
+  <line x1="320" y1="633" x2="451" y2="633" class="wall"/>
+  <line x1="320" y1="508" x2="320" y2="633" stroke="#d6cbbb" stroke-width="1.5" stroke-dasharray="7,4"/>
+  <line x1="230" y1="508" x2="320" y2="508" class="wall"/>
+  <line x1="230" y1="50" x2="230" y2="508" class="wall"/>
+
+  <text x="340" y="44" text-anchor="middle" class="small">Pencere / doğal ışık</text>
+  <text x="372" y="575" class="small">Giriş: açık geçiş</text>
+  <line x1="346" y1="570" x2="368" y2="570" stroke="#d6cbbb" stroke-width="1" marker-end="url(#arrow)"/>
+
+  <!-- Large work zone at the window. -->
+  <rect x="249" y="66" width="160" height="53" fill="#b99673" stroke="#5b4633" stroke-width="0.9" rx="5" filter="url(#shadow)"/>
+  <rect x="257" y="73" width="144" height="8" fill="#d6bc9e" opacity="0.65" rx="3"/>
+  <rect x="274" y="84" width="38" height="25" fill="#171717" rx="2"/>
+  <rect x="322" y="82" width="44" height="28" fill="#111111" rx="2"/>
+  <rect x="377" y="85" width="16" height="18" fill="#2d2a26" rx="2"/>
+  <text x="329" y="98" text-anchor="middle" class="dark" font-weight="800">Büyük çalışma masası</text>
+  <text x="329" y="114" text-anchor="middle" class="dark">225 x 75 cm</text>
+  <rect x="303" y="128" width="51" height="47" fill="#263936" stroke="#0f1f1d" stroke-width="0.8" rx="12" filter="url(#shadow)"/>
+  <rect x="314" y="122" width="29" height="12" fill="#162b27" rx="5"/>
+  <text x="329" y="190" text-anchor="middle" class="small">ergonomik çalışma koltuğu</text>
+
+  <!-- Books/storage around desk without stealing floor depth. -->
+  <rect x="235" y="67" width="10" height="108" fill="#4a4037" rx="2"/>
+  <rect x="414" y="67" width="10" height="108" fill="#4a4037" rx="2"/>
+  <line x1="236" y1="97" x2="244" y2="97" stroke="#b99673" stroke-width="2"/>
+  <line x1="236" y1="132" x2="244" y2="132" stroke="#b99673" stroke-width="2"/>
+  <line x1="415" y1="97" x2="423" y2="97" stroke="#b99673" stroke-width="2"/>
+  <line x1="415" y1="132" x2="423" y2="132" stroke="#b99673" stroke-width="2"/>
+
+  <!-- Sofa and TV zone. -->
+  <rect x="236" y="238" width="68" height="198" fill="#b8b2a7" stroke="#716a60" stroke-width="0.8" rx="10" filter="url(#shadow)"/>
+  <rect x="236" y="238" width="68" height="12" fill="#8e887d" rx="8"/>
+  <rect x="236" y="238" width="10" height="198" fill="#8e887d" rx="8"/>
+  <line x1="255" y1="263" x2="255" y2="416" stroke="#ded9d0" stroke-width="0.8" opacity="0.7"/>
+  <line x1="276" y1="263" x2="276" y2="416" stroke="#ded9d0" stroke-width="0.8" opacity="0.7"/>
+  <line x1="293" y1="263" x2="293" y2="416" stroke="#ded9d0" stroke-width="0.8" opacity="0.7"/>
+  <text x="270" y="331" text-anchor="middle" class="dark" font-weight="800">Ana koltuk</text>
+  <text x="270" y="347" text-anchor="middle" class="dark">280 x 95 cm</text>
+  <text x="270" y="363" text-anchor="middle" class="dark">geniş düz kanepe</text>
+
+  <rect x="423" y="226" width="28" height="242" fill="#443d34" stroke="#201d19" stroke-width="0.8" filter="url(#shadow)"/>
+  <rect x="427" y="265" width="20" height="122" fill="#111111" rx="2"/>
+  <rect x="424" y="402" width="26" height="44" fill="#8d7358" opacity="0.85" rx="2"/>
+  <text x="463" y="302" class="label" font-weight="700">65-77&quot; TV</text>
+  <text x="463" y="320" class="small">alçak kapaklı ünite</text>
+  <text x="463" y="336" class="small">30 cm derinlik</text>
+
+  <!-- No loose central furniture. -->
+  <path d="M310 250 C342 228 386 240 407 270 L407 468 C382 493 336 492 310 466 Z" fill="url(#rug)" opacity="0.58" stroke="#cdbb9e" stroke-width="0.8" filter="url(#shadow)"/>
+  <text x="358" y="357" text-anchor="middle" class="dark" font-weight="800">Organik halı</text>
+  <text x="358" y="373" text-anchor="middle" class="dark">175 x 275 cm</text>
+  <text x="358" y="389" text-anchor="middle" class="dark">puf / orta sehpa yok</text>
+
+  <!-- Required single chair and lamp, shifted away from work desk. -->
+  <g transform="rotate(18, 381, 454)">
+    <rect x="349" y="422" width="64" height="64" fill="#243f3a" stroke="#0e1f1c" stroke-width="0.8" rx="18" filter="url(#shadow)"/>
+    <rect x="349" y="422" width="64" height="11" fill="#162b27" rx="8"/>
+    <rect x="349" y="422" width="9" height="64" fill="#162b27" rx="6"/>
+    <rect x="404" y="422" width="9" height="64" fill="#162b27" rx="6"/>
+  </g>
+  <text x="383" y="505" text-anchor="middle" class="small">Tekli lounge koltuk</text>
+  <text x="383" y="521" text-anchor="middle" class="small">90 x 90 cm</text>
+
+  <circle cx="411" cy="417" r="16" fill="#f0d89c" stroke="#8a7a5a" stroke-width="0.8" filter="url(#shadow)"/>
+  <circle cx="411" cy="417" r="3.2" fill="#3a3a3a"/>
+  <line x1="411" y1="433" x2="411" y2="466" stroke="#242320" stroke-width="2"/>
+  <circle cx="411" cy="470" r="5" fill="#242320"/>
+  <text x="402" y="406" text-anchor="end" class="small">Lambader</text>
+  <text x="402" y="422" text-anchor="end" class="small">tekli koltuk aksı</text>
+
+  <!-- Entry-side shallow storage/art only. -->
+  <rect x="414" y="525" width="30" height="72" fill="#8d7358" opacity="0.72" stroke="#5b4633" stroke-width="0.8" rx="3" filter="url(#shadow)"/>
+  <text x="456" y="552" class="small">ince konsol</text>
+  <text x="456" y="568" class="small">30 cm derinlik</text>
+  <rect x="365" y="528" width="34" height="48" fill="#232323" stroke="#a99277" stroke-width="0.8" rx="2"/>
+  <text x="352" y="596" class="small">sanat duvarı</text>
+
+  <!-- Clearances. -->
+  <rect x="312" y="200" width="88" height="306" fill="#4e8b7b" opacity="0.15" rx="5"/>
+  <line x1="309" y1="455" x2="421" y2="455" stroke="#7ec1b1" stroke-width="1.2" stroke-dasharray="4,4" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <text x="365" y="449" text-anchor="middle" class="small">ana geçiş açık</text>
+  <line x1="308" y1="198" x2="356" y2="198" stroke="#7ec1b1" stroke-width="1.2" stroke-dasharray="4,4" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <text x="373" y="202" class="small">masa arkası sandalye payı</text>
+  <line x1="322" y1="610" x2="446" y2="610" stroke="#7ec1b1" stroke-width="1.2" stroke-dasharray="4,4" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <text x="384" y="604" text-anchor="middle" class="small">girişte kesintisiz akış</text>
+
+  <!-- Dimensions. -->
+  <line x1="230" y1="25" x2="451" y2="25" stroke="#d6cbbb" stroke-width="0.7" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+  <text x="340" y="20" text-anchor="middle" class="small">3.16 m</text>
+  <line x1="520" y1="50" x2="520" y2="633" stroke="#d6cbbb" stroke-width="0.7" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+  <text x="536" y="345" class="small">8.33 m</text>
+  <line x1="230" y1="660" x2="320" y2="660" stroke="#d6cbbb" stroke-width="0.7" marker-end="url(#arrow)" marker-start="url(#arrow)" opacity="0.75"/>
+  <text x="275" y="676" text-anchor="middle" class="small">1.29 m</text>
+  <line x1="200" y1="508" x2="200" y2="633" stroke="#d6cbbb" stroke-width="0.7" marker-end="url(#arrow)" marker-start="url(#arrow)" opacity="0.75"/>
+  <text x="180" y="575" text-anchor="middle" class="small">1.79 m</text>
+
+  <g transform="translate(575, 88)">
+    <rect x="0" y="0" width="225" height="374" rx="10" fill="#34322e" stroke="#635b50" stroke-width="0.8"/>
+    <text x="112.5" y="26" text-anchor="middle" class="panel-title">Final reçete</text>
+    <text x="16" y="58" class="small">1. Masa: 220-230 x 70-80 cm</text>
+    <text x="16" y="82" class="small">2. Çalışma koltuğu: ergonomik, ince</text>
+    <text x="16" y="106" class="small">3. Ana koltuk: 270-285 x 92-95 cm</text>
+    <text x="16" y="130" class="small">4. Tekli koltuk: 88-92 x 88-92 cm</text>
+    <text x="16" y="154" class="small">5. Lambader: tekli koltuk yanında</text>
+    <text x="16" y="178" class="small">6. TV ünitesi: 180-220 cm hat</text>
+    <text x="16" y="202" class="small">7. Halı: 170-180 x 270-280 cm</text>
+    <text x="16" y="226" class="small">8. Puf yok, orta sehpa yok</text>
+
+    <line x1="16" y1="250" x2="209" y2="250" stroke="#635b50"/>
+    <text x="16" y="280" class="panel-title">Yerleşim kararı</text>
+    <text x="16" y="306" class="small">Masa pencere önünde; en iyi ışık burada.</text>
+    <text x="16" y="327" class="small">Koltuk-TV aksı orta bölgede kaldı.</text>
+    <text x="16" y="348" class="small">Tekli koltuk ve lambader çalışma</text>
+    <text x="16" y="366" class="small">sandalyesiyle çakışmıyor.</text>
+  </g>
+
+  <g transform="translate(575, 494)">
+    <rect x="0" y="0" width="225" height="136" rx="10" fill="#34322e" stroke="#635b50" stroke-width="0.8"/>
+    <text x="112.5" y="26" text-anchor="middle" class="panel-title">Modern lüks etki</text>
+    <text x="16" y="56" class="small">Ceviz veya füme meşe çalışma yüzeyi</text>
+    <text x="16" y="79" class="small">Taş rengi bukle ana koltuk</text>
+    <text x="16" y="102" class="small">Zeytin yeşili tekli koltuk</text>
+    <text x="16" y="125" class="small">2700K sıcak, katmanlı ışık</text>
+  </g>
+
+  <g transform="translate(575, 654)">
+    <rect x="0" y="0" width="225" height="66" rx="10" fill="#6f7f55" opacity="0.92" stroke="#9aa77c" stroke-width="0.8"/>
+    <text x="112.5" y="27" text-anchor="middle" class="panel-title">Ana fikir</text>
+    <text x="112.5" y="50" text-anchor="middle" class="label">büyük masa + ferah oturma</text>
+  </g>
+</svg>

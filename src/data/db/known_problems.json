@@ -1,0 +1,670 @@
+{
+  "_meta": {
+    "version": "2.0.0",
+    "generated_at": "2026-04-27",
+    "scraped_from": "carcomplaints.com (worst problems + per-category top complaints)",
+    "total_models": 14,
+    "total_problems": 91,
+    "scrape_method": "WebFetch over public HTML pages (no API)",
+    "notes": [
+      "Each entry: real (title / year / repair cost / mileage) from carcomplaints.com listings as of 2026-04-27.",
+      "Description composes those signals with a one-line factual narrative.",
+      "Category mapped from the carcomplaints section path (transmission/engine/brakes/...) to the 8-category KnownProblems taxonomy."
+    ],
+    "schema": {
+      "key": "slug — used for lookup from (brand, model) tuple",
+      "model": "Display name (Brand + Model)",
+      "brand": "Brand slug (omitted for VW models per source convention)",
+      "source": "Domain that the problem permalinks resolve to",
+      "problems": [
+        {
+          "title": "carcomplaints.com headline",
+          "description": "Composed summary including avg cost + miles",
+          "category": "engine|transmission|safety|electrical|interior|emissions|body|other",
+          "source_url": "Year+category permalink on carcomplaints.com"
+        }
+      ]
+    }
+  },
+  "honda_civic": {
+    "model": "Honda Civic",
+    "brand": "honda",
+    "source": "carcomplaints.com",
+    "problems": [
+      {
+        "title": "Transmission Failure",
+        "description": "2001 model. 1st-gen Civic automatic gearbox suffers complete failure; this is the highest-volume Civic complaint of all time. Average repair cost ~$2,300. Typically reported around 105,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Honda/Civic/2001/transmission/"
+      },
+      {
+        "title": "Transmission Failure",
+        "description": "2002 model. Same automatic-transmission defect carries into 2002 — full rebuild or replacement is the only fix. Average repair cost ~$2,300. Typically reported around 110,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Honda/Civic/2002/transmission/"
+      },
+      {
+        "title": "Transmission Failure",
+        "description": "2003 model. Persisting through the 7th-gen, the 4-speed automatic continues to fail well below the average vehicle service life. Average repair cost ~$2,100. Typically reported around 94,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Honda/Civic/2003/transmission/"
+      },
+      {
+        "title": "Cracked Engine Block",
+        "description": "2006 model. 8th-gen R18 1.8L engines develop a coolant-passage crack; Honda extended warranty up to 10 years / 100k miles. Average repair cost ~$2,900. Typically reported around 98,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Honda/Civic/2006/engine/"
+      },
+      {
+        "title": "Cracked Engine Block",
+        "description": "2007 model. Same R18 block-cracking issue affecting 2007 model year; coolant loss leads to overheating and head-gasket damage. Average repair cost ~$2,600. Typically reported around 83,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Honda/Civic/2007/engine/"
+      },
+      {
+        "title": "Cracked Engine Block",
+        "description": "2008 model. 8th-generation block crack continues to surface in 2008 builds despite mid-cycle revisions. Average repair cost ~$2,800. Typically reported around 88,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Honda/Civic/2008/engine/"
+      },
+      {
+        "title": "Uncomfortable Seats",
+        "description": "2014 model. 9th-gen Civic seat foam loses support quickly; many owners report lower-back pain after short trips. Average repair cost not reported. Typically reported around 13,000 mi.",
+        "category": "interior",
+        "source_url": "https://www.carcomplaints.com/Honda/Civic/2014/accessories-interior/"
+      },
+      {
+        "title": "Uncomfortable Seats",
+        "description": "2013 model. Same seat-comfort complaint for the 2013 9th-gen Civic — Honda did not offer a recall or campaign fix. Average repair cost not reported. Typically reported around 17,000 mi.",
+        "category": "interior",
+        "source_url": "https://www.carcomplaints.com/Honda/Civic/2013/accessories-interior/"
+      },
+      {
+        "title": "Extremely Uncomfortable Seats",
+        "description": "2012 model. Initial year of the 9th-gen Civic; seat geometry was widely criticised in reviews and complaints. Average repair cost ~$0. Typically reported around 16,000 mi.",
+        "category": "interior",
+        "source_url": "https://www.carcomplaints.com/Honda/Civic/2012/accessories-interior/"
+      },
+      {
+        "title": "A/C Not Working",
+        "description": "2017 model. 10th-gen Civic AC compressor fails; warm air at vents is the most common symptom. Average repair cost ~$1,700. Typically reported around 44,000 mi.",
+        "category": "electrical",
+        "source_url": "https://www.carcomplaints.com/Honda/Civic/2017/AC_heater/"
+      },
+      {
+        "title": "A/C Not Working Properly",
+        "description": "2016 model. Compressor + condenser failures cluster around 30–50k mi on the 10th-gen Civic. Average repair cost ~$1,200. Typically reported around 43,000 mi.",
+        "category": "electrical",
+        "source_url": "https://www.carcomplaints.com/Honda/Civic/2016/AC_heater/"
+      },
+      {
+        "title": "A/C Not Working",
+        "description": "2018 model. Same AC compressor failure pattern carrying into 2018 builds; some claims paid under powertrain coverage. Average repair cost ~$2,500. Typically reported around 18,000 mi.",
+        "category": "electrical",
+        "source_url": "https://www.carcomplaints.com/Honda/Civic/2018/AC_heater/"
+      },
+      {
+        "title": "Clear Coat Peeling",
+        "description": "2009 model. Single-stage paint codes peel large flakes from the roof and hood; respray cost runs into thousands. Average repair cost ~$3,100. Typically reported around 63,000 mi.",
+        "category": "body",
+        "source_url": "https://www.carcomplaints.com/Honda/Civic/2009/body_paint/"
+      },
+      {
+        "title": "Clearcoat And Paint Problems",
+        "description": "2006 model. Older 8th-gen Civics show clearcoat oxidation and peeling, especially on horizontal panels. Average repair cost ~$1,400. Typically reported around 82,000 mi.",
+        "category": "body",
+        "source_url": "https://www.carcomplaints.com/Honda/Civic/2006/body_paint/"
+      },
+      {
+        "title": "Paint Chipping",
+        "description": "2012 model. 9th-gen Civic owners report easy stone-strike chipping on bumpers and hood leading edges. Average repair cost ~$5,200. Typically reported around 51,000 mi.",
+        "category": "body",
+        "source_url": "https://www.carcomplaints.com/Honda/Civic/2012/body_paint/"
+      },
+      {
+        "title": "Soy Based Wires Chewed By Rodents",
+        "description": "2018 model. Honda's switch to soy-based wire insulation has attracted rodents; chewed harnesses are widespread. Average repair cost ~$1,600. Typically reported around 9,000 mi.",
+        "category": "electrical",
+        "source_url": "https://www.carcomplaints.com/Honda/Civic/2018/electrical/"
+      },
+      {
+        "title": "Rats Ate Wires/Coils",
+        "description": "2016 model. Same soy-insulation rodent-attractant issue, this time on coil packs and engine harness. Average repair cost ~$800. Typically reported around 13,000 mi.",
+        "category": "electrical",
+        "source_url": "https://www.carcomplaints.com/Honda/Civic/2016/electrical/"
+      },
+      {
+        "title": "Brake Failure",
+        "description": "2012 model. Master-cylinder / brake-system failures reported with very high repair costs when accident damage occurs. Average repair cost ~$18,000. Typically reported around 33,000 mi.",
+        "category": "safety",
+        "source_url": "https://www.carcomplaints.com/Honda/Civic/2012/brakes/"
+      }
+    ]
+  },
+  "honda_hr_v": {
+    "model": "Honda HR-V",
+    "brand": "honda",
+    "source": "carcomplaints.com",
+    "problems": [
+      {
+        "title": "Uncomfortable Seats",
+        "description": "2016 model. 1st-gen HR-V driver-seat foam and lumbar geometry attract widespread complaints, often on the test drive. Average repair cost not reported. Typically reported around 5,000 mi.",
+        "category": "interior",
+        "source_url": "https://www.carcomplaints.com/Honda/HR-V/2016/accessories-interior/"
+      },
+      {
+        "title": "Paint Defective",
+        "description": "2016 model. Crystal Black and Mulberry codes on the 2016 HR-V show clearcoat micro-chipping along the hood and roof. Average repair cost not reported. Typically reported around 31,000 mi.",
+        "category": "body",
+        "source_url": "https://www.carcomplaints.com/Honda/HR-V/2016/body_paint/"
+      },
+      {
+        "title": "Lost Complete Power, Transmission Failed",
+        "description": "2016 model. CVT failure leaves the vehicle unable to maintain speed; replacement is the only repair path. Average repair cost ~$7,400. Typically reported around 100,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Honda/HR-V/2016/transmission/"
+      },
+      {
+        "title": "Extremely Uncomfortable Seats",
+        "description": "2018 model. Seat-comfort complaints persist into the refresh year; aftermarket cushions are the typical owner remedy. Average repair cost not reported. Typically reported around 1,000 mi.",
+        "category": "interior",
+        "source_url": "https://www.carcomplaints.com/Honda/HR-V/2018/accessories-interior/"
+      },
+      {
+        "title": "Weak A/C Blower",
+        "description": "2018 model. Owners report the AC blower never reaches a satisfactory cabin temperature even on the highest fan setting. Average repair cost not reported.",
+        "category": "electrical",
+        "source_url": "https://www.carcomplaints.com/Honda/HR-V/2018/AC_heater/"
+      },
+      {
+        "title": "Engine Slowing Down While Driving",
+        "description": "2019 model. L15B7 1.8L equipped HR-V loses power at speed; symptoms point to fuel-delivery or sensor faults. Average repair cost not reported.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Honda/HR-V/2019/engine/"
+      }
+    ]
+  },
+  "golf": {
+    "model": "Volkswagen Golf",
+    "source": "carcomplaints.com",
+    "problems": [
+      {
+        "title": "Timing Chain Cover Defective And Leaking Oil",
+        "description": "2015 model. MK7 1.8/2.0 TSI engines develop oil leaks at the timing-chain cover seam, often within early ownership. Average repair cost ~$5,000. Typically reported around 16,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Golf/2015/engine/"
+      },
+      {
+        "title": "High Pressure Fuel Pump Failure",
+        "description": "2010 model. MK6 TSI HPFP failures are well-documented; replacement plus injector cleaning is the typical fix. Average repair cost ~$9,500. Typically reported around 40,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Golf/2010/engine/"
+      },
+      {
+        "title": "Panoramic Sunroof Leaks",
+        "description": "2016 model. Clogged sunroof drains route water into headliner and front carpets; comfort modules under the seat can be damaged. Average repair cost ~$5,000. Typically reported around 17,000 mi.",
+        "category": "interior",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Golf/2016/accessories-interior/"
+      },
+      {
+        "title": "Engine Seized",
+        "description": "2011 model. Carbon build-up and oil-consumption problems on TSI Mk6 Golfs eventually lead to seized motors at low miles. Average repair cost ~$5,000. Typically reported around 45,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Golf/2011/engine/"
+      },
+      {
+        "title": "Engine Failure",
+        "description": "2003 model. Mk4 1.8T / 2.0L engine failures linked to oil sludge and inadequate maintenance interval guidance. Average repair cost ~$7,000. Typically reported around 46,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Golf/2003/engine/"
+      },
+      {
+        "title": "Shifting Problems",
+        "description": "2010 model. DSG mechatronic unit develops harsh / refusal-to-shift behaviour, often resolved with a software flash or unit swap. Average repair cost ~$2,000. Typically reported around 37,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Golf/2010/transmission/"
+      },
+      {
+        "title": "Transmission Failure",
+        "description": "2002 model. Mk4 4-speed automatic Golf transmissions fail well below typical service life — full replacement required. Average repair cost ~$3,000. Typically reported around 67,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Golf/2002/transmission/"
+      },
+      {
+        "title": "Infotainment Screen Stopped Working",
+        "description": "2017 model. MIB2 head unit on 7th-gen Golf goes blank or refuses to boot; warranty replacements are common. Average repair cost not reported.",
+        "category": "interior",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Golf/2017/accessories-interior/"
+      },
+      {
+        "title": "Sat Nav Defaults To German",
+        "description": "2014 model. MIB infotainment occasionally reverts language to German after firmware glitches; dealer reset required. Average repair cost not reported. Typically reported around 11,000 mi.",
+        "category": "interior",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Golf/2014/accessories-interior/"
+      }
+    ]
+  },
+  "passat": {
+    "model": "Volkswagen Passat",
+    "source": "carcomplaints.com",
+    "problems": [
+      {
+        "title": "Oil Sludge Resulting In Engine Failure",
+        "description": "2002 model. 1.8T 5th-gen Passat engines build oil sludge with conventional oil + extended intervals, killing the engine. Average repair cost ~$2,800. Typically reported around 92,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Passat/2002/engine/"
+      },
+      {
+        "title": "Engine Failure From Oil Sludge",
+        "description": "2003 model. Same 1.8T sludge issue carrying into 2003 — VW reluctantly settled an oil-sludge class action covering some VINs. Average repair cost ~$2,800. Typically reported around 79,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Passat/2003/engine/"
+      },
+      {
+        "title": "Engine Oil Sludge",
+        "description": "2005 model. Final-year 5th-gen Passats still show sludge accumulation, especially on 1.8T engines run on conventional oil. Average repair cost ~$4,100. Typically reported around 84,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Passat/2005/engine/"
+      },
+      {
+        "title": "Car Wouldn't Start",
+        "description": "2006 model. B6 Passats commonly suffer no-start conditions traced to ignition-coil packs or starter solenoids. Average repair cost ~$1,000. Typically reported around 76,000 mi.",
+        "category": "electrical",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Passat/2006/electrical/"
+      },
+      {
+        "title": "Steering Wheel Functions Do Not Work",
+        "description": "2014 model. B7 steering-wheel button assembly loses contact via a damaged clockspring after airbag actuation or wear. Average repair cost ~$600. Typically reported around 94,000 mi.",
+        "category": "electrical",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Passat/2014/electrical/"
+      },
+      {
+        "title": "Sensors Go Out",
+        "description": "2002 model. Multiple sensor failures (MAF, MAP, O2) on the 1.8T B5 Passat are a recurring complaint; diagnosis is costly. Average repair cost ~$9,000.",
+        "category": "electrical",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Passat/2002/electrical/"
+      },
+      {
+        "title": "Unintended Braking",
+        "description": "2016 model. Front-Assist collision avoidance applies the brakes for phantom obstacles — class action filed in the US market. Average repair cost not reported. Typically reported around 43,000 mi.",
+        "category": "safety",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Passat/2016/brakes/"
+      },
+      {
+        "title": "Rear Brakes Failed",
+        "description": "2022 model. Premature rear pad/rotor wear surfaces on late-gen Passats; replacement is needed surprisingly early. Average repair cost ~$500. Typically reported around 14,000 mi.",
+        "category": "safety",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Passat/2022/brakes/"
+      },
+      {
+        "title": "Parking Brake Auto Sticks On Intermittently",
+        "description": "2008 model. Electronic parking brake on the B6 Passat occasionally refuses to release, requiring a module reset. Average repair cost ~$700. Typically reported around 51,000 mi.",
+        "category": "safety",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Passat/2008/brakes/"
+      }
+    ]
+  },
+  "tiguan": {
+    "model": "Volkswagen Tiguan",
+    "source": "carcomplaints.com",
+    "problems": [
+      {
+        "title": "Burning Oil",
+        "description": "2018 model. MQB 2.0 TSI Tiguans consume oil faster than spec; many enrolled in the VW Tiguan engine class action. Average repair cost ~$2,000. Typically reported around 20,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Tiguan/2018/engine/"
+      },
+      {
+        "title": "Engine Shut Down While Driving",
+        "description": "2016 model. 1st-gen Tiguan stalls mid-drive due to fuel-pressure or ignition faults; safety-relevant complaint. Average repair cost ~$6,000. Typically reported around 16,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Tiguan/2016/engine/"
+      },
+      {
+        "title": "Timing Chain Tensioner Defect / Engine Damage",
+        "description": "2011 model. EA888 chain-tensioner failure; chain skip can bend valves and require a full top-end rebuild. Average repair cost ~$4,000. Typically reported around 90,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Tiguan/2011/engine/"
+      },
+      {
+        "title": "Hesitation And/Or Stalling On Acceleration",
+        "description": "2018 model. DSG launch behaviour on the 2nd-gen Tiguan triggers hesitation / stalls — software updates only partially help. Average repair cost not reported. Typically reported around 5,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Tiguan/2018/transmission/"
+      },
+      {
+        "title": "Car Races Or Lags When Entering Traffic, No Warning",
+        "description": "2024 model. Latest model year still shows DSG lag-then-surge issue; dealer flash is the standard remedy. Average repair cost not reported. Typically reported around 4,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Tiguan/2024/transmission/"
+      },
+      {
+        "title": "Hard Upshifts And Downshifts",
+        "description": "2019 model. Harsh DSG shift quality after fluid + clutch wear; mechatronic units sometimes need replacement. Average repair cost not reported. Typically reported around 23,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Volkswagen/Tiguan/2019/transmission/"
+      }
+    ]
+  },
+  "ford_focus": {
+    "model": "Ford Focus",
+    "brand": "ford",
+    "source": "carcomplaints.com",
+    "problems": [
+      {
+        "title": "Bad Hesitation/Jerking When Starting From A Stop Position",
+        "description": "2014 model. DPS6 PowerShift dual-clutch on the 3rd-gen Focus — the defining defect of this model. Class-action settled. Average repair cost ~$1,200. Typically reported around 25,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Ford/Focus/2014/transmission/"
+      },
+      {
+        "title": "Shuddering",
+        "description": "2015 model. Same PowerShift DCT shuddering carries into 2015 Focus; multiple TSBs and clutch replacements needed. Average repair cost ~$1,400. Typically reported around 22,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Ford/Focus/2015/transmission/"
+      },
+      {
+        "title": "Power Steering Failure",
+        "description": "2012 model. EPAS rack on early 3rd-gen Focus disengages assist intermittently; NHTSA recall 15V-340 covers some VINs. Average repair cost ~$1,800. Typically reported around 82,000 mi.",
+        "category": "safety",
+        "source_url": "https://www.carcomplaints.com/Ford/Focus/2012/steering/"
+      },
+      {
+        "title": "Jerks, Hesitates When You Take Off",
+        "description": "2013 model. PowerShift defect again, demonstrating the multi-year span of the issue across the 3rd-gen Focus run. Average repair cost ~$1,400. Typically reported around 36,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Ford/Focus/2013/transmission/"
+      },
+      {
+        "title": "Engine Failure",
+        "description": "2002 model. 1st-gen Focus 2.0 SOHC suffers intake-valve seat failure — valve falls into the cylinder, destroying the engine. Average repair cost ~$2,500. Typically reported around 109,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Ford/Focus/2002/engine/"
+      },
+      {
+        "title": "Engine Failure",
+        "description": "2001 model. Same intake-valve seat failure plagues the 2001 SOHC Zetec engine. Average repair cost ~$1,900. Typically reported around 114,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Ford/Focus/2001/engine/"
+      },
+      {
+        "title": "Blown Engine",
+        "description": "2000 model. First-year Focus engines fail catastrophically, often with little warning. Average repair cost ~$2,200. Typically reported around 113,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Ford/Focus/2000/engine/"
+      },
+      {
+        "title": "Key Won't Turn In The Ignition",
+        "description": "2003 model. 1st-gen Focus ignition-cylinder lock wafers wear, requiring jiggling or eventually full lock replacement. Average repair cost ~$300. Typically reported around 83,000 mi.",
+        "category": "interior",
+        "source_url": "https://www.carcomplaints.com/Ford/Focus/2003/accessories-interior/"
+      }
+    ]
+  },
+  "toyota_corolla": {
+    "model": "Toyota Corolla",
+    "brand": "toyota",
+    "source": "carcomplaints.com",
+    "problems": [
+      {
+        "title": "Engine Uses Excessive Oil",
+        "description": "2002 model. 1ZZ-FE 1.8L Corolla engines burn over 1qt per 1k miles; piston-ring wear is the root cause. Average repair cost ~$2,500. Typically reported around 99,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Toyota/Corolla/2002/engine/"
+      },
+      {
+        "title": "Transmission Failure",
+        "description": "2003 model. 9th-gen 4-speed automatic suffers premature failure under aggressive shifting or fluid neglect. Average repair cost ~$2,700. Typically reported around 115,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Toyota/Corolla/2003/transmission/"
+      },
+      {
+        "title": "Excessive Oil Consumption",
+        "description": "2009 model. 10th-gen 2ZR-FE shows the well-known piston-ring oil consumption defect; Toyota TSB EG-035-11 covers it. Average repair cost ~$4,500. Typically reported around 100,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Toyota/Corolla/2009/engine/"
+      },
+      {
+        "title": "Engine Uses Excessive Oil",
+        "description": "2000 model. Same 1ZZ-FE oil burn on the early 9th-gen — high repair costs because piston-ring service requires engine pull. Average repair cost ~$6,800. Typically reported around 104,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Toyota/Corolla/2000/engine/"
+      },
+      {
+        "title": "Transmission And Differential Failure",
+        "description": "2003 model. Combined automatic-transmission and differential failure on the 2003 Corolla leaves the car immobile. Average repair cost ~$3,200. Typically reported around 96,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Toyota/Corolla/2003/transmission/"
+      },
+      {
+        "title": "Transmission Failure",
+        "description": "2004 model. Same 4-speed-automatic failure carrying into 2004 — pattern persists across the 9th-gen run. Average repair cost ~$2,700. Typically reported around 119,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Toyota/Corolla/2004/transmission/"
+      }
+    ]
+  },
+  "toyota_corolla_hatchback": {
+    "model": "Toyota Corolla Hatchback",
+    "brand": "toyota",
+    "source": "carcomplaints.com",
+    "problems": [
+      {
+        "title": "Transmission Failure",
+        "description": "2020 model. Direct-Shift 10-speed sequential CVT on the Hatchback fails early on some VINs — replacement under powertrain warranty. Average repair cost ~$5,500. Typically reported around 20,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Toyota/Corolla_Hatchback/2020/transmission/"
+      },
+      {
+        "title": "Blower Noise",
+        "description": "2019 model. First-year Hatchback owners report a persistent fan-blower noise that dealers struggle to repair. Average repair cost not reported.",
+        "category": "electrical",
+        "source_url": "https://www.carcomplaints.com/Toyota/Corolla_Hatchback/2019/AC_heater/"
+      },
+      {
+        "title": "Internal Bearing Failure In The Transmission",
+        "description": "2019 model. CVT bearing failure produces a grinding noise; full transmission replacement is the only fix. Average repair cost ~$5,500. Typically reported around 130,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Toyota/Corolla_Hatchback/2019/transmission/"
+      }
+    ]
+  },
+  "toyota_c_hr": {
+    "model": "Toyota C-HR",
+    "brand": "toyota",
+    "source": "carcomplaints.com",
+    "problems": [
+      {
+        "title": "Transmission Failure",
+        "description": "2018 model. First-year North-American C-HR CVTs fail at high mileage; Toyota covered some replacements under powertrain warranty. Average repair cost ~$14,500. Typically reported around 121,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Toyota/C-HR/2018/transmission/"
+      },
+      {
+        "title": "Fuel Range Not Accurate",
+        "description": "2021 model. Trip-computer fuel-range estimate is wildly off in the 2021 C-HR — likely a fuel-level sender or software bug. Average repair cost not reported.",
+        "category": "electrical",
+        "source_url": "https://www.carcomplaints.com/Toyota/C-HR/2021/electrical/"
+      },
+      {
+        "title": "While Parking Car Suddenly Accelerated",
+        "description": "2021 model. Sudden unintended acceleration reports during parking on 2021 C-HR — investigated under NHTSA database. Average repair cost not reported. Typically reported around 2,000 mi.",
+        "category": "safety",
+        "source_url": "https://www.carcomplaints.com/Toyota/C-HR/2021/brakes/"
+      }
+    ]
+  },
+  "toyota_yaris": {
+    "model": "Toyota Yaris",
+    "brand": "toyota",
+    "source": "carcomplaints.com",
+    "problems": [
+      {
+        "title": "Clear Coat And Paint Peeling",
+        "description": "2008 model. 1st-gen US-market Yaris clearcoat fails widely — peeling sheets of paint from roof and hood. Average repair cost ~$1,500. Typically reported around 64,000 mi.",
+        "category": "body",
+        "source_url": "https://www.carcomplaints.com/Toyota/Yaris/2008/body_paint/"
+      },
+      {
+        "title": "Clear Coat Peeling",
+        "description": "2007 model. Same clearcoat issue on the 2007 Yaris; respray is the only durable repair. Average repair cost ~$1,500. Typically reported around 84,000 mi.",
+        "category": "body",
+        "source_url": "https://www.carcomplaints.com/Toyota/Yaris/2007/body_paint/"
+      },
+      {
+        "title": "Lost Control At Highway Speed",
+        "description": "2008 model. Stability / steering complaints at speed — suspected steering-rack or alignment defect. Average repair cost ~$8,000. Typically reported around 64,000 mi.",
+        "category": "safety",
+        "source_url": "https://www.carcomplaints.com/Toyota/Yaris/2008/brakes/"
+      },
+      {
+        "title": "Peeling Paint",
+        "description": "2007 model. Additional reports of paint peeling on the 2007 Yaris, confirming the clearcoat defect spans early production. Average repair cost not reported. Typically reported around 58,000 mi.",
+        "category": "body",
+        "source_url": "https://www.carcomplaints.com/Toyota/Yaris/2007/body_paint/"
+      }
+    ]
+  },
+  "toyota_rav4": {
+    "model": "Toyota RAV4",
+    "brand": "toyota",
+    "source": "carcomplaints.com",
+    "problems": [
+      {
+        "title": "Hesitates And Lurches At Slower Speeds",
+        "description": "2019 model. 5th-gen RAV4 8-speed automatic exhibits low-speed hesitation followed by hard engagement; software flash + valve-body replacement issued. Average repair cost ~$20,000. Typically reported around 3,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Toyota/RAV4/2019/transmission/"
+      },
+      {
+        "title": "Excessive Oil Consumption",
+        "description": "2008 model. 3rd-gen RAV4 with the 2.4L 2AZ-FE consumes oil heavily; Toyota TSB EG-031-11 covers piston-ring replacement. Average repair cost ~$35,600. Typically reported around 105,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Toyota/RAV4/2008/engine/"
+      },
+      {
+        "title": "Excessive Oil Consumption",
+        "description": "2007 model. Same 2AZ-FE oil-burn defect on the 2007 model year — extended warranty was offered for a defined window. Average repair cost ~$1,900. Typically reported around 104,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Toyota/RAV4/2007/engine/"
+      },
+      {
+        "title": "Problems Shifting",
+        "description": "2001 model. 2nd-gen RAV4 4-speed automatic fails well before typical service life on aggressively driven examples. Average repair cost ~$2,500. Typically reported around 111,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Toyota/RAV4/2001/transmission/"
+      },
+      {
+        "title": "Problems Shifting",
+        "description": "2002 model. Same 4-speed automatic defect on 2002; rebuild or replacement is required. Average repair cost ~$2,200. Typically reported around 97,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Toyota/RAV4/2002/transmission/"
+      },
+      {
+        "title": "Excessive Oil Consumption",
+        "description": "2006 model. First-year of 3rd-gen RAV4 with the 2AZ-FE shows oil consumption emerging around 100k miles. Average repair cost ~$1,800. Typically reported around 113,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Toyota/RAV4/2006/engine/"
+      }
+    ]
+  },
+  "nissan_juke": {
+    "model": "Nissan Juke",
+    "brand": "nissan",
+    "source": "carcomplaints.com",
+    "problems": [
+      {
+        "title": "Transmission Failure",
+        "description": "2013 model. Jatco JF015E CVT in the 1st-gen Juke fails between 50–80k mi; replacement is the only fix. Average repair cost ~$4,000. Typically reported around 59,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Nissan/Juke/2013/transmission/"
+      },
+      {
+        "title": "Turbo Charger Not Working",
+        "description": "2013 model. 1.6L MR16DDT turbocharger bearings wear out, causing oil consumption and blue exhaust smoke. Average repair cost ~$2,400. Typically reported around 77,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Nissan/Juke/2013/engine/"
+      },
+      {
+        "title": "Transmission Failure",
+        "description": "2014 model. JF015E CVT failures continue into 2014 model year — auxiliary cooler retrofit only modestly helps. Average repair cost ~$3,500. Typically reported around 83,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Nissan/Juke/2014/transmission/"
+      },
+      {
+        "title": "Turbo Failure",
+        "description": "2011 model. Earliest US-market Juke turbos exhibit similar bearing failure, often correlated with extended oil intervals. Average repair cost ~$2,800. Typically reported around 89,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Nissan/Juke/2011/engine/"
+      },
+      {
+        "title": "Timing Chain Broke",
+        "description": "2012 model. MR16DDT timing chain stretch / breakage on early Jukes is catastrophic — entire top-end rebuild required. Average repair cost ~$8,600. Typically reported around 79,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Nissan/Juke/2012/engine/"
+      }
+    ]
+  },
+  "jeep_compass": {
+    "model": "Jeep Compass",
+    "brand": "jeep",
+    "source": "carcomplaints.com",
+    "problems": [
+      {
+        "title": "Control Arm /Bushing Failure",
+        "description": "2007 model. 1st-year MK Compass front lower control-arm bushings fail early, producing knocking and uneven tire wear. Average repair cost ~$600. Typically reported around 58,000 mi.",
+        "category": "safety",
+        "source_url": "https://www.carcomplaints.com/Jeep/Compass/2007/suspension/"
+      },
+      {
+        "title": "TIPM Failure",
+        "description": "2007 model. Totally Integrated Power Module on early Compass causes window/door-lock chaos and parasitic battery drain. Average repair cost ~$1,600. Typically reported around 110,000 mi.",
+        "category": "electrical",
+        "source_url": "https://www.carcomplaints.com/Jeep/Compass/2007/electrical/"
+      },
+      {
+        "title": "Cvt Transmission Overheated",
+        "description": "2011 model. Jatco JF011E CVT overheating leaves the Compass in limp-mode and requires costly replacement. Average repair cost ~$1,700. Typically reported around 70,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Jeep/Compass/2011/transmission/"
+      },
+      {
+        "title": "Transmission Failure",
+        "description": "2007 model. 1st-year CVT failures on the MK Compass — frequent without warning. Average repair cost ~$2,400. Typically reported around 89,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Jeep/Compass/2007/transmission/"
+      },
+      {
+        "title": "Stopped Working",
+        "description": "2010 model. CVT failure with high repair cost — owners typically scrap or trade rather than rebuild. Average repair cost ~$4,300. Typically reported around 127,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Jeep/Compass/2010/transmission/"
+      }
+    ]
+  },
+  "jeep_renegade": {
+    "model": "Jeep Renegade",
+    "brand": "jeep",
+    "source": "carcomplaints.com",
+    "problems": [
+      {
+        "title": "Check Engine Light On",
+        "description": "2015 model. First-year Renegade with the 2.4L Tigershark commonly throws CELs early; multiple TSB campaigns issued. Average repair cost ~$1,600. Typically reported around 21,000 mi.",
+        "category": "engine",
+        "source_url": "https://www.carcomplaints.com/Jeep/Renegade/2015/engine/"
+      },
+      {
+        "title": "Squealing Brakes",
+        "description": "2015 model. Front pads squeal at low speeds — pad-compound update issued via TSB. Average repair cost not reported. Typically reported around 4,000 mi.",
+        "category": "safety",
+        "source_url": "https://www.carcomplaints.com/Jeep/Renegade/2015/brakes/"
+      },
+      {
+        "title": "9-Speed Automatic Transmission Problem",
+        "description": "2015 model. ZF 9HP48 9-speed exhibits hard / inconsistent shifts; multiple flash updates rolled out post-launch. Average repair cost not reported. Typically reported around 14,000 mi.",
+        "category": "transmission",
+        "source_url": "https://www.carcomplaints.com/Jeep/Renegade/2015/transmission/"
+      }
+    ]
+  }
+}

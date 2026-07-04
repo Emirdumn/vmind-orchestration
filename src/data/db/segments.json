@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "name": "C-SUV",
+    "category_type": "technical",
+    "description": "Compact SUV"
+  },
+  {
+    "id": 2,
+    "name": "Premium Sedan",
+    "category_type": "technical",
+    "description": "Premium sedan class"
+  }
+]

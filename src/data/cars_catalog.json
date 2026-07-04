@@ -1,0 +1,1741 @@
+[
+  {
+    "brand": "Audi",
+    "models": [
+      {
+        "model": "A3",
+        "segment": "C-Sedan",
+        "body_type": "Sedan",
+        "variants": [
+          {
+            "trim": "35 TFSI S Line",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 150,
+            "cc": 1498,
+            "consumption_l100": 5.7,
+            "luggage_l": 425
+          }
+        ]
+      },
+      {
+        "model": "Q3",
+        "segment": "B-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "35 TFSI Advanced",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 150,
+            "cc": 1498,
+            "consumption_l100": 6.6,
+            "luggage_l": 530
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BMW",
+    "models": [
+      {
+        "model": "3 Serisi",
+        "segment": "D-Sedan",
+        "body_type": "Sedan",
+        "variants": [
+          {
+            "trim": "320i Sport Line",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 184,
+            "cc": 1998,
+            "consumption_l100": 6.5,
+            "luggage_l": 480
+          },
+          {
+            "trim": "320d M Sport",
+            "year": 2024,
+            "fuel": "Dizel",
+            "transmission": "Otomatik",
+            "hp": 190,
+            "cc": 1995,
+            "consumption_l100": 4.7,
+            "luggage_l": 480
+          },
+          {
+            "trim": "330i M Sport",
+            "year": 2025,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 245,
+            "cc": 1998,
+            "consumption_l100": 6.8,
+            "luggage_l": 480
+          }
+        ]
+      },
+      {
+        "model": "X1",
+        "segment": "B-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "sDrive18i xLine",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 136,
+            "cc": 1499,
+            "consumption_l100": 6.6,
+            "luggage_l": 540
+          }
+        ]
+      },
+      {
+        "model": "X3",
+        "segment": "C-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "xDrive20i M Sport",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 184,
+            "cc": 1998,
+            "consumption_l100": 7.4,
+            "luggage_l": 550
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "BYD",
+    "models": [
+      {
+        "model": "Atto 3",
+        "segment": "B-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "Comfort 60.5 kWh",
+            "year": 2024,
+            "fuel": "Elektrik",
+            "transmission": "Otomatik",
+            "hp": 204,
+            "cc": 0,
+            "consumption_l100": 0.0,
+            "luggage_l": 440
+          }
+        ]
+      },
+      {
+        "model": "Seal",
+        "segment": "C-Sedan",
+        "body_type": "Sedan",
+        "variants": [
+          {
+            "trim": "Design 82.5 kWh",
+            "year": 2024,
+            "fuel": "Elektrik",
+            "transmission": "Otomatik",
+            "hp": 313,
+            "cc": 0,
+            "consumption_l100": 0.0,
+            "luggage_l": 400
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Chery",
+    "models": [
+      {
+        "model": "Tiggo 4 Pro",
+        "segment": "B-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.5 Turbo Luxury",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 147,
+            "cc": 1498,
+            "consumption_l100": 6.8,
+            "luggage_l": 340
+          }
+        ]
+      },
+      {
+        "model": "Tiggo 7 Pro",
+        "segment": "C-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.5 Turbo Luxury",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 147,
+            "cc": 1498,
+            "consumption_l100": 7.3,
+            "luggage_l": 475
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Citroen",
+    "models": [
+      {
+        "model": "C3",
+        "segment": "B-HB",
+        "body_type": "Hatchback",
+        "variants": [
+          {
+            "trim": "1.2 PureTech Feel",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Manuel",
+            "hp": 83,
+            "cc": 1199,
+            "consumption_l100": 5.1,
+            "luggage_l": 300
+          }
+        ]
+      },
+      {
+        "model": "C3 Aircross",
+        "segment": "B-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.2 PureTech Feel",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 110,
+            "cc": 1199,
+            "consumption_l100": 5.8,
+            "luggage_l": 410
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Cupra",
+    "models": [
+      {
+        "model": "Formentor",
+        "segment": "C-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.5 TSI VZ",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 150,
+            "cc": 1498,
+            "consumption_l100": 6.4,
+            "luggage_l": 450
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Dacia",
+    "models": [
+      {
+        "model": "Duster",
+        "segment": "B-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.0 TCe Comfort",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Manuel",
+            "hp": 90,
+            "cc": 999,
+            "consumption_l100": 6.5,
+            "luggage_l": 445
+          },
+          {
+            "trim": "1.5 dCi Comfort",
+            "year": 2024,
+            "fuel": "Dizel",
+            "transmission": "Manuel",
+            "hp": 115,
+            "cc": 1461,
+            "consumption_l100": 5.3,
+            "luggage_l": 445
+          },
+          {
+            "trim": "1.3 TCe Extreme",
+            "year": 2025,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 130,
+            "cc": 1332,
+            "consumption_l100": 6.8,
+            "luggage_l": 445
+          }
+        ]
+      },
+      {
+        "model": "Sandero",
+        "segment": "B-HB",
+        "body_type": "Hatchback",
+        "variants": [
+          {
+            "trim": "1.0 TCe Comfort",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Manuel",
+            "hp": 90,
+            "cc": 999,
+            "consumption_l100": 5.0,
+            "luggage_l": 328
+          },
+          {
+            "trim": "1.0 TCe Stepway",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 90,
+            "cc": 999,
+            "consumption_l100": 5.4,
+            "luggage_l": 328
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Fiat",
+    "models": [
+      {
+        "model": "Egea",
+        "segment": "C-Sedan",
+        "body_type": "Sedan",
+        "variants": [
+          {
+            "trim": "1.4 Fire",
+            "year": 2023,
+            "fuel": "Benzin",
+            "transmission": "Manuel",
+            "hp": 95,
+            "cc": 1368,
+            "consumption_l100": 6.4,
+            "luggage_l": 510
+          },
+          {
+            "trim": "1.0 Firefly",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 100,
+            "cc": 999,
+            "consumption_l100": 5.8,
+            "luggage_l": 510
+          },
+          {
+            "trim": "1.6 MultiJet",
+            "year": 2023,
+            "fuel": "Dizel",
+            "transmission": "Otomatik",
+            "hp": 130,
+            "cc": 1598,
+            "consumption_l100": 4.5,
+            "luggage_l": 510
+          },
+          {
+            "trim": "1.0 Firefly",
+            "year": 2025,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 100,
+            "cc": 999,
+            "consumption_l100": 5.8,
+            "luggage_l": 510
+          }
+        ]
+      },
+      {
+        "model": "Egea Cross",
+        "segment": "C-SUV",
+        "body_type": "Crossover",
+        "variants": [
+          {
+            "trim": "1.0 Firefly Cross",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 100,
+            "cc": 999,
+            "consumption_l100": 6.2,
+            "luggage_l": 440
+          },
+          {
+            "trim": "1.6 MultiJet Cross",
+            "year": 2024,
+            "fuel": "Dizel",
+            "transmission": "Otomatik",
+            "hp": 130,
+            "cc": 1598,
+            "consumption_l100": 5.0,
+            "luggage_l": 440
+          }
+        ]
+      },
+      {
+        "model": "Egea HB",
+        "segment": "C-HB",
+        "body_type": "Hatchback",
+        "variants": [
+          {
+            "trim": "1.0 Firefly",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 100,
+            "cc": 999,
+            "consumption_l100": 5.6,
+            "luggage_l": 450
+          },
+          {
+            "trim": "1.4 Fire",
+            "year": 2023,
+            "fuel": "Benzin",
+            "transmission": "Manuel",
+            "hp": 95,
+            "cc": 1368,
+            "consumption_l100": 6.2,
+            "luggage_l": 450
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Ford",
+    "models": [
+      {
+        "model": "Focus",
+        "segment": "C-HB",
+        "body_type": "Hatchback",
+        "variants": [
+          {
+            "trim": "1.0 EcoBoost Trend X",
+            "year": 2023,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 125,
+            "cc": 999,
+            "consumption_l100": 5.6,
+            "luggage_l": 375
+          }
+        ]
+      },
+      {
+        "model": "Kuga",
+        "segment": "C-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.5 EcoBoost Titanium",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 150,
+            "cc": 1498,
+            "consumption_l100": 7.0,
+            "luggage_l": 475
+          },
+          {
+            "trim": "2.5 PHEV ST-Line",
+            "year": 2024,
+            "fuel": "Hybrid",
+            "transmission": "Otomatik",
+            "hp": 225,
+            "cc": 2488,
+            "consumption_l100": 1.2,
+            "luggage_l": 405
+          }
+        ]
+      },
+      {
+        "model": "Puma",
+        "segment": "B-SUV",
+        "body_type": "Crossover",
+        "variants": [
+          {
+            "trim": "1.0 EcoBoost ST-Line",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 125,
+            "cc": 999,
+            "consumption_l100": 5.8,
+            "luggage_l": 456
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Honda",
+    "models": [
+      {
+        "model": "Civic",
+        "segment": "C-Sedan",
+        "body_type": "Sedan",
+        "variants": [
+          {
+            "trim": "1.5 VTEC Turbo Elegance",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 182,
+            "cc": 1498,
+            "consumption_l100": 6.0,
+            "luggage_l": 410
+          },
+          {
+            "trim": "2.0 e:HEV Advance",
+            "year": 2024,
+            "fuel": "Hybrid",
+            "transmission": "Otomatik",
+            "hp": 184,
+            "cc": 1993,
+            "consumption_l100": 4.7,
+            "luggage_l": 410
+          }
+        ]
+      },
+      {
+        "model": "HR-V",
+        "segment": "B-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.5 e:HEV Advance",
+            "year": 2024,
+            "fuel": "Hybrid",
+            "transmission": "Otomatik",
+            "hp": 131,
+            "cc": 1498,
+            "consumption_l100": 5.4,
+            "luggage_l": 319
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Hyundai",
+    "models": [
+      {
+        "model": "Bayon",
+        "segment": "B-SUV",
+        "body_type": "Crossover",
+        "variants": [
+          {
+            "trim": "1.0 T-GDI Style Plus",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 100,
+            "cc": 998,
+            "consumption_l100": 5.6,
+            "luggage_l": 411
+          }
+        ]
+      },
+      {
+        "model": "Kona",
+        "segment": "B-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.0 T-GDI Style",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 120,
+            "cc": 998,
+            "consumption_l100": 5.8,
+            "luggage_l": 466
+          },
+          {
+            "trim": "EV 65.4 kWh",
+            "year": 2024,
+            "fuel": "Elektrik",
+            "transmission": "Otomatik",
+            "hp": 218,
+            "cc": 0,
+            "consumption_l100": 0.0,
+            "luggage_l": 466
+          }
+        ]
+      },
+      {
+        "model": "Tucson",
+        "segment": "C-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.6 T-GDI Elite",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 150,
+            "cc": 1598,
+            "consumption_l100": 7.0,
+            "luggage_l": 620
+          },
+          {
+            "trim": "1.6 CRDi Elite",
+            "year": 2024,
+            "fuel": "Dizel",
+            "transmission": "Otomatik",
+            "hp": 136,
+            "cc": 1598,
+            "consumption_l100": 5.3,
+            "luggage_l": 620
+          },
+          {
+            "trim": "1.6 T-GDI HEV",
+            "year": 2025,
+            "fuel": "Hybrid",
+            "transmission": "Otomatik",
+            "hp": 230,
+            "cc": 1598,
+            "consumption_l100": 5.2,
+            "luggage_l": 616
+          }
+        ]
+      },
+      {
+        "model": "i10",
+        "segment": "B-HB",
+        "body_type": "Hatchback",
+        "variants": [
+          {
+            "trim": "1.0 MPI Jump",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Manuel",
+            "hp": 67,
+            "cc": 998,
+            "consumption_l100": 4.8,
+            "luggage_l": 252
+          }
+        ]
+      },
+      {
+        "model": "i20",
+        "segment": "B-HB",
+        "body_type": "Hatchback",
+        "variants": [
+          {
+            "trim": "1.4 MPI Style",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 100,
+            "cc": 1368,
+            "consumption_l100": 5.7,
+            "luggage_l": 326
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Jeep",
+    "models": [
+      {
+        "model": "Compass",
+        "segment": "C-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.3 Turbo Limited",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 150,
+            "cc": 1332,
+            "consumption_l100": 6.9,
+            "luggage_l": 438
+          }
+        ]
+      },
+      {
+        "model": "Renegade",
+        "segment": "B-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.3 Turbo Limited",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 150,
+            "cc": 1332,
+            "consumption_l100": 6.5,
+            "luggage_l": 351
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Kia",
+    "models": [
+      {
+        "model": "Ceed",
+        "segment": "C-HB",
+        "body_type": "Hatchback",
+        "variants": [
+          {
+            "trim": "1.5 T-GDI Cool",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 160,
+            "cc": 1482,
+            "consumption_l100": 6.0,
+            "luggage_l": 395
+          }
+        ]
+      },
+      {
+        "model": "Sportage",
+        "segment": "C-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.6 T-GDI Prestige",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 150,
+            "cc": 1598,
+            "consumption_l100": 7.1,
+            "luggage_l": 587
+          },
+          {
+            "trim": "1.6 T-GDI HEV",
+            "year": 2024,
+            "fuel": "Hybrid",
+            "transmission": "Otomatik",
+            "hp": 230,
+            "cc": 1598,
+            "consumption_l100": 5.3,
+            "luggage_l": 587
+          }
+        ]
+      },
+      {
+        "model": "Stonic",
+        "segment": "B-SUV",
+        "body_type": "Crossover",
+        "variants": [
+          {
+            "trim": "1.0 T-GDI Cool",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 120,
+            "cc": 998,
+            "consumption_l100": 5.7,
+            "luggage_l": 352
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "MG",
+    "models": [
+      {
+        "model": "HS",
+        "segment": "C-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.5 Turbo Luxury",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 162,
+            "cc": 1490,
+            "consumption_l100": 7.0,
+            "luggage_l": 463
+          }
+        ]
+      },
+      {
+        "model": "ZS",
+        "segment": "B-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.5 VTi Luxury",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Manuel",
+            "hp": 106,
+            "cc": 1498,
+            "consumption_l100": 6.5,
+            "luggage_l": 443
+          },
+          {
+            "trim": "EV Luxury",
+            "year": 2024,
+            "fuel": "Elektrik",
+            "transmission": "Otomatik",
+            "hp": 177,
+            "cc": 0,
+            "consumption_l100": 0.0,
+            "luggage_l": 448
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Mazda",
+    "models": [
+      {
+        "model": "CX-30",
+        "segment": "B-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "2.0 SkyActiv-G Power",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 150,
+            "cc": 1998,
+            "consumption_l100": 6.4,
+            "luggage_l": 430
+          }
+        ]
+      },
+      {
+        "model": "CX-5",
+        "segment": "C-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "2.0 SkyActiv-G Power",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 165,
+            "cc": 1998,
+            "consumption_l100": 7.1,
+            "luggage_l": 506
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Mercedes",
+    "models": [
+      {
+        "model": "A Serisi",
+        "segment": "C-HB",
+        "body_type": "Hatchback",
+        "variants": [
+          {
+            "trim": "A 180 Style",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 136,
+            "cc": 1332,
+            "consumption_l100": 6.0,
+            "luggage_l": 370
+          }
+        ]
+      },
+      {
+        "model": "C Serisi",
+        "segment": "D-Sedan",
+        "body_type": "Sedan",
+        "variants": [
+          {
+            "trim": "C 180 AMG",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 170,
+            "cc": 1496,
+            "consumption_l100": 6.6,
+            "luggage_l": 455
+          },
+          {
+            "trim": "C 200 AMG",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 204,
+            "cc": 1496,
+            "consumption_l100": 6.8,
+            "luggage_l": 455
+          },
+          {
+            "trim": "C 220d AMG",
+            "year": 2024,
+            "fuel": "Dizel",
+            "transmission": "Otomatik",
+            "hp": 200,
+            "cc": 1993,
+            "consumption_l100": 4.8,
+            "luggage_l": 455
+          }
+        ]
+      },
+      {
+        "model": "GLC",
+        "segment": "C-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "GLC 200 AMG",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 204,
+            "cc": 1999,
+            "consumption_l100": 7.6,
+            "luggage_l": 620
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Mitsubishi",
+    "models": [
+      {
+        "model": "ASX",
+        "segment": "B-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.0 Turbo Invite",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 91,
+            "cc": 999,
+            "consumption_l100": 5.6,
+            "luggage_l": 422
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Nissan",
+    "models": [
+      {
+        "model": "Juke",
+        "segment": "B-SUV",
+        "body_type": "Crossover",
+        "variants": [
+          {
+            "trim": "1.0 DIG-T N-Connecta",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 114,
+            "cc": 999,
+            "consumption_l100": 5.8,
+            "luggage_l": 354
+          }
+        ]
+      },
+      {
+        "model": "Qashqai",
+        "segment": "C-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.3 DIG-T Tekna",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 158,
+            "cc": 1332,
+            "consumption_l100": 6.3,
+            "luggage_l": 504
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Opel",
+    "models": [
+      {
+        "model": "Corsa",
+        "segment": "B-HB",
+        "body_type": "Hatchback",
+        "variants": [
+          {
+            "trim": "1.2 Edition",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Manuel",
+            "hp": 75,
+            "cc": 1199,
+            "consumption_l100": 5.5,
+            "luggage_l": 309
+          },
+          {
+            "trim": "1.2 Turbo GS Line",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 100,
+            "cc": 1199,
+            "consumption_l100": 5.8,
+            "luggage_l": 309
+          }
+        ]
+      },
+      {
+        "model": "Mokka",
+        "segment": "B-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.2 Turbo GS Line",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 130,
+            "cc": 1199,
+            "consumption_l100": 6.1,
+            "luggage_l": 350
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Peugeot",
+    "models": [
+      {
+        "model": "2008",
+        "segment": "B-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.2 PureTech Active",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 130,
+            "cc": 1199,
+            "consumption_l100": 5.8,
+            "luggage_l": 434
+          }
+        ]
+      },
+      {
+        "model": "208",
+        "segment": "B-HB",
+        "body_type": "Hatchback",
+        "variants": [
+          {
+            "trim": "1.2 PureTech Active",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 100,
+            "cc": 1199,
+            "consumption_l100": 5.2,
+            "luggage_l": 309
+          }
+        ]
+      },
+      {
+        "model": "3008",
+        "segment": "C-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.2 PureTech Allure",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 130,
+            "cc": 1199,
+            "consumption_l100": 6.4,
+            "luggage_l": 520
+          },
+          {
+            "trim": "1.6 BlueHDi Allure",
+            "year": 2024,
+            "fuel": "Dizel",
+            "transmission": "Otomatik",
+            "hp": 130,
+            "cc": 1499,
+            "consumption_l100": 4.7,
+            "luggage_l": 520
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Renault",
+    "models": [
+      {
+        "model": "Clio",
+        "segment": "B-HB",
+        "body_type": "Hatchback",
+        "variants": [
+          {
+            "trim": "1.0 TCe Joy",
+            "year": 2023,
+            "fuel": "Benzin",
+            "transmission": "Manuel",
+            "hp": 90,
+            "cc": 999,
+            "consumption_l100": 5.2,
+            "luggage_l": 391
+          },
+          {
+            "trim": "1.0 TCe Touch",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 100,
+            "cc": 999,
+            "consumption_l100": 5.4,
+            "luggage_l": 391
+          },
+          {
+            "trim": "1.0 TCe Icon",
+            "year": 2025,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 100,
+            "cc": 999,
+            "consumption_l100": 5.3,
+            "luggage_l": 391
+          }
+        ]
+      },
+      {
+        "model": "Megane",
+        "segment": "C-Sedan",
+        "body_type": "Sedan",
+        "variants": [
+          {
+            "trim": "1.3 TCe Joy",
+            "year": 2023,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 140,
+            "cc": 1332,
+            "consumption_l100": 5.9,
+            "luggage_l": 508
+          },
+          {
+            "trim": "1.5 dCi Touch",
+            "year": 2023,
+            "fuel": "Dizel",
+            "transmission": "Otomatik",
+            "hp": 115,
+            "cc": 1461,
+            "consumption_l100": 4.2,
+            "luggage_l": 508
+          }
+        ]
+      },
+      {
+        "model": "Taliant",
+        "segment": "B-Sedan",
+        "body_type": "Sedan",
+        "variants": [
+          {
+            "trim": "1.0 TCe Joy",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Manuel",
+            "hp": 90,
+            "cc": 999,
+            "consumption_l100": 5.3,
+            "luggage_l": 510
+          },
+          {
+            "trim": "1.0 SCe Joy",
+            "year": 2023,
+            "fuel": "Benzin",
+            "transmission": "Manuel",
+            "hp": 65,
+            "cc": 999,
+            "consumption_l100": 5.8,
+            "luggage_l": 510
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Seat",
+    "models": [
+      {
+        "model": "Arona",
+        "segment": "B-SUV",
+        "body_type": "Crossover",
+        "variants": [
+          {
+            "trim": "1.0 TSI Style",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 110,
+            "cc": 999,
+            "consumption_l100": 5.6,
+            "luggage_l": 400
+          }
+        ]
+      },
+      {
+        "model": "Leon",
+        "segment": "C-HB",
+        "body_type": "Hatchback",
+        "variants": [
+          {
+            "trim": "1.5 TSI Style",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 150,
+            "cc": 1498,
+            "consumption_l100": 5.6,
+            "luggage_l": 380
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Skoda",
+    "models": [
+      {
+        "model": "Karoq",
+        "segment": "B-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.5 TSI Style",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 150,
+            "cc": 1498,
+            "consumption_l100": 6.3,
+            "luggage_l": 521
+          }
+        ]
+      },
+      {
+        "model": "Octavia",
+        "segment": "C-Sedan",
+        "body_type": "Sedan",
+        "variants": [
+          {
+            "trim": "1.5 TSI Style",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 150,
+            "cc": 1498,
+            "consumption_l100": 5.6,
+            "luggage_l": 600
+          },
+          {
+            "trim": "2.0 TDI Style",
+            "year": 2024,
+            "fuel": "Dizel",
+            "transmission": "Otomatik",
+            "hp": 150,
+            "cc": 1968,
+            "consumption_l100": 4.2,
+            "luggage_l": 600
+          }
+        ]
+      },
+      {
+        "model": "Superb",
+        "segment": "D-Sedan",
+        "body_type": "Sedan",
+        "variants": [
+          {
+            "trim": "1.5 TSI Style",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 150,
+            "cc": 1498,
+            "consumption_l100": 5.8,
+            "luggage_l": 625
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Suzuki",
+    "models": [
+      {
+        "model": "S-Cross",
+        "segment": "B-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.4 Boosterjet GLX",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 129,
+            "cc": 1373,
+            "consumption_l100": 5.6,
+            "luggage_l": 430
+          }
+        ]
+      },
+      {
+        "model": "Vitara",
+        "segment": "B-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.4 Boosterjet GLX",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 129,
+            "cc": 1373,
+            "consumption_l100": 5.8,
+            "luggage_l": 375
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Tesla",
+    "models": [
+      {
+        "model": "Model 3",
+        "segment": "C-Sedan",
+        "body_type": "Sedan",
+        "variants": [
+          {
+            "trim": "Long Range AWD",
+            "year": 2024,
+            "fuel": "Elektrik",
+            "transmission": "Otomatik",
+            "hp": 350,
+            "cc": 0,
+            "consumption_l100": 0.0,
+            "luggage_l": 561
+          }
+        ]
+      },
+      {
+        "model": "Model Y",
+        "segment": "C-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "Long Range AWD",
+            "year": 2024,
+            "fuel": "Elektrik",
+            "transmission": "Otomatik",
+            "hp": 351,
+            "cc": 0,
+            "consumption_l100": 0.0,
+            "luggage_l": 854
+          },
+          {
+            "trim": "Performance",
+            "year": 2024,
+            "fuel": "Elektrik",
+            "transmission": "Otomatik",
+            "hp": 462,
+            "cc": 0,
+            "consumption_l100": 0.0,
+            "luggage_l": 854
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Togg",
+    "models": [
+      {
+        "model": "T10X",
+        "segment": "C-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "RWD Standard",
+            "year": 2024,
+            "fuel": "Elektrik",
+            "transmission": "Otomatik",
+            "hp": 200,
+            "cc": 0,
+            "consumption_l100": 0.0,
+            "luggage_l": 460
+          },
+          {
+            "trim": "RWD Long Range",
+            "year": 2025,
+            "fuel": "Elektrik",
+            "transmission": "Otomatik",
+            "hp": 218,
+            "cc": 0,
+            "consumption_l100": 0.0,
+            "luggage_l": 460
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Toyota",
+    "models": [
+      {
+        "model": "C-HR",
+        "segment": "C-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.8 Hybrid Passion",
+            "year": 2024,
+            "fuel": "Hybrid",
+            "transmission": "Otomatik",
+            "hp": 140,
+            "cc": 1798,
+            "consumption_l100": 4.7,
+            "luggage_l": 310
+          },
+          {
+            "trim": "2.0 Hybrid GR Sport",
+            "year": 2025,
+            "fuel": "Hybrid",
+            "transmission": "Otomatik",
+            "hp": 197,
+            "cc": 1987,
+            "consumption_l100": 4.9,
+            "luggage_l": 310
+          }
+        ]
+      },
+      {
+        "model": "Corolla",
+        "segment": "C-Sedan",
+        "body_type": "Sedan",
+        "variants": [
+          {
+            "trim": "1.8 Hybrid Dream",
+            "year": 2024,
+            "fuel": "Hybrid",
+            "transmission": "Otomatik",
+            "hp": 140,
+            "cc": 1798,
+            "consumption_l100": 4.3,
+            "luggage_l": 313
+          },
+          {
+            "trim": "1.5 Vision",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Manuel",
+            "hp": 123,
+            "cc": 1496,
+            "consumption_l100": 5.8,
+            "luggage_l": 313
+          },
+          {
+            "trim": "2.0 Hybrid Flame",
+            "year": 2025,
+            "fuel": "Hybrid",
+            "transmission": "Otomatik",
+            "hp": 196,
+            "cc": 1987,
+            "consumption_l100": 4.5,
+            "luggage_l": 313
+          }
+        ]
+      },
+      {
+        "model": "Corolla HB",
+        "segment": "C-HB",
+        "body_type": "Hatchback",
+        "variants": [
+          {
+            "trim": "1.8 Hybrid Dream",
+            "year": 2024,
+            "fuel": "Hybrid",
+            "transmission": "Otomatik",
+            "hp": 140,
+            "cc": 1798,
+            "consumption_l100": 4.4,
+            "luggage_l": 313
+          },
+          {
+            "trim": "2.0 Hybrid Flame",
+            "year": 2025,
+            "fuel": "Hybrid",
+            "transmission": "Otomatik",
+            "hp": 196,
+            "cc": 1987,
+            "consumption_l100": 4.6,
+            "luggage_l": 313
+          }
+        ]
+      },
+      {
+        "model": "RAV4",
+        "segment": "C-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "2.5 Hybrid Passion",
+            "year": 2024,
+            "fuel": "Hybrid",
+            "transmission": "Otomatik",
+            "hp": 222,
+            "cc": 2487,
+            "consumption_l100": 5.6,
+            "luggage_l": 580
+          }
+        ]
+      },
+      {
+        "model": "Yaris",
+        "segment": "B-HB",
+        "body_type": "Hatchback",
+        "variants": [
+          {
+            "trim": "1.5 Hybrid Dream",
+            "year": 2024,
+            "fuel": "Hybrid",
+            "transmission": "Otomatik",
+            "hp": 116,
+            "cc": 1490,
+            "consumption_l100": 3.8,
+            "luggage_l": 286
+          }
+        ]
+      },
+      {
+        "model": "Yaris Cross",
+        "segment": "B-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.5 Hybrid Adventure",
+            "year": 2024,
+            "fuel": "Hybrid",
+            "transmission": "Otomatik",
+            "hp": 116,
+            "cc": 1490,
+            "consumption_l100": 4.4,
+            "luggage_l": 320
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Volkswagen",
+    "models": [
+      {
+        "model": "Golf",
+        "segment": "C-HB",
+        "body_type": "Hatchback",
+        "variants": [
+          {
+            "trim": "1.0 TSI Life",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 110,
+            "cc": 999,
+            "consumption_l100": 5.4,
+            "luggage_l": 380
+          },
+          {
+            "trim": "1.5 TSI Style",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 150,
+            "cc": 1498,
+            "consumption_l100": 5.7,
+            "luggage_l": 380
+          },
+          {
+            "trim": "2.0 TDI Style",
+            "year": 2024,
+            "fuel": "Dizel",
+            "transmission": "Otomatik",
+            "hp": 150,
+            "cc": 1968,
+            "consumption_l100": 4.3,
+            "luggage_l": 380
+          }
+        ]
+      },
+      {
+        "model": "Passat",
+        "segment": "D-Sedan",
+        "body_type": "Sedan",
+        "variants": [
+          {
+            "trim": "1.5 TSI Elegance",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 150,
+            "cc": 1498,
+            "consumption_l100": 5.9,
+            "luggage_l": 586
+          },
+          {
+            "trim": "2.0 TDI Elegance",
+            "year": 2024,
+            "fuel": "Dizel",
+            "transmission": "Otomatik",
+            "hp": 150,
+            "cc": 1968,
+            "consumption_l100": 4.6,
+            "luggage_l": 586
+          }
+        ]
+      },
+      {
+        "model": "T-Roc",
+        "segment": "B-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.0 TSI Life",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 110,
+            "cc": 999,
+            "consumption_l100": 5.9,
+            "luggage_l": 392
+          },
+          {
+            "trim": "1.5 TSI Style",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 150,
+            "cc": 1498,
+            "consumption_l100": 6.2,
+            "luggage_l": 392
+          }
+        ]
+      },
+      {
+        "model": "Tiguan",
+        "segment": "C-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "1.5 TSI Life",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 150,
+            "cc": 1498,
+            "consumption_l100": 6.5,
+            "luggage_l": 615
+          },
+          {
+            "trim": "2.0 TDI Elegance",
+            "year": 2024,
+            "fuel": "Dizel",
+            "transmission": "Otomatik",
+            "hp": 150,
+            "cc": 1968,
+            "consumption_l100": 5.2,
+            "luggage_l": 615
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "brand": "Volvo",
+    "models": [
+      {
+        "model": "XC40",
+        "segment": "B-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "B3 Plus",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 163,
+            "cc": 1969,
+            "consumption_l100": 7.0,
+            "luggage_l": 452
+          }
+        ]
+      },
+      {
+        "model": "XC60",
+        "segment": "C-SUV",
+        "body_type": "SUV",
+        "variants": [
+          {
+            "trim": "B4 Plus",
+            "year": 2024,
+            "fuel": "Benzin",
+            "transmission": "Otomatik",
+            "hp": 197,
+            "cc": 1969,
+            "consumption_l100": 7.3,
+            "luggage_l": 483
+          }
+        ]
+      }
+    ]
+  }
+]

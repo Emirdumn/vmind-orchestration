@@ -1,0 +1,258 @@
+
+Orbina Müşteri Analiz Raporu
+Yapay zeka teknolojilerinin kurumsal ekosistemlere entegrasyonu, basit sohbet botu (chatbot) uygulamalarından, iş süreçlerini uçtan uca yönetebilen ve otonom kararlar alabilen "AI Orchestration" (Yapay Zeka Orkestrasyonu) katmanına evrilmektedir. Türkiye'nin endüstriyel ve ticari lokomotifi olan Zorlu Holding, Eti Gıda, Socar ve Hepsiburada gibi yapılar, çok sayıda iştiraki ve karmaşık veri setlerini bünyesinde barındırmaktadır. Bu rapor, Orbina AI tarafından geliştirilen Orbina CXOS, Orbina Flux ve Orbina AI Platform ürünlerinin, her bir holding yapısına ve iştirakine nasıl değer katabileceğini, operasyonel verimliliği nasıl artırabileceğini ve dijital dönüşüm stratejilerini nasıl bir üst seviyeye taşıyabileceğini analiz etmektedir. Orbina, geleneksel sistemlerin aksine sadece yanıt veren değil, intent (niyet) algılayan, bağlam analizi yapan ve CRM, ERP veya özel API’lar üzerinden aksiyon alan bir dijital iş ortağı olarak konumlanmaktadır.
+Orbina Ürün Ekosistemi: Teknik Yetkinlikler ve Farklılaştırıcı Unsurlar
+Kurumsal yapılara sunulacak çözümlerin temelini oluşturan Orbina ürünleri, farklı iş ihtiyaçlarına yanıt verecek şekilde modüler bir yapıda tasarlanmıştır.
+Orbina CXOS: Karar Verici Yapay Zeka Orkestrasyonu
+Orbina CXOS, dağınık sinyalleri koordineli eylemlere dönüştüren bir orkestrasyon katmanıdır. Müşteri verilerinin farklı sistemlerde (CRM, destek, pazarlama, operasyon) fragmante olduğu yapılarda, bu verileri tek bir akışta birleştirir. Geleneksel chatbotlar sadece yanıt verirken, Orbina CXOS niyet algılar, bağlamı analiz eder, karar verir ve gerçek zamanlı eylemler gerçekleştirir.
+
+Özellik
+Orbina CXOS Yetkinliği
+İş Değeri
+Niyet Algılama
+Çoklu AI ajanlarını koordine ederek kullanıcı niyetini en yüksek doğrulukla tespit eder.
+Hatalı yönlendirmeleri azaltır ve ilk temasta çözüm oranını artırır.
+Sistem Entegrasyonu
+CRM, ERP, biletleme sistemleri ve özel API'lar ile derin entegrasyon sağlar.
+AI ajanlarının sadece konuşmasını değil, kayıt güncelleme veya işlem tetikleme yapmasını sağlar.
+Konuşma Odaklı Raporlama
+Müşteri etkileşimlerini konu, zaman ve kanal bazlı olarak izler; sentiment (duygu) analizi sunar.
+Vanity metrikler yerine karar vermeye hazır analitik veriler sunar.
+Hibrit Dağıtım
+Kamu bulutu, özel bulut (Private Cloud) veya on-premise altyapılarda çalışabilir.
+Veri gizliliği ve güvenlik protokollerine tam uyum sağlar.
+Orbina Flux: Akıllı Belge İşleme ve Süreç Otomasyonu
+Orbina Flux, belgelerden gelen veriyi kullanılabilir bir bağlama dönüştüren akıllı belge işleme (Intelligent Document Processing - IDP) çözümüdür. Özellikle finans, lojistik ve sigorta gibi belge yoğunluklu sektörlerde, manuel veri girişini ortadan kaldırarak hata payını minimize eder.
+
+Uygulama Alanı
+Orbina Flux Kullanımı
+Beklenen Etki
+Fatura ve Makbuz İşleme
+Gelen faturaları otomatik olarak okur, ERP ile eşleştirir ve onay sürecine sokar.
+Finans ekiplerinin operasyonel yükünü %80'e kadar azaltır.
+Sözleşme Analizi
+Hukuki metinlerdeki kritik maddeleri, tarihleri ve riskleri otomatik olarak tespit eder.
+Hukuk departmanlarının inceleme sürelerini hızlandırır.
+Lojistik Evrakları
+Konşimento, gümrük beyannamesi gibi belgeleri dijitalleştirir ve takip sistemlerine entegre eder.
+Tedarik zinciri görünürlüğünü artırır.
+
+Orbina AI Platform: İçerik Üretimi ve Türk LLM Altyapısı
+Orbina AI Platform, kurumlara özel Türk dil modeli (LLM) yetkinlikleri sunarak, dilsel nüansları ve kültürel bağlamı en iyi şekilde yöneten AI ajanları üretilmesine olanak tanır. Görsel ve yazılı içerik üretimi süreçlerini otomatize ederken, hazır şablonlar ve interaktif chatbotlar ile iş süreçlerini hızlandırır.
+
+Zorlu Holding: Çok Sektörlü Yapıda AI Entegrasyonu
+Zorlu Holding, tekstil, tüketici elektroniği, beyaz eşya, enerji, gayrimenkul ve madencilik gibi geniş bir yelpazede faaliyet göstermektedir. Grubun dijital dönüşüm vizyonu, özellikle Vestel ve Zorlu Enerji gibi iştirakler üzerinden şekillenmektedir.
+İştirak Bazlı Çözüm Önerileri
+Zorlu Holding'in karmaşık yapısında her bir iştirak için özelleştirilmiş Orbina çözümleri aşağıda detaylandırılmıştır:
+
+İştirak
+Faaliyet Alanı
+Önerilen Ürün
+Kullanım Senaryosu ve Stratejik Sunum
+Vestel
+Tüketici Elektroniği
+Orbina CXOS
+Küresel çapta garanti yönetimi, teknik destek süreçlerinin orkestrasyonu ve akıllı ev (IoT) cihazlarıyla entegre destek ajanları.
+Zorlu Enerji
+Enerji Üretim ve Dağıtım
+Orbina Flux
+Yenilenebilir enerji sahalarındaki bakım raporlarının dijitalleştirilmesi, elektrik fatura itirazlarının otomatik işlenmesi ve mevzuat uyum belgelerinin takibi.
+Korteks / Zorluteks
+Tekstil / Sanayi
+Orbina AI Platform
+Tasarım ekipleri için tekstil deseni trend analizleri, teknik kumaş spekülasyonlarının özetlenmesi ve ihracat odaklı çok dilli içerik üretimi.
+Zorlu Center / Zorlu PSM
+Gayrimenkul / Sanat
+Orbina CXOS
+Ziyaretçi deneyimi için çok dilli dijital asistan, etkinlik biletleme süreçlerinin otomasyonu ve kiracı taleplerinin yönetimi.
+Vestel, Zorlu Holding'in en büyük teknoloji gücü olarak, sadece beyaz eşya değil, mobilite ve batarya teknolojileri alanında da büyümektedir. Vestel Ventures aracılığıyla yapılan yatırımlar (örneğin Splitvolt), mobilite ekosisteminin genişlediğini göstermektedir. Orbina AI Platform, Vestel'in Ar-Ge süreçlerinde patent analizleri ve rakip teknoloji taramaları için kritik bir araç olarak sunulabilir.
+Eti Gıda ve Sarp Lojistik: Tedarik Zincirinde Yapay Zeka Verimliliği
+Eti Gıda, Türkiye'nin lider gıda üreticilerinden biri olmasının yanı sıra, Sarp Lojistik aracılığıyla devasa bir operasyonel güce sahiptir. Sarp Lojistik, 2012 yılında kurulan modern lojistik merkezi ile AS/RS (otomasyon) sistemlerini entegre etmiştir.
+Operasyonel Modernizasyon Planı
+Eti Grubu'nun üretim ve lojistik döngüsünde Orbina ürünleri aşağıdaki gibi konumlandırılabilir:
+
+İş Birimi
+Odak Alanı
+Önerilen Ürün
+Uygulama Detayı
+Eti Gıda Pazarlama
+FMCG
+Orbina AI Platform
+Yeni ürün lansmanları için görsel içerik üretimi, sosyal medya kampanya yönetimi ve tüketici geri bildirimlerinin duygu analizi.
+Sarp Lojistik
+Multimodal Taşımacılık
+Orbina Flux
+Karayolu, denizyolu ve havayolu belgelerinin (konşimento, fatura, gümrük) otomatik işlenmesi ve AS/RS sistem verilerinin analiz edilmesi.
+Petito / Bebek Maması
+Özel Beslenme
+Orbina CXOS
+Ebeveynlere özel beslenme danışmanlığı sunan, ürün içeriklerine dair soruları yanıtlayan ve stok sorgulaması yapabilen AI asistanı.
+Eti Satış Operasyonları
+Satış
+Orbina CXOS
+Saha satış ekipleri için envanter yönetimi, sipariş girişi ve rota optimizasyonu süreçlerini orkestre eden yazılı asistan.
+Sarp Lojistik, Eti dışındaki büyük markalara da hizmet vermekte ve multimodal taşımacılık yapmaktadır. Orbina Flux'un belge işleme yetenekleri, farklı dillerde ve formatlarda gelen uluslararası lojistik belgelerinin standartlaştırılmasında benzersiz bir verimlilik sağlayacaktır.
+Danone-Aptamil: Sağlık ve Beslenmede Güvenli Yapay Zeka
+Danone Türkiye, bünyesinde Danone Tikveşli (Sütlü Ürünler), Numil (Aptamil/Bebelac Bebek Mamaları) ve Hayat/Sırma (Su ve İçecek) gibi kritik markaları barındırmaktadır. Sağlık odaklı bir misyona sahip olan Danone için verinin doğruluğu ve güvenliği en üst önceliktir.
+Marka ve İştirak Stratejileri
+Danone'nin "Société à Mission" statüsü ve sürdürülebilirlik hedefleriyle uyumlu AI çözümleri:
+
+
+Marka / Birim
+Sektör
+Önerilen Ürün
+Stratejik Değer Önerisi
+Aptamil / Nutricia
+Özel Beslenme
+Orbina CXOS
+Pediyatrik beslenme konularında ebeveynlere yönelik 7/24 uzman AI desteği, niyet algılama ile acil durumların tespit edilmesi.
+Hayat Su / Sırma
+Su / İçecek
+Orbina CXOS
+Abonelik yönetimi, Carboy (damacana) siparişlerinin WhatsApp üzerinden orkestrasyonu ve teslimat bildirimlerinin yönetimi.
+Danone Tikveşli
+Sütlü Ürünler
+Orbina Flux
+Süt tedarikçileriyle yapılan sözleşmelerin takibi, kalite kontrol raporlarının dijital arşive aktarılması ve soğuk zincir belgelerinin yönetimi.
+Nutricia için sunulacak Orbina CXOS çözümü, sadece bilgi veren bir "AI Knowledge Base" değil, aynı zamanda CRM ile entegre çalışarak kullanıcının geçmişteki etkileşimlerini hatırlayan ve kişiselleştirilmiş tavsiyeler sunan bir "dijital ekip arkadaşı" olarak kurgulanmalıdır.
+Gülsan Holding: Gaziantep'ten Dünyaya Endüstriyel AI
+Gülsan Holding, nonwoven (dokunmamış kumaş) teknolojilerinde dünya liderlerinden biridir ve enerji sektöründe de ciddi yatırımlara sahiptir.
+
+İştirak
+Sektör
+Önerilen Ürün
+Uygulama Alanı
+Gülsan Sentetik
+Tekstil / Hijyen
+Orbina Flux
+Uluslararası müşterilerden gelen teknik şartnamelerin analizi, üretim emirlerinin otomatik oluşturulması ve ihracat belgelerinin yönetimi.
+Gül Enerji / Paşa HES
+Enerji
+Orbina AI Platform
+Enerji üretim verilerinin özetlenmesi, çevresel etki raporlarının hazırlanması ve teknik bakım kılavuzlarının AI ile sorgulanabilir hale gelmesi.
+Kaşmir Yapı
+Gayrimenkul
+Orbina CXOS
+Gayrimenkul projelerinde müşteri taleplerinin yönetimi, ödeme planı hatırlatıcıları ve satış sonrası destek süreçlerinin otomasyonu.
+Gülsan'ın yüksek teknolojiye dayalı üretim tesisleri (Gaziantep ve Kahire), Orbina Flux ile operasyonel verimliliğini artırarak küresel rekabette avantaj elde edebilir.
+Mavi: Perakendede Müşteri Deneyimi Orkestrasyonu
+Türkiye perakende sektörünün öncülerinden Mavi, omnichannel (çok kanallı) stratejilerini güçlendirmek için yapay zekayı merkezi bir noktaya konumlandırmaktadır.
+Perakende Ekosistemi Analizi
+
+İştirak / Marka
+Önerilen Ürün
+Kullanım Senaryosu
+Mavi
+Orbina CXOS
+ABD, Kanada, Avrupa ve Türkiye pazarlarında çok dilli müşteri desteği, iade süreçlerinin otomatik başlatılması ve marka sesinin korunması ile agentic orkestrasyon ve CX ekipleri ile dijital takım arkadaşı.
+
+TOGG ve Siro Enerji: Mobilite Ekosisteminde Agentic AI
+TOGG, bir otomobilden fazlası olarak "akıllı cihaz" vizyonuyla hareket etmekte; Siro Enerji ise bu ekosistemin enerji depolama kalbini oluşturmaktadır.
+Gelecek Nesil Mobilite Çözümleri
+
+Yapı
+Önerilen Ürün
+Entegrasyon Hedefi
+TOGG (Smart Device)
+Orbina CXOS
+Araç içi sesli asistanın, kullanıcı niyetine göre Trugo üzerinden şarj istasyonu rezerve etmesi veya Trumore üzerinden restoran rezervasyonu yapması.
+Siro Enerji
+Orbina Flux
+Batarya hücre üretimindeki kalite kontrol verilerinin dijitalleştirilmesi, teknik patent dokümanlarının analizi ve hammadde tedarik belgelerinin takibi.
+Trugo / Trumore
+Orbina AI Platform
+Ekosistem kullanıcıları için dinamik içerik üretimi, kişiselleştirilmiş rotalar ve oyunlaştırılmış pazarlama içerikleri.
+
+Bayegan: Emtia Ticaretinde Yüksek Performanslı AI
+Bayegan (BGN), 120 ülkede faaliyet gösteren küresel bir enerji ve emtia ticaret devidir. Entrade platformu ise bu ticaretin risk yönetimi ve operasyonel merkezidir.
+Ticari Operasyonların Otomasyonu
+
+Birim
+Önerilen Ürün
+Kullanım Amacı
+Bayegan Petrokimya
+Orbina Flux
+Akreditif (L/C) belgelerinin, konşimentoların ve sertifikaların otomatik okunması; ticaret finansmanı süreçlerinin hızlandırılması.
+Entrade 7'nin sunduğu "real-time analytics" ve "machine learning" özellikleri, Orbina'nın orkestrasyon katmanı ile birleştiğinde, ticaret operasyonlarında hata payını sıfıra indiren bir yapı sunabilir.
+Saat&amp;Saat: Lüks Saat Dağıtımında Teknik Servis Dönüşümü
+Saat&amp;Saat, 30'dan fazla dünya markasının distribütörlüğünü yapmakta ve geniş bir teknik servis ağına sahiptir.
+Servis ve Satış Optimizasyonu
+
+Alan
+Önerilen Ürün
+Stratejik Yaklaşım
+Mağazacılık
+Orbina CXOS
+Müşterilerin teknik özellik sorgularına (kalibre, cam tipi, su geçirmezlik) yanıt veren ve mağaza stoğunu anlık kontrol eden uzman asistan.
+Saat Teknik (Servis)
+Orbina Flux
+Servis formlarının otomatik işlenmesi, yedek parça envanterinin belge üzerinden takibi ve garanti belgelerinin OCR ile doğrulanması.
+Pazarlama
+Orbina AI Platform
+Saat koleksiyonları için lüks marka diline uygun içerik üretimi ve akıllı saat kullanıcıları için kurulum kılavuzları.
+Saat&amp;Saat'in Magento 2 tabanlı e-ticaret altyapısı, Orbina CXOS'un sunduğu gelişmiş entegrasyon yetenekleri sayesinde müşteri deneyimini kişiselleştirilmiş bir seviyeye taşıyabilir.44
+Hepsiburada: E-ticaret Ekosisteminde Derin Entegrasyon
+Hepsiburada, Hepsipay ve HepsiJET ile sadece bir pazaryeri değil, uçtan uca bir teknoloji ekosistemidir.
+Ekosistem Odaklı Çözümler
+
+İştirak
+Önerilen Ürün
+Operasyonel Katkı
+Hepsipay
+Orbina CXOS
+Cüzdan yönetimi, harca-sonra-öde limit sorgulamaları ve şüpheli işlem bildirimlerinin yönetimi.
+HepsiJET
+Orbina Flux
+Kargo rotalama belgelerinin dijitalleştirilmesi, iade sürecindeki ürün fotoğraflarının analizi ve gümrük evraklarının yönetimi.
+Hepsiburada Premium
+Orbina AI Platform, Orbina CXOS
+Üyelere özel kişiselleştirilmiş fayda bildirimleri, kampanya görselleri ve interaktif alışveriş asistanları.
+Hepsiburada'nın "Eskiyi Kapında Yenile" programı gibi karmaşık operasyonlar, Orbina Flux ve CXOS kombinasyonu ile kullanıcıdan cihaz bilgilerini alıp, lojistik süreci tetikleyerek mükemmel bir akış sağlayabilir.
+Socar Türkiye: Dijital Dönüşümün Öncüsü
+Socar Türkiye, Petkim ve STAR Rafineri gibi devasa üretim tesisleriyle Türkiye'nin en büyük endüstriyel holdinglerinden biridir.
+Endüstriyel AI ve Süreç Optimizasyonu
+
+İştirak
+Önerilen Ürün
+Entegrasyon Noktası
+Petkim / STAR Rafineri
+Orbina Flux
+Güvenlik (HSE) raporlarının analizi, teknik bakım formlarının dijitalleştirilmesi ve hammadde sertifikalarının otomatik kontrolü.
+Bursagaz / Kayserigaz
+Orbina CXOS
+Doğalgaz abonelik işlemleri, fatura itirazlarının yönetimi ve acil durum ekipleri için niyet odaklı yönlendirme asistanı.
+Socar Ar-Ge
+Orbina AI Platform
+Biyoyakıt ve mikro yosun araştırmaları gibi teknik metinlerin özetlenmesi, patent taramaları ve akademik raporlama desteği.
+Millenicom / Socar Fiber
+Orbina CXOS
+Teknik destek süreçlerinin orkestrasyonu, paket değişim taleplerinin yönetimi ve müşteri kaybı (churn) tahmini analitiği.
+Socar'ın SAP S/4HANA tabanlı "Project Earth" dijital dönüşüm projesi, Orbina CXOS'un derin ERP entegrasyon yetenekleri için en uygun zeminlerden birini sunmaktadır.
+Türk Tuborg ve Çokyaşar: Sanayi ve Dağıtımda AI
+Türk Tuborg'un geniş bayi ağı ve Çokyaşar Holding'in küresel tel/halat ihracat operasyonları, verimlilik artışı için kritik alanlardır.
+Sektörel Uygulama Matrisi
+
+Şirket
+Önerilen Ürün
+Uygulama Stratejisi
+Türk Tuborg
+Orbina CXOS
+Bayi portalı üzerinden sipariş orkestrasyonu, promosyon malzemesi taleplerinin yönetimi ve ticari pazarlama desteği.
+Desa Enerji
+Orbina Flux
+Enerji üretim loglarının dijitalleşmesi ve düzenleyici kurum (EPDK) raporlarının otomatik hazırlanması.
+Çokyaşar Tel / Halat
+Orbina Flux
+70'den fazla ülkeye yapılan ihracatta gümrük ve nakliye belgelerinin otomatik yönetimi, kalite sertifikalarının dijital arşivi.
+CWI (Arnavutluk)
+Orbina AI Platform
+Bölgesel pazar analizleri, teknik ürün kataloglarının çok dilli üretimi ve satış temsilcileri için AI destekli CRM kullanımı.
+Çokyaşar Holding'in bilgi teknolojileri altyapısını MES (Üretim Yürütme Sistemi) ile modernize etmiş olması, Orbina ürünlerinin üretim sahasından gelen verilerle beslenmesini ve daha akıllı kararlar almasını sağlayacaktır.
+
+Teknik Entegrasyon ve Güvenlik Parametreleri
+Büyük holding yapıları için Orbina'nın sunduğu en büyük avantajlardan biri, yerel bulut firmaları ile olan iş birliğidir. Bu sayede, kurumların verileri Türkiye sınırları içerisinde kalırken, yüksek performanslı GPU altyapısı ve düşük gecikme süreli (low-latency) AI hizmetleri sağlanabilmektedir.
+Güvenlik ve Uyum Standartları
+Veri Egemenliği: Veriler kurumun kendi altyapısında veya güvenli yerli bulutta saklanır.
+GDPR / KVKK Uyumu: Orbina, kişisel verilerin korunması kanunlarına tam uyumlu bir mimari sunar; müşteri verileri genel AI modellerini eğitmek için kullanılmaz.
+ISO Sertifikasyonu: Kurumsal düzeyde güvenlik kontrolleri ve denetim izleri sağlanır.
+Role-Based Access Control (RBAC): AI ajanlarının hangi verilere erişebileceği ve hangi eylemleri gerçekleştirebileceği granüler seviyede kontrol edilir.

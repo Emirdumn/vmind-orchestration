@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "brand_id": 1,
+    "segment_id": 1,
+    "name": "Corolla Cross",
+    "body_type": "SUV",
+    "start_year": 2020,
+    "end_year": null
+  },
+  {
+    "id": 2,
+    "brand_id": 2,
+    "segment_id": 1,
+    "name": "Qashqai",
+    "body_type": "SUV",
+    "start_year": 2021,
+    "end_year": null
+  },
+  {
+    "id": 3,
+    "brand_id": 3,
+    "segment_id": 1,
+    "name": "Tucson",
+    "body_type": "SUV",
+    "start_year": 2021,
+    "end_year": null
+  },
+  {
+    "id": 4,
+    "brand_id": 4,
+    "segment_id": 2,
+    "name": "320i",
+    "body_type": "Sedan",
+    "start_year": 2020,
+    "end_year": null
+  }
+]

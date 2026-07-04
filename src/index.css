@@ -1,0 +1,171 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ArabaiQ — Fluid HUD design system. All colors HSL. */
+
+@layer base {
+  :root {
+    /* Midnight base */
+    --background: 222 47% 7%;
+    --foreground: 210 40% 96%;
+
+    --card: 222 39% 11%;
+    --card-foreground: 210 40% 96%;
+    --card-hover: 222 39% 14%;
+
+    --popover: 222 39% 11%;
+    --popover-foreground: 210 40% 96%;
+
+    /* Electric Blue #3B82F6 */
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 7%;
+    --primary-hover: 217 91% 67%;
+    --primary-active: 217 91% 52%;
+    --primary-glow: 217 91% 70%;
+
+    --brand: 217 91% 60%;
+    --brand-foreground: 222 47% 7%;
+    --brand-soft: 217 60% 18%;
+    --brand-hover: 217 91% 67%;
+
+    --secondary: 222 32% 17%;
+    --secondary-foreground: 210 40% 96%;
+    --secondary-hover: 222 32% 22%;
+
+    --muted: 222 32% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 217 60% 22%;
+    --accent-foreground: 210 40% 96%;
+    --accent-hover: 217 60% 28%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --destructive-soft: 0 60% 20%;
+    --destructive-hover: 0 84% 67%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 222 47% 7%;
+    --warning-soft: 38 50% 20%;
+    --warning-hover: 38 92% 62%;
+
+    --success: 160 84% 45%;
+    --success-foreground: 222 47% 7%;
+    --success-soft: 160 50% 18%;
+    --success-hover: 160 84% 52%;
+
+    --surface-soft: 222 42% 9%;
+    --surface-raised: 222 39% 13%;
+
+    --border: 222 32% 20%;
+    --border-hover: 217 91% 60%;
+    --input: 222 32% 20%;
+    --ring: 217 91% 60%;
+
+    --radius: 1rem;
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(180deg, hsl(222 47% 7%) 0%, hsl(var(--surface-soft)) 100%);
+    --gradient-navy: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(217 91% 45%) 100%);
+    --gradient-glow: radial-gradient(circle at 50% 0%, hsl(217 91% 60% / 0.15), transparent 70%);
+
+    /* Shadows — glow on dark */
+    --shadow-soft: 0 4px 24px -8px hsl(217 91% 60% / 0.18);
+    --shadow-elevated: 0 24px 48px -16px hsl(217 91% 60% / 0.25);
+    --shadow-ring: 0 0 0 1px hsl(217 91% 60% / 0.12);
+    --shadow-glow: 0 0 0 4px hsl(217 91% 60% / 0.18), 0 8px 32px -8px hsl(217 91% 60% / 0.45);
+    --shadow-hover: 0 12px 40px -12px hsl(217 91% 60% / 0.4);
+
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --sidebar-background: 222 47% 7%;
+    --sidebar-foreground: 210 40% 96%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 222 47% 7%;
+    --sidebar-accent: 222 32% 17%;
+    --sidebar-accent-foreground: 210 40% 96%;
+    --sidebar-border: 222 32% 20%;
+    --sidebar-ring: 217 91% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    background-image: var(--gradient-glow);
+    background-attachment: fixed;
+  }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Global interaction polish — applies to every button/link/card */
+  button,
+  [role="button"],
+  a {
+    transition: var(--transition-fast);
+  }
+
+  /* Primary buttons */
+  button.bg-primary:hover:not(:disabled),
+  .bg-primary:hover:not(:disabled) {
+    background-color: hsl(var(--primary-hover));
+    box-shadow: var(--shadow-glow);
+  }
+  button.bg-primary:active:not(:disabled),
+  .bg-primary:active:not(:disabled) {
+    background-color: hsl(var(--primary-active));
+    transform: translateY(1px);
+  }
+
+  /* Secondary / muted buttons & chips */
+  .bg-secondary:hover:not(:disabled) {
+    background-color: hsl(var(--secondary-hover));
+  }
+
+  /* Destructive */
+  .bg-destructive:hover:not(:disabled) {
+    background-color: hsl(var(--destructive-hover));
+    box-shadow: 0 8px 32px -8px hsl(var(--destructive) / 0.4);
+  }
+
+  /* Cards & surface tiles — subtle lift on hover */
+  .bg-card {
+    transition: var(--transition-smooth);
+  }
+  .bg-card:hover {
+    background-color: hsl(var(--card-hover));
+    box-shadow: var(--shadow-hover);
+  }
+
+  /* Ring/border glow on focus */
+  :focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-glow);
+    border-radius: var(--radius);
+  }
+
+  /* Badges / chips with ring accent */
+  .ring-foreground\/5:hover {
+    --tw-ring-color: hsl(var(--primary) / 0.4);
+  }
+
+  /* Links */
+  a:hover {
+    color: hsl(var(--primary-hover));
+  }
+}
