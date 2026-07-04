@@ -5,7 +5,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import OperationsHub from "./pages/OperationsHub.tsx";
 import NotFound from "./pages/NotFound.tsx";
-import AdminImport from "./pages/AdminImport.tsx";
 
 const queryClient = new QueryClient();
 
@@ -17,7 +16,6 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<OperationsHub />} />
-          <Route path="/admin/import" element={<AdminImport />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
