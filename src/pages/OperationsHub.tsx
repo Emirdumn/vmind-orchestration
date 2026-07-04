@@ -13,6 +13,7 @@ import { ChatWorkbench } from "@/components/vmind/ChatWorkbench";
 import { SafetyPanel } from "@/components/vmind/SafetyPanel";
 import { RoadmapTab } from "@/components/vmind/RoadmapTab";
 import { EvalTab } from "@/components/vmind/EvalTab";
+import { ConnectorReadinessTab } from "@/components/vmind/ConnectorReadinessTab";
 import { corpus } from "@/data/vmind/corpus";
 import { roleLabels } from "@/data/vmind/scenarios";
 import { retrieve } from "@/lib/vmind/retrieval";
@@ -43,8 +44,8 @@ export default function OperationsHub() {
   };
 
   return (
-    <div className="flex h-screen flex-col bg-background">
-      <header className="flex shrink-0 items-center justify-between gap-4 border-b border-border px-4 py-2.5">
+    <div className="flex h-screen min-w-0 flex-col bg-background">
+      <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border px-3 py-2.5 sm:px-4">
         <div className="flex items-center gap-2.5">
           <span className="flex h-7 w-7 items-center justify-center rounded-md bg-brand-soft">
             <Boxes className="h-4 w-4 text-primary" />
@@ -76,8 +77,8 @@ export default function OperationsHub() {
       </header>
 
       <Tabs defaultValue="workbench" className="flex min-h-0 flex-1 flex-col">
-        <div className="shrink-0 border-b border-border px-4">
-          <TabsList className="h-9 rounded-none bg-transparent p-0">
+        <div className="shrink-0 overflow-x-auto border-b border-border px-3 sm:px-4">
+          <TabsList className="h-9 min-w-max rounded-none bg-transparent p-0">
             <TabsTrigger
               value="workbench"
               className="rounded-none border-b-2 border-transparent px-3 text-xs data-[state=active]:border-primary data-[state=active]:bg-transparent"
@@ -91,6 +92,12 @@ export default function OperationsHub() {
               MVP Yol Haritasi
             </TabsTrigger>
             <TabsTrigger
+              value="connectors"
+              className="rounded-none border-b-2 border-transparent px-3 text-xs data-[state=active]:border-primary data-[state=active]:bg-transparent"
+            >
+              Connectorlar
+            </TabsTrigger>
+            <TabsTrigger
               value="eval"
               className="rounded-none border-b-2 border-transparent px-3 text-xs data-[state=active]:border-primary data-[state=active]:bg-transparent"
             >
@@ -100,14 +107,14 @@ export default function OperationsHub() {
         </div>
 
         <TabsContent value="workbench" className="mt-0 min-h-0 flex-1 focus-visible:outline-none">
-          <div className="grid h-full min-h-0 grid-cols-12 gap-0">
-            <div className="col-span-3 min-h-0 overflow-y-auto border-r border-border p-3 xl:col-span-2">
+          <div className="grid h-full min-h-0 grid-cols-1 gap-0 overflow-y-auto lg:grid-cols-12 lg:overflow-hidden">
+            <div className="min-h-0 border-b border-border p-3 lg:col-span-3 lg:overflow-y-auto lg:border-b-0 lg:border-r xl:col-span-2">
               <SourceNav scope={scope} onScopeChange={setScope} />
             </div>
-            <div className="col-span-6 flex min-h-0 flex-col p-4 xl:col-span-7">
+            <div className="flex min-h-[520px] flex-col p-3 sm:p-4 lg:col-span-6 lg:min-h-0 xl:col-span-7">
               <ChatWorkbench messages={messages} onAsk={handleAsk} />
             </div>
-            <div className="col-span-3 min-h-0 overflow-y-auto border-l border-border p-3">
+            <div className="min-h-0 border-t border-border p-3 lg:col-span-3 lg:overflow-y-auto lg:border-l lg:border-t-0">
               <SafetyPanel role={role} lastAnswer={lastAnswer} auditLog={auditLog} />
             </div>
           </div>
@@ -115,6 +122,10 @@ export default function OperationsHub() {
 
         <TabsContent value="roadmap" className="mt-0 min-h-0 flex-1 overflow-y-auto p-4 focus-visible:outline-none">
           <RoadmapTab />
+        </TabsContent>
+
+        <TabsContent value="connectors" className="mt-0 min-h-0 flex-1 overflow-y-auto p-4 focus-visible:outline-none">
+          <ConnectorReadinessTab />
         </TabsContent>
 
         <TabsContent value="eval" className="mt-0 min-h-0 flex-1 overflow-y-auto p-4 focus-visible:outline-none">

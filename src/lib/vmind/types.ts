@@ -48,6 +48,29 @@ export interface DataSource {
   mvpMode: string;
 }
 
+export type ConnectorStage =
+  | "mock"
+  | "export_ready"
+  | "read_only_ready"
+  | "approval_required"
+  | "blocked";
+
+export type ConnectorRisk = "low" | "medium" | "high" | "critical";
+
+export interface ConnectorProfile {
+  id: SourceSystem;
+  owner: string;
+  stage: ConnectorStage;
+  risk: ConnectorRisk;
+  dataClasses: DataClass[];
+  ingestionMode: string;
+  refreshCadence: string;
+  readiness: number;
+  allowedActions: ActionMode[];
+  blockers: string[];
+  nextActions: string[];
+}
+
 export interface Citation {
   sourceSystem: SourceSystem;
   sourceUri: string;

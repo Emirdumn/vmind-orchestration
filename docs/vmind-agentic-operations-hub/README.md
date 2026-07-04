@@ -23,4 +23,4 @@ Current implementation stance:
 - Keep Logo and PortvMind integrations read-only until approval and audit gates exist.
 - Treat write actions as drafts unless explicitly approved by an authorized user.
 - Every answer should be source-grounded or clearly refuse to guess.
-
+- Track connector readiness, risk, data classes, blockers, and next actions before enabling live integrations.

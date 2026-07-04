@@ -121,13 +121,13 @@
   }
 
   /* Primary buttons */
-  button.bg-primary:hover:not(:disabled),
-  .bg-primary:hover:not(:disabled) {
+  button[class~="bg-primary"]:hover:not(:disabled),
+  [role="button"][class~="bg-primary"]:hover:not(:disabled) {
     background-color: hsl(var(--primary-hover));
     box-shadow: var(--shadow-glow);
   }
-  button.bg-primary:active:not(:disabled),
-  .bg-primary:active:not(:disabled) {
+  button[class~="bg-primary"]:active:not(:disabled),
+  [role="button"][class~="bg-primary"]:active:not(:disabled) {
     background-color: hsl(var(--primary-active));
     transform: translateY(1px);
   }
