@@ -76,7 +76,7 @@ export function retrieve(query: string, options: RetrievalOptions): AgentAnswer 
       refusalReason: "secret",
       text: "Sifre, token, private key veya lisans anahtari gibi gizli degerler hicbir rolde paylasilmaz. Bu tur degerler bilgi tabanina da alinmaz.",
       citations: [],
-      ticketIds: [],
+      articleIds: [],
       confidence: 1,
       dataClass: "secret",
       actionMode: "read_only",
@@ -90,7 +90,7 @@ export function retrieve(query: string, options: RetrievalOptions): AgentAnswer 
       refusalReason: "permission",
       text: "Bu soru kisi verisi (PII) iceriyor ve mevcut rolunuz bu sinifa erisemiyor. Ihtiyac gercekse talebi veri sahibi ekibe iletebilirim (insan devri).",
       citations: [],
-      ticketIds: [],
+      articleIds: [],
       confidence: 1,
       dataClass: "pii",
       actionMode: "read_only",
@@ -113,14 +113,14 @@ export function retrieve(query: string, options: RetrievalOptions): AgentAnswer 
   if (!best || bestScore === 0) {
     const scopeNote =
       scope === "all"
-        ? "SMAX, vRPMind, PortvMind, Logo ve runbook kaynaklarinda"
+        ? "Knowledge Base, SMAX sinyalleri, vRPMind, PortvMind, Logo ve runbook kaynaklarinda"
         : `secili kaynakta (${scope})`;
     return {
       kind: "refusal",
       refusalReason: "no_source",
       text: `Bu soru icin ${scopeNote} yeterli kaynak bulamadim, bu yuzden tahmin uretmiyorum. Eksik dokuman listesine ekleyebilir veya soruyu ilgili ekibe devredebilirim.`,
       citations: [],
-      ticketIds: [],
+      articleIds: [],
       confidence: 0,
       dataClass: "public",
       actionMode: "read_only",
@@ -134,7 +134,7 @@ export function retrieve(query: string, options: RetrievalOptions): AgentAnswer 
       refusalReason: "permission",
       text: `Bu icerik "${best.dataClass}" veri sinifinda ve mevcut rolunuz bu sinifa erisemiyor. Dogru yol: ilgili kaynak sahibi ekipten erisim talep etmek. Istersen devir ozeti hazirlayabilirim.`,
       citations: [],
-      ticketIds: [],
+      articleIds: [],
       confidence: 1,
       dataClass: best.dataClass,
       actionMode: "read_only",
@@ -143,14 +143,23 @@ export function retrieve(query: string, options: RetrievalOptions): AgentAnswer 
   }
 
   const actionDecision = best.draftAction
-    ? resolveActionMode(role, best.draftAction.type === "smax_ticket" ? "ticket_draft" : best.draftAction.type === "vrpmind_task" ? "task_draft" : "checklist_draft")
+    ? resolveActionMode(
+        role,
+        best.draftAction.type === "smax_ticket"
+          ? "ticket_draft"
+          : best.draftAction.type === "vrpmind_task"
+            ? "task_draft"
+            : best.draftAction.type === "kb_article"
+              ? "kb_article_draft"
+              : "checklist_draft",
+      )
     : resolveActionMode(role, "read_query");
 
   return {
     kind: "answer",
     text: best.answerText,
     citations: best.citations,
-    ticketIds: best.ticketIds,
+    articleIds: best.articleIds,
     draftAction: actionDecision.allowed && actionDecision.mode === "draft" ? best.draftAction : undefined,
     confidence: best.confidence,
     dataClass: best.dataClass,

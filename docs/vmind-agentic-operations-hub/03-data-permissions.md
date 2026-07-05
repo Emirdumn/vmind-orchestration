@@ -14,9 +14,10 @@ created: 2026-07-03
 
 | Kaynak | Ilk kullanim | Risk | MVP modu |
 |---|---|---:|---|
+| Problem KB makaleleri | Dokumante edilmis problem/cozum bilgisi | Orta | Birincil cevap kaynagi (RAG) |
 | vRPMind dokumanlari | Surec, gorev, teklif ve departman akislari | Orta | RAG + read-only |
 | PortvMind console dokumanlari | Cloud kaynak rehberi, quota, backup, network, K8s | Orta | RAG + read-only |
-| SMAX ticketlari | Incident cozum hafizasi, kategori/oncelik onerisi | Yuksek | Anonim export + RAG |
+| SMAX sinyalleri | Tekrar eden problem kategorileri, KB backlog onceligi | Yuksek | Anonim trend export |
 | Logo surec dokumanlari | Fatura, cari, mutabakat, odeme akis rehberi | Yuksek | RAG |
 | Logo API/veri | Fatura/cari durum sorgu | Cok yuksek | Read-only pilot |
 | Public VMind web | Urun aciklamasi, satis dili, public bilgi | Dusuk | RAG |
@@ -34,7 +35,7 @@ created: 2026-07-03
 ## MVP icin minimum guvenlik
 
 - SSO veya LDAP rol bilgisi olmadan departman verisi acilmaz.
-- SMAX exportlari anonimlestirilmeden vector store'a alinmaz.
+- SMAX exportlari anonimlestirilmeden islenmez; cozum kaynagi olarak vector store'a alinmaz.
 - Logo verisi ilk fazda sadece dokuman seviyesinde islenir.
 - Secret degerler asla embedding'e girmez.
 - Her cevap icin kaynak ve audit trace tutulur.
@@ -45,7 +46,7 @@ created: 2026-07-03
 | Rol | Gorebilecegi bilgi | Yapabilecegi islem |
 |---|---|---|
 | Stajyer | Public + secili internal onboarding | Soru sorma, kaynak gorme |
-| Network | Network runbook, anonim/izinli SMAX ticket | Ticket ozetleme, taslak cozum |
+| Network | Problem KB, network runbook, anonim SMAX sinyali | KB maddesi taslagi, runbook arama |
 | Muhasebe | Logo surec dokumani, izinli finans ozetleri | Fatura surec sorusu, taslak kontrol listesi |
 | Cloud Ops | PortvMind kaynak rehberi ve read-only durum | Kaynak durum sorgu, risk raporu |
 | Satis/CS | vRPMind surec, public urun, musteri notlari | Teklif/surec ozeti, takip taslagi |
@@ -62,14 +63,14 @@ created: 2026-07-03
 - Cevap eval setine eklendi mi?
 - Retention suresi belli mi?
 
-## SMAX ticketlari icin on isleme
+## SMAX sinyalleri icin on isleme
 
 1. Ticket ID korunabilir, kisi/musteri bilgisi maskelenir.
-2. Baslik, kategori, etki, oncelik, cozum, kapanis notu ayrilir.
+2. Baslik, kategori, etki ve oncelik ayrilir; cozum metni otomatik cevap kaynagi yapilmaz.
 3. "Cozuldu" ve "tekrar acildi" bilgisi etiketlenir.
-4. Benzer ticket gruplari cluster edilir.
-5. Her cozum adimi guven skoru alir.
-6. Bot cevaplarinda "gecmis ticketlara gore" ifadesi kullanilir.
+4. Benzer ticket gruplari problem kategorisi olarak cluster edilir.
+5. Her kategori icin "KB maddesi var mi / eksik mi" kontrolu yapilir.
+6. Bot cevaplarinda "SMAX sinyali" ifadesi kullanilir; cozum Problem KB'den gelir.
 
 ## Logo icin guvenli baslangic
 
@@ -88,4 +89,3 @@ Read-only pilot sonrasi:
 - Cari ozet.
 - Vade/odeme hatirlatma.
 - Mutabakat taslagi.
-

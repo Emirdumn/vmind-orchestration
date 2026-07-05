@@ -2,25 +2,28 @@ import type { CorpusEntry } from "@/lib/vmind/types";
 
 /**
  * Mock bilgi tabani. Her kayit, RAG katmaninin "retrieve + generate" ciktisini
- * temsil eder: kaynakli cevap metni, citation listesi, benzer ticketlar ve
- * (varsa) taslak aksiyon. Gercek connectorlar geldiginde bu katman
- * vector+keyword retrieval ile degistirilecek; cevap sozlesmesi ayni kalacak.
+ * temsil eder: kaynakli cevap metni, citation listesi, ilgili KB makaleleri ve
+ * (varsa) taslak aksiyon.
+ *
+ * KB-first ilke: cevaplar dokumante edilmis knowledge base makalelerine ve
+ * surec dokumanlarina dayanir. SMAX ticketlari cevap kaynagi degildir; sadece
+ * KB makalelerinde "kaynak vaka" olarak gorunur.
  */
 export const corpus: CorpusEntry[] = [
   {
     id: "vpn-dropout",
-    sourceSystem: "smax",
+    sourceSystem: "kb",
     dataClass: "internal",
     keywords: ["vpn", "kopuyor", "kopma", "tunel", "ipsec", "disconnect", "baglanti"],
     answerText:
-      "Gecmis kayitlara gore VPN kopma problemlerinde en sik ise yarayan ilk kontrol listesi:\n\n1. IKE/IPsec faz-2 lifetime degerlerinin iki ucta esit oldugunu dogrula (SMAX-10432'de kok neden buydu).\n2. Karsi uc NAT arkasindaysa NAT-T'nin acik oldugunu kontrol et.\n3. Tunel MTU degerini 1400'e dusurup paket fragmantasyonunu test et.\n4. Hat kalitesini olc; %1 uzeri paket kaybi varsa ISP eskalasyonu ac (SMAX-9954).\n\nBu adimlar kesin cozum degil, gecmiste ise yaramis adimlardir. Iki denemeden sonra cozum yoksa network ekibine devir onerilir.",
+      "KB-001 makalesine gore VPN kopma probleminde dokumante edilmis kok neden ve kontrol sirasi:\n\nKok neden (en sik): iki ucta IKE/IPsec faz-2 lifetime uyusmazligi.\n\n1. Iki ucta faz-2 lifetime degerlerini esitle.\n2. Karsi uc NAT arkasindaysa NAT-T'nin acik oldugunu kontrol et.\n3. Tunel MTU degerini 1400'e dusurup fragmantasyonu test et.\n4. Hat kalitesini olc; %1 uzeri paket kaybinda ISP eskalasyonu ac.\n\nDogrulama: tunel 24 saat kesintisiz kalirsa cozum dogrulanmis sayilir. Makale, gecmisteki 3 vakadan (SMAX kayitlari) uretildi ve 18.06.2026'da dogrulandi. Iki denemeden sonra cozum yoksa network ekibine devir onerilir.",
     citations: [
       {
-        sourceSystem: "smax",
-        sourceUri: "SMAX-10432",
+        sourceSystem: "kb",
+        sourceUri: "KB-001",
         title: "Site-to-site VPN tuneli periyodik kopuyor",
-        docType: "ticket",
-        snippet: "Faz-2 lifetime uyusmazligi giderildi, MTU 1400'e dusuruldu.",
+        docType: "kb_article",
+        snippet: "Kok neden: faz-2 lifetime uyusmazligi; NAT-T ve MTU ikincil nedenler.",
       },
       {
         sourceSystem: "runbooks",
@@ -30,30 +33,37 @@ export const corpus: CorpusEntry[] = [
         snippet: "Ilk kontrol: lifetime, NAT-T, MTU, hat kalitesi sirasiyla incelenir.",
       },
     ],
-    ticketIds: ["SMAX-10432", "SMAX-10287", "SMAX-9954"],
+    articleIds: ["KB-001"],
     draftAction: {
-      id: "draft-vpn-ticket",
-      type: "smax_ticket",
-      targetSystem: "smax",
-      title: "SMAX ticket taslagi: VPN kopma incelemesi",
+      id: "draft-vpn-kb-article",
+      type: "kb_article",
+      targetSystem: "kb",
+      title: "Problem KB taslagi: VPN kopma kontrol listesi",
       fields: [
-        { label: "Kategori", value: "Network / VPN" },
-        { label: "Oncelik", value: "High" },
-        { label: "Onerilen ekip", value: "Network Operasyon" },
-        { label: "Ozet", value: "Musteri VPN tuneli periyodik kopuyor; lifetime/NAT-T/MTU kontrolleri uygulanacak." },
+        { label: "Problem", value: "Site-to-site VPN tuneli periyodik kopuyor" },
+        { label: "Sahip ekip", value: "Network Operasyon" },
+        { label: "KB onceligi", value: "High - SMAX tekrar sinyali var" },
+        { label: "Kontrol listesi", value: "Lifetime, NAT-T, MTU ve hat kalitesi dogrulanacak" },
       ],
-      note: "Taslak otomatik gonderilmez. Gondermeden once yetkili onayi gerekir.",
+      note: "Bu bir knowledge base maddesi taslagidir; ticket cozumunden otomatik uretilmez ve ekip dogrulamasi gerektirir.",
     },
-    confidence: 0.86,
+    confidence: 0.9,
   },
   {
     id: "backup-restore",
-    sourceSystem: "portvmind",
+    sourceSystem: "kb",
     dataClass: "internal",
     keywords: ["backup", "restore", "volume", "yedek", "geri yukleme", "snapshot"],
     answerText:
-      "PortvMind'de volume backup restore akisi:\n\n1. Volumes > Backups ekranindan ilgili backup'i sec.\n2. Restore hedefini belirle: mevcut volume uzerine yazma veya yeni volume olusturma.\n3. Restore islemini baslatmadan once mutlaka guncel bir snapshot al.\n\nRisk uyarisi: Restore, hedef volume uzerindeki mevcut veriyi GERI DONUSSUZ sekilde uzerine yazar (SMAX-10511'de bu nedenle instance boot edememisti). Bu islem onay gerektirir; asistan restore'u kendisi baslatmaz, sadece taslak gorev olusturur.",
+      "KB-002 makalesi ve PortvMind rehberine gore volume backup restore akisi:\n\n1. Volumes > Backups ekranindan ilgili backup'i sec.\n2. Restore hedefini belirle: mumkunse 'yeni volume olustur' secenegini kullan.\n3. Restore islemini baslatmadan once mutlaka guncel bir snapshot al.\n\nDokumante edilmis risk: Restore, hedef volume uzerindeki mevcut veriyi GERI DONUSSUZ sekilde uzerine yazar. Bu islem onay gerektirir; asistan restore'u kendisi baslatmaz, sadece taslak gorev olusturur.",
     citations: [
+      {
+        sourceSystem: "kb",
+        sourceUri: "KB-002",
+        title: "Volume restore mevcut verinin uzerine yazar",
+        docType: "kb_article",
+        snippet: "Restore oncesi snapshot zorunlu; mumkunse yeni volume hedefi secilir.",
+      },
       {
         sourceSystem: "portvmind",
         sourceUri: "portvmind/docs/volumes/backup-restore.md",
@@ -61,15 +71,8 @@ export const corpus: CorpusEntry[] = [
         docType: "product_doc",
         snippet: "Restore islemi hedef volume icerigini uzerine yazar; oncesinde snapshot onerilir.",
       },
-      {
-        sourceSystem: "smax",
-        sourceUri: "SMAX-10511",
-        title: "Volume restore sonrasi instance boot etmiyor",
-        docType: "ticket",
-        snippet: "Restore mevcut volume uzerine yazilmis; snapshot'tan yeni volume ile cozuldu.",
-      },
     ],
-    ticketIds: ["SMAX-10511"],
+    articleIds: ["KB-002"],
     draftAction: {
       id: "draft-backup-task",
       type: "vrpmind_task",
@@ -90,7 +93,7 @@ export const corpus: CorpusEntry[] = [
     dataClass: "internal",
     keywords: ["teklif", "onay", "muhasebe onayi", "surec", "asama", "termin"],
     answerText:
-      "vRPMind teklif surecinde 'muhasebe onayi bekliyor' asamasindan sonraki adimlar:\n\n1. Sorumlu: Muhasebe onay kuyrugundaki yetkili (surec kartinda gorunur).\n2. Gerekli belgeler: teklif formu, fiyat onay tablosu ve varsa ozel indirim gerekcesi.\n3. Onay tamamlaninca surec otomatik olarak 'sozlesme hazirligi' adimina gecer; satis sorumlusuna gorev acilir.\n4. Termin: onay SLA'si 2 is gunu; asilirsa hatirlatma gorevi onerilir.\n\nIstersen bekleyen onay icin vRPMind'de hatirlatma gorevi taslagi hazirlayabilirim.",
+      "vRPMind surec dokumani ve KB-004 makalesine gore 'muhasebe onayi bekliyor' asamasindan sonraki adimlar:\n\n1. Sorumlu: Muhasebe onay kuyrugundaki yetkili (surec kartinda gorunur).\n2. Gerekli belgeler: teklif formu, fiyat onay tablosu ve varsa ozel indirim gerekcesi.\n3. Onay tamamlaninca surec otomatik olarak 'sozlesme hazirligi' adimina gecer; satis sorumlusuna gorev acilir.\n4. Termin: onay SLA'si 2 is gunu; asilirsa hatirlatma gorevi onerilir.\n\nIstersen bekleyen onay icin vRPMind'de hatirlatma gorevi taslagi hazirlayabilirim.",
     citations: [
       {
         sourceSystem: "vrpmind",
@@ -99,8 +102,15 @@ export const corpus: CorpusEntry[] = [
         docType: "procedure",
         snippet: "Muhasebe onayi > sozlesme hazirligi > imza adimlari; onay SLA 2 is gunu.",
       },
+      {
+        sourceSystem: "kb",
+        sourceUri: "KB-004",
+        title: "Teklif sureci: muhasebe onayi adimi",
+        docType: "kb_article",
+        snippet: "SLA asiminda hatirlatma gorevi; onay sonrasi otomatik adim gecisi.",
+      },
     ],
-    ticketIds: [],
+    articleIds: ["KB-004"],
     draftAction: {
       id: "draft-proposal-reminder",
       type: "vrpmind_task",
@@ -121,7 +131,7 @@ export const corpus: CorpusEntry[] = [
     dataClass: "financial",
     keywords: ["cari", "mutabakat", "belge", "fatura", "tahsilat", "odeme"],
     answerText:
-      "Logo surec dokumanina gore cari mutabakat icin gerekli belgeler:\n\n1. Donem sonu cari hesap ekstresi (iki taraf icin).\n2. Acik fatura listesi ve vade dokumu.\n3. Varsa iade/fiyat farki dekontlari.\n4. Mutabakat mektubu sablonu (imza yetkilisi onayli).\n\nSurec: ekstre karsilastirmasi > fark analizi > mutabakat mektubu > karsilikli imza. Asistan muhasebe kaydi olusturmaz; sadece eksik belge kontrol listesi taslagi hazirlar.",
+      "Logo surec dokumani ve KB-005 makalesine gore cari mutabakat icin gerekli belgeler:\n\n1. Donem sonu cari hesap ekstresi (iki taraf icin).\n2. Acik fatura listesi ve vade dokumu.\n3. Varsa iade/fiyat farki dekontlari.\n4. Mutabakat mektubu sablonu (imza yetkilisi onayli).\n\nSurec: ekstre karsilastirmasi > fark analizi > mutabakat mektubu > karsilikli imza. Asistan muhasebe kaydi olusturmaz; sadece eksik belge kontrol listesi taslagi hazirlar.",
     citations: [
       {
         sourceSystem: "logo",
@@ -130,8 +140,15 @@ export const corpus: CorpusEntry[] = [
         docType: "invoice_process",
         snippet: "Ekstre, acik fatura listesi, dekontlar ve mutabakat mektubu zorunlu belgelerdir.",
       },
+      {
+        sourceSystem: "kb",
+        sourceUri: "KB-005",
+        title: "Cari mutabakat icin gerekli belgeler",
+        docType: "kb_article",
+        snippet: "Standart belge kontrol listesi; surec kisiye bagimliliktan cikarilir.",
+      },
     ],
-    ticketIds: [],
+    articleIds: ["KB-005"],
     draftAction: {
       id: "draft-reconciliation-checklist",
       type: "checklist",
@@ -149,12 +166,19 @@ export const corpus: CorpusEntry[] = [
   },
   {
     id: "quota-floating-ip",
-    sourceSystem: "portvmind",
+    sourceSystem: "kb",
     dataClass: "internal",
     keywords: ["kota", "quota", "floating ip", "limit", "instance", "erisilemiyor"],
     answerText:
-      "PortvMind'de kota ve floating IP durumu icin:\n\n1. Quota ekranindan compute/volume/network kotalarini kontrol et.\n2. Floating IP limiti doluysa yeni instance IP alamaz; instance calisir ama disaridan erisilemez (SMAX-10120).\n3. Kullanilmayan IP'lerin release edilmesi riskli islemdir: onay ve yetki gerektirir, asistan bunu kendisi yapmaz.\n\nRead-only kota durumu sorgusu Cloud Ops rolu icin acmaya uygundur.",
+      "KB-003 makalesine gore floating IP kotasi doldugunda:\n\nKok neden: kota proje limitine ulasmis; yeni instance IP alamadigi icin calisir ama disaridan erisilemez.\n\n1. Quota ekranindan floating IP kullanimini dogrula.\n2. Kullanilmayan IP'leri tespit et.\n3. Release islemi icin yetkili onayi al - bu riskli bir islemdir, asistan otomatik yapmaz.\n\nRead-only kota durumu sorgusu Cloud Ops rolu icin uygundur.",
     citations: [
+      {
+        sourceSystem: "kb",
+        sourceUri: "KB-003",
+        title: "Floating IP kotasi dolunca instance'a erisilemez",
+        docType: "kb_article",
+        snippet: "Kota dolulugunda instance IP alamaz; release onay gerektirir.",
+      },
       {
         sourceSystem: "portvmind",
         sourceUri: "portvmind/docs/quota/quota-overview.md",
@@ -162,16 +186,9 @@ export const corpus: CorpusEntry[] = [
         docType: "product_doc",
         snippet: "Compute, volume ve network kotalari ayri ekranlarda izlenir.",
       },
-      {
-        sourceSystem: "smax",
-        sourceUri: "SMAX-10120",
-        title: "Floating IP kotasi dolu",
-        docType: "ticket",
-        snippet: "Kullanilmayan IP'ler onayli sekilde release edilerek cozuldu.",
-      },
     ],
-    ticketIds: ["SMAX-10120"],
-    confidence: 0.8,
+    articleIds: ["KB-003"],
+    confidence: 0.82,
   },
   {
     id: "onboarding-overview",
@@ -179,17 +196,17 @@ export const corpus: CorpusEntry[] = [
     dataClass: "public",
     keywords: ["vmind", "nedir", "onboarding", "portvmind nedir", "vrpmind nedir", "urun"],
     answerText:
-      "VMind urun ailesi kisa ozet:\n\n- PortvMind: compute, volume, network, Kubernetes, load balancer, object storage, quota ve billing modulleri iceren cloud console.\n- vRPMind: departmanlar arasi workflow, gorev, teklif, termin ve dashboard yonetimi.\n- SMAX: incident/request ticket sistemi; network ekibinin cozum hafizasi.\n- Logo: muhasebe ve finans surecleri.\n\nYeni baslayanlar icin onboarding dokumanlarindaki 'ilk hafta kontrol listesi' onerilir.",
+      "VMind urun ailesi kisa ozet:\n\n- PortvMind: compute, volume, network, Kubernetes, load balancer, object storage, quota ve billing modulleri iceren cloud console.\n- vRPMind: departmanlar arasi workflow, gorev, teklif, termin ve dashboard yonetimi.\n- SMAX: incident/request ticket sistemi; en sik problemler knowledge base makalesine cevrilir.\n- Logo: muhasebe ve finans surecleri.\n\nYeni baslayanlar icin onboarding dokumanlarindaki 'ilk hafta kontrol listesi' onerilir.",
     citations: [
       {
         sourceSystem: "runbooks",
         sourceUri: "runbooks/onboarding/vmind-products.md",
         title: "VMind Urun Ailesi - Onboarding Notu",
         docType: "product_doc",
-        snippet: "PortvMind cloud console, vRPMind surec motoru, SMAX ticket sistemi ozetleri.",
+        snippet: "PortvMind cloud console, vRPMind surec motoru, Problem KB ve SMAX sinyal sistemi ozetleri.",
       },
     ],
-    ticketIds: [],
+    articleIds: [],
     confidence: 0.78,
   },
 ];

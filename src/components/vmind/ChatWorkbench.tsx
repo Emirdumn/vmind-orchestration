@@ -3,9 +3,9 @@ import { CornerDownLeft, Sparkles, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { AnswerPanel } from "./AnswerPanel";
-import { SimilarTickets } from "./SimilarTickets";
+import { KnowledgeArticles } from "./KnowledgeArticles";
 import { DraftActionCard } from "./DraftActionCard";
-import { getTicketsByIds } from "@/data/vmind/tickets";
+import { getArticlesByIds } from "@/data/vmind/articles";
 import { suggestedQuestions } from "@/data/vmind/scenarios";
 import type { ChatMessage } from "@/lib/vmind/types";
 
@@ -35,8 +35,9 @@ export function ChatWorkbench({ messages, onAsk }: ChatWorkbenchProps) {
         {messages.length === 0 && (
           <div className="rounded-md border border-border bg-surface-soft p-4">
             <p className="text-sm text-foreground/90">
-              Operasyonel bir soru sorun. Cevaplar SMAX, vRPMind, PortvMind, Logo ve runbook
-              kaynaklarina dayanir; kaynak yoksa tahmin uretilmez.
+              Operasyonel bir soru sorun. Cevaplar oncelikle Problem KB, runbook ve onayli
+              prosedurlere dayanir; SMAX yalnizca problem trend sinyali olarak kullanilir.
+              Kaynak yoksa tahmin uretilmez.
             </p>
             <p className="mb-1.5 mt-3 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
               Ornek senaryolar
@@ -75,7 +76,7 @@ export function ChatWorkbench({ messages, onAsk }: ChatWorkbenchProps) {
                 {message.answer && (
                   <>
                     <AnswerPanel answer={message.answer} />
-                    <SimilarTickets tickets={getTicketsByIds(message.answer.ticketIds)} />
+                    <KnowledgeArticles articles={getArticlesByIds(message.answer.articleIds)} />
                     {message.answer.draftAction && <DraftActionCard draft={message.answer.draftAction} />}
                   </>
                 )}

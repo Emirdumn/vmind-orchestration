@@ -1,9 +1,9 @@
 {
 	"nodes":[
 		{"id":"vision","type":"file","file":"docs/vmind-agentic-operations-hub/00-overview.md","x":-760,"y":-80,"width":360,"height":240},
-		{"id":"sources","type":"text","text":"# Kaynaklar\n\n- SMAX ticketlari\n- Logo surecleri\n- vRPMind workflow\n- PortvMind console\n- Runbook/prosedur\n- Public VMind web","x":-280,"y":-360,"width":320,"height":260},
+		{"id":"sources","type":"text","text":"# Kaynaklar\n\n- Problem KB / runbook\n- SMAX problem sinyalleri\n- Logo surecleri\n- vRPMind workflow\n- PortvMind console\n- Public VMind web","x":-280,"y":-360,"width":320,"height":260},
 		{"id":"rag","type":"file","file":"docs/vmind-agentic-operations-hub/02-rag-agent-architecture.md","x":-280,"y":20,"width":360,"height":260},
-		{"id":"agents","type":"text","text":"# Agent katmani\n\n- Router Agent\n- Knowledge Agent\n- SMAX Ticket Agent\n- PortvMind Cloud Agent\n- vRPMind Process Agent\n- Logo Finance Agent","x":220,"y":-360,"width":340,"height":260},
+		{"id":"agents","type":"text","text":"# Agent katmani\n\n- Router Agent\n- Knowledge Agent\n- SMAX Signal Agent\n- PortvMind Cloud Agent\n- vRPMind Process Agent\n- Logo Finance Agent","x":220,"y":-360,"width":340,"height":260},
 		{"id":"governance","type":"file","file":"docs/vmind-agentic-operations-hub/03-data-permissions.md","x":220,"y":20,"width":360,"height":260},
 		{"id":"mvp","type":"file","file":"docs/vmind-agentic-operations-hub/04-mvp-roadmap.md","x":720,"y":-80,"width":360,"height":260},
 		{"id":"eval","type":"file","file":"docs/vmind-agentic-operations-hub/05-bot-guardrails-eval.md","x":720,"y":260,"width":360,"height":240},

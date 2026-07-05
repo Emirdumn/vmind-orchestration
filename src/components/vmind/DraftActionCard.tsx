@@ -8,6 +8,7 @@ const typeLabels: Record<DraftAction["type"], string> = {
   smax_ticket: "SMAX ticket taslagi",
   vrpmind_task: "vRPMind gorev taslagi",
   checklist: "Kontrol listesi taslagi",
+  kb_article: "Problem KB taslagi",
 };
 
 interface DraftActionCardProps {
@@ -19,7 +20,7 @@ export function DraftActionCard({ draft }: DraftActionCardProps) {
     <div className="rounded-md border border-primary/30 bg-brand-soft/20 p-3">
       <div className="flex items-center justify-between gap-2">
         <p className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-primary">
-          {draft.type === "checklist" ? (
+          {draft.type === "checklist" || draft.type === "kb_article" ? (
             <ClipboardList className="h-3 w-3" />
           ) : (
             <PenLine className="h-3 w-3" />

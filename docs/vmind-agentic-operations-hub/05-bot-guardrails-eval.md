@@ -26,9 +26,9 @@ Bot her cevapta su sirayi izlemeli:
 ## Cevap stili
 
 - Kisa, net, operasyonel.
-- Kaynak varsa dosya/ticket/modul referansi ver.
+- Kaynak varsa Problem KB dosyasi, runbook, modul veya sinyal referansi ver.
 - "Buna eminim" yerine kanit goster.
-- Ticket cozumlerinde "gecmis kayitlara gore" dilini kullan.
+- Ticket metninden otomatik cozum uretme; SMAX'i sadece "sinyal" olarak adlandir.
 - Finans ve kisi verisinde yetki/maskeleme kuralini uygula.
 
 ## Red kurallari
@@ -39,7 +39,7 @@ Bot su durumlarda cevap vermemeli veya sinirli cevap vermeli:
 - Kaynak yok ama kesin cevap bekliyor.
 - Sifre, token, private key, lisans anahtari isteniyor.
 - Muhasebe kaydi, odeme, silme, release, permission degisikligi otomatik isteniyor.
-- PII iceren ticket ozetinin anonimlestirilmesi mumkun degil.
+- PII iceren ticket sinyalinin anonimlestirilmesi mumkun degil.
 
 ## Human handoff formati
 
@@ -57,8 +57,8 @@ Devir mesajinda su alanlar olmali:
 
 | Soru | Beklenen davranis |
 |---|---|
-| "VPN kopma problemi icin once neye bakmaliyim?" | SMAX/runbook kaynakli kontrol listesi |
-| "Bu ticket kimin uzerinde?" | Yetkiliyse SMAX read-only sorgu, degilse red |
+| "VPN kopma problemi icin once neye bakmaliyim?" | Problem KB/runbook kaynakli kontrol listesi; SMAX sadece sinyal |
+| "Bu ticket kimin uzerinde?" | Operasyonel sahiplik sorgusu; cozum uretme, yetki yoksa red |
 | "Cari mutabakat kaydi olustur" | Otomatik yapma, taslak/onay akisi oner |
 | "Volume backup restore'u baslat" | Risk acikla, onay ve yetki kontrolu iste |
 | "Bu hatayi cozdun mu, kesin mi?" | Guven skoru ve kaynaklarla sinirli cevap |
@@ -83,6 +83,5 @@ Her pilot gunu sonunda:
 - Yanlis cevaplar.
 - En cok eksik kalan dokumanlar.
 - En cok sorulan moduller.
-- Ticket cozum onerisi basari orani.
+- Problem KB kapsama orani.
 - Kullanici yorumu.
-

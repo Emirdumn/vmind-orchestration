@@ -12,11 +12,12 @@ created: 2026-07-03
 
 ## Onemli ayrim
 
-RAG'de genelde modeli "egitmek" yerine kaynaklari **indeksleriz**. Model sabit kalir; bot soruya cevap verirken ilgili dokuman/ticket/sistem kaydini getirir ve cevabi bu kaynaklara dayandirir.
+RAG'de genelde modeli "egitmek" yerine kaynaklari **indeksleriz**. Model sabit kalir; bot soruya cevap verirken ilgili Problem KB, dokuman, runbook veya sistem kaydini getirir ve cevabi bu kaynaklara dayandirir.
 
 Fine-tuning daha sonra dusunulebilir, ama ilk MVP icin hedef:
 
-- Dokumanlari ve ticketlari temizlemek.
+- Problem KB, dokuman ve runbooklari temizlemek.
+- SMAX ticketlarini cozum kaynagi degil, anonim problem trend sinyali olarak ayri islemek.
 - Parcalara ayirmak.
 - Embedding ile vector store'a koymak.
 - Yetki ve kaynak metadatasi eklemek.
@@ -28,8 +29,8 @@ Fine-tuning daha sonra dusunulebilir, ama ilk MVP icin hedef:
 ```mermaid
 flowchart TB
     subgraph Sources["Kaynaklar"]
-        DOC["Dokumanlar\nPDF, Word, runbook, prosedur"]
-        SMAX["SMAX ticketlari\nincident, request, cozum notu"]
+        DOC["Problem KB + dokumanlar\nPDF, Word, runbook, prosedur"]
+        SMAX["SMAX sinyalleri\nanonim problem trendleri"]
         LOGO["Logo\nfatura, cari, muhasebe sureci"]
         VRP["vRPMind\nsurec, gorev, teklif, musteri"]
         PORT["PortvMind\ncloud kaynaklari, quota, backup, network"]
@@ -91,17 +92,17 @@ Gorev:
 
 Gorev:
 
-- Dokuman, ticket ve runbooklardan kaynakli cevap uretir.
+- Problem KB, dokuman ve runbooklardan kaynakli cevap uretir.
 - Cevapta kaynak belirtir.
 - Kaynak yoksa uydurmaz.
 
-### 3. SMAX Ticket Agent
+### 3. SMAX Signal Agent
 
 Gorev:
 
-- Benzer ticketlari bulur.
-- Kategori, oncelik, cozum adimi ve sorumlu ekip onerir.
-- Ilk MVP'de ticket acma/guncelleme taslak olarak kalmali.
+- Tekrar eden problem kategorilerini ve frekans sinyallerini bulur.
+- Eksik Problem KB maddesi veya guncelleme ihtiyacini onerir.
+- Ticket metninden otomatik cozum uretmez; gerekiyorsa ticket acma/guncelleme taslak olarak kalir.
 
 ### 4. PortvMind Cloud Agent
 
@@ -148,10 +149,10 @@ flowchart LR
 
 Her chunk icin onerilen alanlar:
 
-- `source_system`: smax, logo, vrpmind, portvmind, website, manual, policy.
-- `source_uri`: dosya yolu, URL, ticket id veya API resource id.
+- `source_system`: kb, smax, logo, vrpmind, portvmind, website, manual, policy.
+- `source_uri`: dosya yolu, URL, KB id, ticket-signal id veya API resource id.
 - `department`: network, finance, sales, cloud, support, hr.
-- `doc_type`: runbook, ticket, policy, invoice_process, product_doc, faq.
+- `doc_type`: kb_article, runbook, ticket, policy, invoice_process, product_doc, faq.
 - `sensitivity`: public, internal, confidential, pii, financial.
 - `owner`: dokuman sahibi ekip.
 - `permission_group`: LDAP/SSO grubu.
@@ -164,9 +165,8 @@ Her chunk icin onerilen alanlar:
 ## Retrieval kurallari
 
 - Kaynak yoksa "bilmiyorum" de ve hangi kaynagin eksik oldugunu soyle.
-- Ticket cozumlerini "gecmiste ise yaramis adim" diye sun; kesin cozum gibi satma.
+- Ticket metninden cozum uretme; ticketlari sadece problem onceligi ve KB eksigi sinyali olarak kullan.
 - Logo ve finans tarafinda otomatik aksiyon yerine onayli taslak kullan.
 - PortvMind operasyonunda delete, release, password, key, payment, permission gibi islemler icin onay zorunlu.
-- SMAX ticket ozetlerinde kisi verisi maskele.
+- SMAX sinyal ozetlerinde kisi verisi maskele.
 - Cevaplar kaynak linki, dosya adi, ticket id veya modul adiyla izlenebilir olmali.
-

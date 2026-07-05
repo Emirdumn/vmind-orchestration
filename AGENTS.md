@@ -18,4 +18,8 @@ Implementation guardrails:
 - Keep sensitive systems read-only or mocked until explicit approval gates exist.
 - Prefer source-grounded RAG behavior over unsupported claims.
 - Show data class, permission status, and action mode when the UI presents agent decisions.
+- Knowledge-base-first (stakeholder feedback, Jul 2026): documented problem/solution
+  articles are the primary answer source. SMAX tickets are NOT an answer source;
+  they only provide provenance references on KB articles and a prioritization
+  signal for what to document next.
 

@@ -47,7 +47,7 @@ describe("resolveActionMode", () => {
   });
 
   it("yazma islemleri her zaman taslak modunda kalir", () => {
-    for (const action of ["ticket_draft", "task_draft", "checklist_draft"] as const) {
+    for (const action of ["ticket_draft", "task_draft", "checklist_draft", "kb_article_draft"] as const) {
       const decision = resolveActionMode("network", action);
       expect(decision.allowed).toBe(true);
       expect(decision.mode).toBe("draft");

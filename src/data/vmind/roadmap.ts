@@ -10,8 +10,8 @@ export const roadmapWeeks: RoadmapWeek[] = [
     week: "Hafta 1",
     title: "Kaynak ve izin",
     items: [
-      "SMAX'tan 50-100 anonim ticket export'u al",
-      "Network runbook/prosedurlerini topla",
+      "En cok tekrar eden 10 problem kategorisini SMAX'tan anonim sinyal olarak cikar",
+      "Network runbook/prosedurlerini Problem KB maddelerine donustur",
       "vRPMind surec dokumanlarini topla",
       "PortvMind console yardim metinlerini topla",
       "Logo icin sadece surec dokumanlariyla basla",
@@ -23,7 +23,7 @@ export const roadmapWeeks: RoadmapWeek[] = [
     week: "Hafta 2",
     title: "RAG temel demo",
     items: [
-      "Markdown/Obsidian tabanli kaynak deposu kur",
+      "Markdown/Obsidian tabanli Problem KB deposu kur",
       "Chunk metadata semasini uygula",
       "Vector DB sec: Qdrant veya pgvector",
       "Hybrid retrieval kur: vector + keyword",
@@ -36,10 +36,10 @@ export const roadmapWeeks: RoadmapWeek[] = [
     week: "Hafta 3",
     title: "Tool/API taslaklari",
     items: [
-      "SMAX read-only / export tabanli benzer ticket arama",
+      "SMAX read-only / export tabanli problem trend sinyali",
       "PortvMind modul envanteri ve read-only mock API",
       "vRPMind process mock veya test ortami endpoint'i",
-      "Ticket taslagi ureten ama otomatik gondermeyen aksiyon",
+      "Problem KB maddesi taslagi ureten ama otomatik yayinlamayan aksiyon",
       "Audit log: soru, kaynak, karar, kullanici, zaman",
     ],
   },
@@ -49,8 +49,8 @@ export const roadmapWeeks: RoadmapWeek[] = [
     items: [
       "Network ekibiyle 10-20 gercek soru testi",
       "Halusinasyon ve yetki reddi testleri",
-      "Kaynak kalitesi skoru",
-      "Eksik dokuman listesi",
+      "KB kapsam skoru: sorularin yuzde kaci makaleyle karsilaniyor",
+      "Eksik makale/dokuman listesi",
       "Demo anlatimi ve 5 slaytlik yonetici ozeti",
     ],
   },
@@ -64,7 +64,7 @@ export interface SuccessMetric {
 export const successMetrics: SuccessMetric[] = [
   { metric: "Kaynakli cevap dogrulugu", target: "%85+" },
   { metric: "Kaynak olmayan soruda uydurmama", target: "%95+" },
-  { metric: "Benzer ticket bulma isabeti", target: "%70+" },
+  { metric: "Problem KB kapsama orani", target: "%70+" },
   { metric: "Ilk cevap suresi", target: "< 5 sn" },
   { metric: "Yetkisiz veri reddi", target: "%100" },
   { metric: "Pilot memnuniyet", target: "4/5+" },

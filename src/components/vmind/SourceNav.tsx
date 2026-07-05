@@ -1,9 +1,10 @@
-import { Database, FileText, Layers, Network, Ticket, Wallet } from "lucide-react";
+import { BookOpen, Database, FileText, Layers, Network, Ticket, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { dataSources } from "@/data/vmind/sources";
 import type { SourceSystem } from "@/lib/vmind/types";
 
 const sourceIcons: Record<SourceSystem, typeof Database> = {
+  kb: BookOpen,
   smax: Ticket,
   vrpmind: Layers,
   portvmind: Network,

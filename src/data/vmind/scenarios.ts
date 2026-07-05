@@ -8,7 +8,7 @@ export interface SuggestedQuestion {
 /** 04-mvp-roadmap.md'deki demo senaryolarindan uretilen ornek sorular. */
 export const suggestedQuestions: SuggestedQuestion[] = [
   {
-    question: "Musteri VPN kopuyor diyor, daha once benzer ticket var mi?",
+    question: "Musteri VPN kopuyor diyor, Problem KB'de hangi runbook'a bakmaliyim?",
     persona: "Network",
   },
   {

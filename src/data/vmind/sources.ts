@@ -2,12 +2,20 @@ import type { DataSource } from "@/lib/vmind/types";
 
 export const dataSources: DataSource[] = [
   {
-    id: "smax",
-    name: "SMAX",
-    description: "Incident ve request ticket hafizasi, cozum notlari",
+    id: "kb",
+    name: "Knowledge Base",
+    description: "Dokumante edilmis problem/cozum makaleleri; birincil cevap kaynagi",
     status: "mock",
-    docCount: 84,
-    mvpMode: "Anonim export + RAG",
+    docCount: 34,
+    mvpMode: "Birincil cevap kaynagi",
+  },
+  {
+    id: "runbooks",
+    name: "Runbooks",
+    description: "Network ve operasyon prosedurleri, kontrol listeleri",
+    status: "mock",
+    docCount: 29,
+    mvpMode: "RAG + RBAC",
   },
   {
     id: "vrpmind",
@@ -34,11 +42,11 @@ export const dataSources: DataSource[] = [
     mvpMode: "Sadece surec dokumani",
   },
   {
-    id: "runbooks",
-    name: "Runbooks",
-    description: "Network ve operasyon prosedurleri, kontrol listeleri",
+    id: "smax",
+    name: "SMAX",
+    description: "Cevap kaynagi degil; en sik problemler KB makalesine cevrilir",
     status: "mock",
-    docCount: 29,
-    mvpMode: "RAG + RBAC",
+    docCount: 84,
+    mvpMode: "Sinyal - dokumantasyon kuyrugu",
   },
 ];

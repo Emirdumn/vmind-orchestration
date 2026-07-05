@@ -15,9 +15,10 @@ export function RoadmapTab() {
       <section>
         <h2 className="text-sm font-semibold text-foreground">30 gunluk MVP hedefi</h2>
         <p className="mt-1 max-w-3xl text-[13px] leading-relaxed text-muted-foreground">
-          Network ekibi ve stajyer kullanicilar, SMAX ticket gecmisi + runbook + vRPMind/PortvMind
-          dokumanlari uzerinden kaynakli cevap alir; bot benzer ticket bulur, cozum adimi onerir,
-          gerekiyorsa ticket taslagi ve insan devri uretir.
+          Network ekibi ve stajyer kullanicilar, Problem KB + runbook + vRPMind/PortvMind
+          dokumanlari uzerinden kaynakli cevap alir; SMAX yalnizca tekrar eden problem
+          sinyallerini ve KB backlog onceligini besler. Bot kaynak yoksa cozum uretmez,
+          gerekiyorsa KB maddesi taslagi ve insan devri uretir.
         </p>
       </section>
 

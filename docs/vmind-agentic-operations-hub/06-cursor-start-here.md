@@ -19,14 +19,14 @@ Create a usable MVP prototype in this existing Vite/React/Shadcn project for an 
 The first screen should be the actual product interface, not a marketing landing page.
 
 Build:
-- Left navigation for data sources: SMAX, vRPMind, PortvMind, Logo, Runbooks.
+- Left navigation for data sources: Knowledge Base (primary), Runbooks, vRPMind, PortvMind, Logo, SMAX (signal only).
 - Main chat/workbench area for asking operational questions.
 - Source-grounded answer panel with citations.
-- Similar-ticket/result cards for SMAX-style troubleshooting.
+- SMAX ticket-signal cards for problem trend and KB backlog prioritization.
 - Permission/safety status panel showing role, data class, and action mode.
 - MVP roadmap or evaluation tab if useful.
 
-Keep write actions as drafts. Do not implement destructive operations. Use mock data first, but structure the code so real connectors can be added later.
+Keep write actions as drafts. Do not implement destructive operations. Use mock data first, but structure the code so real connectors can be added later. Do not generate solutions directly from ticket text; answers should come from Problem KB/runbooks/procedures.
 
 Design tone:
 Quiet, operational, dense but readable. This is a work tool for cloud/network/finance/sales operations, not a hero landing page.
@@ -36,7 +36,6 @@ Quiet, operational, dense but readable. This is a work tool for cloud/network/fi
 
 1. Inspect the existing React routes and components.
 2. Decide whether to replace the current first screen or add a new route.
-3. Add mock data for sources, citations, tickets, and agent decisions.
+3. Add mock data for sources, citations, Problem KB articles, ticket signals, and agent decisions.
 4. Build the workbench UI.
 5. Add tests for retrieval/permission helper functions if helpers are introduced.
-

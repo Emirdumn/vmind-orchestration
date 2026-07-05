@@ -75,7 +75,7 @@ VMind'in rakipten daha iyi urun fikri gelistirebilecegi alanlar:
 - Cloud operasyon verisi VMind'in kendi altyapisinda.
 - PortvMind console zaten compute, volume, network, Kubernetes, load balancer, object storage, backup ve quota gibi somut moduller tasiyor.
 - vRPMind zaten surec, gorev, workflow ve departmanlar arasi koordinasyon diline sahip.
-- SMAX ticketlari, network ekibinin gercek incident hafizasi olarak cok degerli.
+- SMAX ticketlari, hangi problemlerin tekrar ettigini gosteren gercek sinyal kaynagi; cozumler Problem KB'de dokumante edilerek degerlenir.
 - Logo muhasebe kullanimi, finans sureclerine dokunan gercek kurumsal workflow firsati veriyor.
 - VMind yerel cloud/on-prem/KVKK anlatimini kendi marka gucuyle daha inandirici kurabilir.
 
@@ -104,7 +104,7 @@ Bu envanter, ilk RAG botunun PortvMind icin "kullanim kilavuzu + operasyon rehbe
 - Internal ops copilot.
 - Cloud console copilot.
 - vRPMind workflow copilot.
-- SMAX ticket resolver.
+- Problem KB assistant (SMAX sinyalleriyle beslenen).
 - Logo finance assistant.
 - Customer success / proposal assistant.
 
@@ -112,5 +112,5 @@ Kritik fark: VMind'in botu sadece "musteriyle konusmaz"; VMind ekiplerinin opera
 
 ## Ilk anlatim cumlesi
 
-> VMind Agentic Operations Hub, VMind'in cloud, ticket, ERP/VRP ve muhasebe sistemlerindeki kurumsal hafizayi tek bir guvenli AI operasyon katmanina cevirir; cevap verir, kaynak gosterir, sistemden veri okur, onayli aksiyon baslatir ve kritik durumda dogru ekibe devreder.
+> VMind Agentic Operations Hub, VMind'in cloud, Problem KB/runbook, ERP/VRP ve muhasebe sistemlerindeki kurumsal hafizayi tek bir guvenli AI operasyon katmanina cevirir; cevap verir, kaynak gosterir, sistemden veri okur, onayli aksiyon baslatir ve kritik durumda dogru ekibe devreder. Ticketlar cevap kaynagi degil, dokumantasyon onceligi sinyalidir.
 

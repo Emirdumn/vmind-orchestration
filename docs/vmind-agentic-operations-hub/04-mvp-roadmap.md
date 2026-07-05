@@ -14,7 +14,7 @@ created: 2026-07-03
 
 30 gun icinde calisan bir demo:
 
-> Network ekibi ve stajyer kullanicilar, SMAX ticket gecmisi + runbook + vRPMind/PortvMind dokumanlari uzerinden kaynakli cevap alir; bot benzer ticket bulur, cozum adimi onerir, gerekiyorsa ticket taslagi ve insan devri uretir.
+> Network ekibi ve stajyer kullanicilar, Problem KB + runbook + vRPMind/PortvMind dokumanlari uzerinden kaynakli cevap alir; SMAX yalnizca tekrar eden problem sinyali ve KB backlog onceligi icin kullanilir. Bot kaynak yoksa cozum uretmez, gerekiyorsa KB maddesi taslagi ve insan devri uretir.
 
 ## Kapsam disi
 
@@ -26,8 +26,8 @@ created: 2026-07-03
 
 ## Hafta 1 - Kaynak ve izin
 
-- SMAX'tan 50-100 anonim ticket export'u al.
-- Network runbook/prosedurlerini topla.
+- SMAX'tan tekrar eden 10 problem kategorisini anonim sinyal olarak cikar.
+- Network runbook/prosedurlerini Problem KB maddelerine donustur.
 - vRPMind surec dokumanlarini topla.
 - PortvMind console yardim metinleri veya ekran rehberlerini topla.
 - Logo icin sadece surec dokumanlariyla basla.
@@ -36,7 +36,7 @@ created: 2026-07-03
 
 ## Hafta 2 - RAG temel demo
 
-- Markdown/Obsidian tabanli kaynak deposu kur.
+- Markdown/Obsidian tabanli Problem KB deposu kur.
 - Chunk metadata semasini uygula.
 - Vector DB sec: Qdrant veya pgvector.
 - Hybrid retrieval kur: vector + keyword.
@@ -46,10 +46,10 @@ created: 2026-07-03
 
 ## Hafta 3 - Tool/API taslaklari
 
-- SMAX read-only veya export tabanli benzer ticket arama.
+- SMAX read-only veya export tabanli problem trend sinyali.
 - PortvMind modul envanteri ve read-only mock API.
 - vRPMind process mock veya test ortami endpoint'i.
-- Ticket taslagi ureten ama otomatik gondermeyen aksiyon.
+- Problem KB maddesi taslagi ureten ama otomatik yayinlamayan aksiyon.
 - Audit log: soru, kaynak, karar, kullanici, zaman.
 
 ## Hafta 4 - Pilot ve olcum
@@ -66,23 +66,23 @@ created: 2026-07-03
 |---|---:|
 | Kaynakli cevap dogrulugu | %85+ |
 | Kaynak olmayan soruda uydurmama | %95+ |
-| Benzer ticket bulma isabeti | %70+ |
+| Problem KB kapsama orani | %70+ |
 | Ilk cevap suresi | < 5 sn |
 | Yetkisiz veri reddi | %100 |
 | Pilot memnuniyet | 4/5+ |
 
 ## Demo senaryolari
 
-### Senaryo 1 - Network ticket cozum onerisi
+### Senaryo 1 - Network Problem KB onerisi
 
 Kullanici:
 
-> Musteri VPN kopuyor diyor, daha once benzer ticket var mi?
+> Musteri VPN kopuyor diyor, Problem KB'de hangi runbook'a bakmaliyim?
 
 Beklenen:
 
-- Benzer SMAX ticketlari listeler.
-- En sik cozum adimlarini kaynakli ozetler.
+- Problem KB/runbook maddesini kaynakli getirir.
+- SMAX sinyallerini sadece tekrar eden problem kaniti olarak gosterir.
 - Ilk kontrol listesini verir.
 - Emin degilse network ekibine devreder.
 
@@ -126,8 +126,7 @@ Beklenen:
 
 - Internal Ops Assistant.
 - Cloud Console Assistant.
-- SMAX Ticket Resolver.
+- Problem KB Assistant.
 - vRPMind Process Copilot.
 - Logo Finance Assistant.
 - Customer Success Proposal Copilot.
-

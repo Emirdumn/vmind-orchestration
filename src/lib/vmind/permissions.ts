@@ -34,6 +34,7 @@ const draftActions: ActionType[] = [
   "ticket_draft",
   "task_draft",
   "checklist_draft",
+  "kb_article_draft",
 ];
 
 export interface ActionDecision {

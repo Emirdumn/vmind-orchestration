@@ -14,12 +14,13 @@ Start here:
 
 Core product sentence:
 
-> VMind Agentic Operations Hub turns VMind's cloud, ticket, ERP/VRP, and finance knowledge into one secure AI operations layer that answers with sources, reads systems through approved tools, drafts actions, and hands off risky cases to the right human team.
+> VMind Agentic Operations Hub turns VMind's cloud, Problem KB, ERP/VRP, finance, and ticket-signal knowledge into one secure AI operations layer that answers with sources, reads systems through approved tools, drafts actions, and hands off risky cases to the right human team.
 
 Current implementation stance:
 
+- Knowledge-base-first (stakeholder feedback, Jul 2026): answers come from documented Problem KB articles, runbooks, and process docs.
 - Build RAG first; do not fine-tune in the MVP.
-- Use anonymized SMAX exports before live ticket integration.
+- Use SMAX only as anonymized problem trend signal; do not generate solutions directly from ticket text.
 - Keep Logo and PortvMind integrations read-only until approval and audit gates exist.
 - Treat write actions as drafts unless explicitly approved by an authorized user.
 - Every answer should be source-grounded or clearly refuse to guess.

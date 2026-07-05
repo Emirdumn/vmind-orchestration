@@ -9,6 +9,7 @@ import {
 describe("connector profiles", () => {
   it("her kaynak icin connector profili tanimlidir", () => {
     expect(connectorProfiles.map((profile) => profile.id).sort()).toEqual([
+      "kb",
       "logo",
       "portvmind",
       "runbooks",
@@ -32,6 +33,7 @@ describe("connector profiles", () => {
   it("connector asamalarini sayar", () => {
     const counts = countProfilesByStage();
     expect(counts.export_ready).toBeGreaterThanOrEqual(1);
+    expect(counts.read_only_ready).toBeGreaterThanOrEqual(1);
     expect(counts.blocked).toBe(1);
   });
 });

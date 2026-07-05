@@ -1,4 +1,4 @@
-export type SourceSystem = "smax" | "vrpmind" | "portvmind" | "logo" | "runbooks";
+export type SourceSystem = "kb" | "smax" | "vrpmind" | "portvmind" | "logo" | "runbooks";
 
 export type DataClass =
   | "public"
@@ -24,6 +24,7 @@ export type ActionType =
   | "ticket_draft"
   | "task_draft"
   | "checklist_draft"
+  | "kb_article_draft"
   | "delete"
   | "release"
   | "payment"
@@ -31,6 +32,7 @@ export type ActionType =
   | "accounting_entry";
 
 export type DocType =
+  | "kb_article"
   | "runbook"
   | "ticket"
   | "policy"
@@ -79,14 +81,34 @@ export interface Citation {
   snippet: string;
 }
 
+/**
+ * SMAX ticketlari cevap kaynagi DEGILDIR. KB makalelerine "kaynak vaka"
+ * referansi olarak baglanir ve dokumantasyon onceliklendirmesi icin
+ * sinyal uretir.
+ */
 export interface Ticket {
   id: string;
   title: string;
   category: string;
   priority: "low" | "medium" | "high" | "critical";
   status: "resolved" | "reopened" | "open";
+}
+
+/** Dokumante edilmis problem/cozum makalesi: RAG'in birincil cevap kaynagi. */
+export interface KnowledgeArticle {
+  id: string;
+  title: string;
+  category: string;
+  problem: string;
+  symptoms: string[];
+  rootCause: string;
   resolutionSteps: string[];
-  similarity: number;
+  verification: string;
+  owner: string;
+  lastVerified: string;
+  /** Bu makalenin yazilmasina yol acan gecmis vakalar (provenance). */
+  sourceTicketIds: string[];
+  relevance: number;
 }
 
 export interface DraftActionField {
@@ -96,7 +118,7 @@ export interface DraftActionField {
 
 export interface DraftAction {
   id: string;
-  type: "smax_ticket" | "vrpmind_task" | "checklist";
+  type: "smax_ticket" | "vrpmind_task" | "checklist" | "kb_article";
   targetSystem: SourceSystem;
   title: string;
   fields: DraftActionField[];
@@ -109,7 +131,7 @@ export interface AgentAnswer {
   kind: "answer" | "refusal";
   text: string;
   citations: Citation[];
-  ticketIds: string[];
+  articleIds: string[];
   draftAction?: DraftAction;
   confidence: number;
   dataClass: DataClass;
@@ -130,7 +152,7 @@ export interface CorpusEntry {
   keywords: string[];
   answerText: string;
   citations: Citation[];
-  ticketIds: string[];
+  articleIds: string[];
   draftAction?: DraftAction;
   confidence: number;
 }

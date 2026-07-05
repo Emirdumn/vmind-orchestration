@@ -19,16 +19,19 @@ describe("scoreEntry", () => {
 });
 
 describe("retrieve", () => {
-  it("VPN sorusuna kaynakli cevap ve benzer ticket doner", () => {
-    const answer = retrieve("Musteri VPN kopuyor diyor, benzer ticket var mi?", {
+  it("VPN sorusuna Problem KB kaynakli cevap ve KB makalesi doner", () => {
+    const answer = retrieve("Musteri VPN kopuyor diyor, Problem KB'de hangi runbook'a bakmaliyim?", {
       role: "network",
       corpus,
       now,
     });
     expect(answer.kind).toBe("answer");
     expect(answer.citations.length).toBeGreaterThan(0);
-    expect(answer.ticketIds).toContain("SMAX-10432");
-    expect(answer.citations.some((c) => c.sourceSystem === "smax")).toBe(true);
+    expect(answer.articleIds).toContain("KB-001");
+    expect(answer.citations.some((c) => c.sourceSystem === "kb")).toBe(true);
+    expect(answer.citations.some((c) => c.sourceSystem === "runbooks")).toBe(true);
+    expect(answer.text).toContain("KB-001");
+    expect(answer.draftAction?.type).toBe("kb_article");
   });
 
   it("kaynak yoksa tahmin uretmez", () => {
@@ -90,6 +93,17 @@ describe("retrieve", () => {
       role: "network",
       corpus,
       scope: "logo",
+      now,
+    });
+    expect(answer.kind).toBe("refusal");
+    expect(answer.refusalReason).toBe("no_source");
+  });
+
+  it("SMAX scope'u ticket metninden dogrudan cozum uretmez", () => {
+    const answer = retrieve("Musteri VPN kopuyor diyor", {
+      role: "network",
+      corpus,
+      scope: "smax",
       now,
     });
     expect(answer.kind).toBe("refusal");
