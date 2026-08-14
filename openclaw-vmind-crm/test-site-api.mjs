@@ -8,9 +8,9 @@ import { CRMStore, normalizePhone } from "./crm-store.js";
 import {
   createSiteHealthHttpHandler,
   createSiteSignature,
+  verifySiteSignature,
   normalizeSiteQuotePayload,
   syncSiteQuote,
-  verifySiteSignature,
 } from "./site-api.js";
 
 const directory = mkdtempSync(join(tmpdir(), "vmind-crm-site-"));
@@ -28,6 +28,16 @@ try {
   const signature = createSiteSignature(secret, timestamp, rawBody);
   assert.equal(
     verifySiteSignature(secret, timestamp, rawBody, `v1=${signature}`, 1786698000 * 1000),
+    true,
+  );
+  assert.equal(
+    verifySiteSignature(
+      ["new-site-secret-that-is-at-least-32-characters", secret],
+      timestamp,
+      rawBody,
+      `v1=${signature}`,
+      1786698000 * 1000,
+    ),
     true,
   );
   assert.equal(

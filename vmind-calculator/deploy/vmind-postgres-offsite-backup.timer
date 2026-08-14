@@ -1,0 +1,11 @@
+[Unit]
+Description=Nightly VMind encrypted offsite PostgreSQL backup
+
+[Timer]
+OnCalendar=*-*-* 05:00:00 Europe/Istanbul
+Persistent=true
+RandomizedDelaySec=20m
+Unit=vmind-postgres-offsite-backup.service
+
+[Install]
+WantedBy=timers.target

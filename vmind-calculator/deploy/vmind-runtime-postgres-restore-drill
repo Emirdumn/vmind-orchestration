@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+backup_dir=${VMIND_BACKUP_DIR:-/var/backups/vmind-runtime-postgres}
+state_dir=${VMIND_RESTORE_STATE_DIR:-/var/lib/vmind-runtime-restore-drill}
+shopt -s nullglob
+backups=("$backup_dir"/vmind-runtime-*.dump)
+(( ${#backups[@]} > 0 )) || { echo 'restore drill için backup yok' >&2; exit 1; }
+latest=${backups[-1]}
+checksum="$latest.sha256"
+[[ -r "$checksum" ]] || { echo 'backup checksum yok' >&2; exit 1; }
+(cd "$backup_dir" && sha256sum -c "$(basename "$checksum")")
+
+stamp=$(date -u +%Y%m%dT%H%M%SZ)
+drill_db="vmind_restore_drill_${stamp}_$$"
+pg_env=(env "PGHOST=${PGHOST:-/var/run/postgresql}" PGUSER=postgres)
+as_postgres() { runuser -u postgres -- "${pg_env[@]}" "$@"; }
+cleanup() { as_postgres dropdb --if-exists "$drill_db" >/dev/null 2>&1 || true; }
+trap cleanup EXIT
+
+as_postgres createdb --template=template0 "$drill_db"
+as_postgres pg_restore --exit-on-error --no-owner --no-privileges --dbname="$drill_db" <"$latest"
+verified=$(as_postgres psql --dbname="$drill_db" --tuples-only --no-align --command \
+  "SELECT (to_regclass('platform.schema_migrations') IS NOT NULL AND to_regclass('agent.runs') IS NOT NULL)::text")
+[[ "$verified" == 'true' ]] || { echo 'restore edilen şema doğrulanamadı' >&2; exit 1; }
+install -d -m 700 "$state_dir"
+printf '%s %s\n' "$stamp" "$(basename "$latest")" >"$state_dir/last-success"
+chmod 600 "$state_dir/last-success"

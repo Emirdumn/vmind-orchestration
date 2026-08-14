@@ -141,9 +141,11 @@ export default definePluginEntry({
     // zaman penceresi icindeki istekleri kabul eder. Sir yoksa rota bilincli
     // olarak kaydedilmez; yanlis yapilandirma acik bir yazma yuzeyi yaratmaz.
     const siteSecret = String(process.env.VMIND_CRM_SITE_SECRET ?? "").trim();
+    const siteSecretPrevious = String(process.env.VMIND_CRM_SITE_SECRET_PREVIOUS ?? "").trim();
     if (siteSecret) {
-      const siteHandler = createSiteQuoteHttpHandler({ store, secret: siteSecret });
-      const siteHealthHandler = createSiteHealthHttpHandler({ store, secret: siteSecret });
+      const acceptedSiteSecrets = [siteSecret, siteSecretPrevious].filter(Boolean);
+      const siteHandler = createSiteQuoteHttpHandler({ store, secret: acceptedSiteSecrets });
+      const siteHealthHandler = createSiteHealthHttpHandler({ store, secret: acceptedSiteSecrets });
       api.registerHttpRoute({
         path: SITE_QUOTE_ROUTE,
         auth: "plugin",

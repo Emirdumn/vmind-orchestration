@@ -1,0 +1,21 @@
+[Unit]
+Description=VMind CRM encrypted offsite PostgreSQL backup with restic
+After=network-online.target vmind-postgres-backup.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+EnvironmentFile=/etc/vmind/offsite-backup.env
+Environment=VMIND_BACKUP_DIR=/home/openclaw/.openclaw/backups/postgres
+Environment=VMIND_BACKUP_TAG=vmind-crm
+Environment=RESTIC_CACHE_DIR=/var/cache/vmind-crm-restic
+ExecStart=/usr/local/sbin/vmind-postgres-offsite-backup
+Nice=15
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadOnlyPaths=/home/openclaw/.openclaw/backups/postgres
+CacheDirectory=vmind-crm-restic
+CacheDirectoryMode=0700

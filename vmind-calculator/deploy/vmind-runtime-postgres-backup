@@ -1,12 +1,26 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-backup_dir=/var/backups/vmind-runtime-postgres
+backup_dir=${VMIND_BACKUP_DIR:-/var/backups/vmind-runtime-postgres}
 stamp=$(date -u +%Y%m%dT%H%M%SZ)
 target="$backup_dir/vmind-runtime-$stamp.dump"
 
 install -d -m 700 "$backup_dir"
-pg_dump --format=custom --compress=9 --file="$target" vmind_runtime
-chmod 600 "$target"
-pg_restore --list "$target" >/dev/null
+exec 9>"$backup_dir/.backup.lock"
+flock -n 9 || { echo 'backup zaten çalışıyor' >&2; exit 0; }
+temporary=$(mktemp "$backup_dir/.vmind-runtime-$stamp.XXXXXX.dump")
+cleanup() { if [[ -f "$temporary" ]]; then rm -f -- "$temporary"; fi; }
+trap cleanup EXIT
+
+pg_dump --format=custom --compress=9 --no-owner --no-privileges \
+  --file="$temporary" --dbname="${PGDATABASE:-vmind_runtime}"
+pg_restore --list "$temporary" >/dev/null
+chmod 600 "$temporary"
+[[ ! -e "$target" ]] || { echo 'aynı zaman damgalı backup zaten var' >&2; exit 1; }
+mv -n -- "$temporary" "$target"
+digest=$(sha256sum "$target" | cut -d' ' -f1)
+printf '%s  %s\n' "$digest" "$(basename "$target")" >"$target.sha256"
+chmod 600 "$target.sha256"
+(cd "$backup_dir" && sha256sum -c "$(basename "$target").sha256") >/dev/null
 find "$backup_dir" -maxdepth 1 -type f -name 'vmind-runtime-*.dump' -mtime +14 -delete
+find "$backup_dir" -maxdepth 1 -type f -name 'vmind-runtime-*.dump.sha256' -mtime +14 -delete

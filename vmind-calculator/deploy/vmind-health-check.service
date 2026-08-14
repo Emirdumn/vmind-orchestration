@@ -1,0 +1,17 @@
+[Unit]
+Description=VMind readiness and LLM cost monitor
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=nobody
+Group=nogroup
+EnvironmentFile=/etc/vmind/monitor.env
+ExecStart=/usr/local/sbin/vmind-health-check
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6

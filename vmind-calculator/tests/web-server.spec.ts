@@ -92,6 +92,7 @@ async function startServer(
     auth?: AuthProvider;
     publicAccess?: PublicAccessGuard;
     adminAuth?: AdminApiAuth;
+    monitorAuth?: AdminApiAuth;
     runtimeStore?: RuntimeStore;
   } = {},
 ): Promise<void> {
@@ -103,6 +104,7 @@ async function startServer(
     rules,
     auth: options.auth ?? new SharedSecretAuthProvider(PASSWORD),
     ...(options.adminAuth ? { adminAuth: options.adminAuth } : {}),
+    ...(options.monitorAuth ? { monitorAuth: options.monitorAuth } : {}),
     ...(options.publicAccess ? { publicAccess: options.publicAccess } : {}),
     ...(options.runtimeStore ? { runtimeStore: options.runtimeStore } : {}),
     budget,
@@ -170,6 +172,12 @@ const guidedConfig = {
 };
 
 describe('Yetkilendirme', () => {
+  it('liveness kimlik gerektirmeden yalnız süreç durumunu döndürüyor', async () => {
+    const response = await fetch(`${base}/api/health/live`);
+    expect(response.status).toBe(200);
+    expect(await json(response)).toEqual({ status: 'live' });
+  });
+
   it('giris formunun sekli kimlik gerektirmez', async () => {
     const response = await fetch(`${base}/api/auth/config`);
     expect(response.status).toBe(200);
@@ -257,6 +265,7 @@ describe('Yönetim API sınırı', () => {
     get: async () => null,
     put: async () => {},
     init: async () => {},
+    healthCheck: async () => {},
     assertCanSpend: async () => {},
     remaining: async () => ({ total: 5, user: 1 }),
     snapshot: async () => ({
@@ -286,6 +295,19 @@ describe('Yönetim API sınırı', () => {
 
   it('yapılandırılmamış yönetim yüzeyini kapalı tutuyor', async () => {
     expect((await fetch(`${base}/api/admin/overview`)).status).toBe(404);
+  });
+
+  it('readiness ayrı monitor anahtarıyla çalışıyor ve admin verisi açmıyor', async () => {
+    close();
+    await startServer({ monitorAuth: new AdminApiAuth(adminKey), runtimeStore: store });
+    expect((await fetch(`${base}/api/health/ready`)).status).toBe(401);
+    const response = await fetch(`${base}/api/health/ready`, {
+      headers: { Authorization: `Bearer ${adminKey}` },
+    });
+    expect(response.status).toBe(200);
+    expect(await json(response)).toMatchObject({
+      status: 'ready', components: { database: 'ok', inventory: 'ok', llm: 'configured' },
+    });
   });
 
   it('normal site çerezi admin yetkisi vermiyor; ayrı Bearer gerekiyor', async () => {

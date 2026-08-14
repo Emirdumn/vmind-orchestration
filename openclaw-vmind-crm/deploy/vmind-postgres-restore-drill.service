@@ -1,0 +1,20 @@
+[Unit]
+Description=VMind CRM PostgreSQL isolated restore drill
+After=postgresql.service vmind-postgres-backup.service
+Requires=postgresql.service
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+Environment=PGHOST=/var/run/postgresql
+Environment=VMIND_BACKUP_DIR=/home/openclaw/.openclaw/backups/postgres
+ExecStart=/usr/local/sbin/vmind-postgres-restore-drill
+Nice=15
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadOnlyPaths=/home/openclaw/.openclaw/backups/postgres
+ReadWritePaths=/var/lib/vmind-crm-restore-drill
+StateDirectory=vmind-crm-restore-drill
+StateDirectoryMode=0700

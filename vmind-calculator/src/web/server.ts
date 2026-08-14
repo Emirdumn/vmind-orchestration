@@ -61,7 +61,8 @@ import {
   type Identity,
   type ServiceApiKeyAuth,
 } from './auth.js';
-import { adminApiAuthFromEnv, type AdminApiAuth } from './admin-auth.js';
+import { adminApiAuthFromEnv, monitorApiAuthFromEnv, type AdminApiAuth } from './admin-auth.js';
+import { assessCatalogInventory } from '../core/catalog/inventory.js';
 import { FlowCapacityError, FlowSession, FlowSessionRegistry } from './flow-session.js';
 import {
   RuntimeStoreUnavailableError,
@@ -99,6 +100,8 @@ export interface ServerDeps {
   auth: AuthProvider;
   /** Site/müşteri oturumundan ayrı, yalnızca yönetim API'sine ait Bearer sınırı. */
   adminAuth?: AdminApiAuth;
+  /** Admin/CRM verisi açmadan yalnız readiness kontrolü yapan ayrı Bearer. */
+  monitorAuth?: AdminApiAuth;
   /** Public müşteri modunda IP-hash limitleri ve Turnstile doğrulaması. */
   publicAccess?: PublicAccessGuard;
   // OpenClaw gibi makine istemcileri icin cerezden bagimsiz Bearer kimligi.
@@ -129,6 +132,7 @@ export interface ServerDeps {
    *   dryRun varsayılan → blocker kontrolü → insan onayı → bu izin.
    */
   allowPublish?: boolean;
+  healthRequirements?: { postgres: boolean; llm: boolean };
   /**
    * AKIŞ BAŞINA yeni bir LLM istemcisi üretir; maliyet callback'i o akışa bağlanır.
    *
@@ -308,6 +312,38 @@ export function createAgentServer(deps: ServerDeps) {
   ): Promise<boolean> {
     const method = req.method ?? 'GET';
     deps.publicAccess?.assertRequest(req);
+
+    if (pathname === '/api/health/live' && method === 'GET') {
+      sendJson(res, 200, { status: 'live' });
+      return true;
+    }
+
+    if (pathname === '/api/health/ready' && method === 'GET') {
+      if (!deps.monitorAuth) throw new HttpError(404, 'İzleme ucu yapılandırılmamış.');
+      if (!deps.monitorAuth.accepts(req.headers.authorization)) {
+        res.setHeader('WWW-Authenticate', 'Bearer realm="vmind-monitor"');
+        throw new HttpError(401, 'Geçerli izleme Bearer anahtarı gerekli.');
+      }
+      const inventory = assessCatalogInventory(deps.catalog);
+      let database: 'ok' | 'not-configured' | 'failed' = deps.runtimeStore ? 'ok' : 'not-configured';
+      try { await deps.runtimeStore?.healthCheck(); } catch { database = 'failed'; }
+      const llm = deps.createLlm ? 'configured' : 'missing';
+      const requirements = deps.healthRequirements ?? { postgres: false, llm: false };
+      const ready =
+        inventory.ready && database !== 'failed' &&
+        (!requirements.postgres || database === 'ok') &&
+        (!requirements.llm || llm === 'configured');
+      sendJson(res, ready ? 200 : 503, {
+        status: ready ? 'ready' : 'not-ready',
+        components: {
+          database,
+          inventory: inventory.ready ? 'ok' : 'blocked',
+          llm,
+          publishing: deps.allowPublish === true ? 'enabled' : 'dry-run',
+        },
+      });
+      return true;
+    }
 
     // --- yönetim API'si: müşteri/site oturumundan bağımsız ----------------
     if (pathname.startsWith('/api/admin')) {
@@ -1094,6 +1130,7 @@ export async function startFromEnv(root: string): Promise<void> {
   const { catalog, rules } = loadCatalogAndRules(root);
   const auth = createAuthProvider(authConfigFromEnv());
   const adminAuth = adminApiAuthFromEnv();
+  const monitorAuth = monitorApiAuthFromEnv();
   const publicAccess = publicAccessFromEnv(auth.kind);
   const serviceAuth = serviceApiKeyAuthFromEnv();
   const limits = limitsFromEnv();
@@ -1136,6 +1173,7 @@ export async function startFromEnv(root: string): Promise<void> {
     rules,
     auth,
     ...(adminAuth ? { adminAuth } : {}),
+    ...(monitorAuth ? { monitorAuth } : {}),
     ...(publicAccess ? { publicAccess } : {}),
     ...(serviceAuth ? { serviceAuth } : {}),
     budget,
@@ -1147,6 +1185,10 @@ export async function startFromEnv(root: string): Promise<void> {
     ...(llmModel ? { llmModel } : {}),
     staticRoot,
     allowPublish,
+    healthRequirements: {
+      postgres: process.env['WEB_REQUIRE_POSTGRES_READY'] !== '0',
+      llm: process.env['WEB_REQUIRE_LLM_READY'] !== '0',
+    },
     // Akış başına yeni istemci: maliyet callback'i o akışa bağlı.
     ...(llmAvailable && routerConfig
       ? {

@@ -1,0 +1,12 @@
+[Unit]
+Description=VMind readiness and cost check every two minutes
+
+[Timer]
+OnBootSec=2m
+OnUnitActiveSec=2m
+AccuracySec=15s
+Persistent=true
+Unit=vmind-health-check.service
+
+[Install]
+WantedBy=timers.target

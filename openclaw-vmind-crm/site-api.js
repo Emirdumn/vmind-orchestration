@@ -156,13 +156,18 @@ export function verifySiteSignature(secret, timestamp, rawBody, provided, now = 
   const signature = String(provided ?? "").replace(/^v1=/, "");
   if (!/^[0-9a-f]{64}$/i.test(signature)) return false;
 
-  let expected;
-  try {
-    expected = createSiteSignature(secret, String(timestamp), rawBody);
-  } catch {
-    return false;
-  }
-  return timingSafeEqual(Buffer.from(expected, "hex"), Buffer.from(signature, "hex"));
+  const secrets = (Array.isArray(secret) ? secret : [secret])
+    .map((value) => String(value ?? "").trim())
+    .filter(Boolean);
+  return secrets.some((candidate) => {
+    let expected;
+    try {
+      expected = createSiteSignature(candidate, String(timestamp), rawBody);
+    } catch {
+      return false;
+    }
+    return timingSafeEqual(Buffer.from(expected, "hex"), Buffer.from(signature, "hex"));
+  });
 }
 
 export async function syncSiteQuote(store, input) {
@@ -232,7 +237,8 @@ function sendJson(res, status, payload) {
 }
 
 export function createSiteQuoteHttpHandler({ store, secret, now = () => Date.now() }) {
-  if (String(secret ?? "").length < 32) {
+  const secrets = (Array.isArray(secret) ? secret : [secret]).filter(Boolean);
+  if (secrets.length === 0 || secrets.some((value) => String(value).length < 32)) {
     throw new Error("VMIND_CRM_SITE_SECRET en az 32 karakter olmalıdır.");
   }
 
@@ -281,7 +287,8 @@ export function createSiteQuoteHttpHandler({ store, secret, now = () => Date.now
 }
 
 export function createSiteHealthHttpHandler({ store, secret, now = () => Date.now() }) {
-  if (String(secret ?? "").length < 32) {
+  const secrets = (Array.isArray(secret) ? secret : [secret]).filter(Boolean);
+  if (secrets.length === 0 || secrets.some((value) => String(value).length < 32)) {
     throw new Error("VMIND_CRM_SITE_SECRET en az 32 karakter olmalıdır.");
   }
 

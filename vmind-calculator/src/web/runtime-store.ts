@@ -152,6 +152,7 @@ export interface AdminOpportunityUpdate {
 
 export interface RuntimeStore extends StructuredResponseCache {
   init(): Promise<void>;
+  healthCheck(): Promise<void>;
   assertCanSpend(identity: Identity): Promise<void>;
   remaining(identity: Identity): Promise<{ total: number | null; user: number | null }>;
   snapshot(): Promise<BudgetSnapshot>;
@@ -364,6 +365,13 @@ export class PostgresRuntimeStore implements RuntimeStore {
       }
     });
     this.degraded = false;
+  }
+
+  async healthCheck(): Promise<void> {
+    await this.guarded('sağlık kontrolü', async () => {
+      const result = await this.pool.query<{ ok: number }>('SELECT 1::int AS ok');
+      if (result.rows[0]?.ok !== 1) throw new Error('PostgreSQL beklenen yanıtı vermedi.');
+    });
   }
 
   private async ensurePrincipal(identity: Identity): Promise<string> {

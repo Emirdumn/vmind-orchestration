@@ -1,0 +1,20 @@
+[Unit]
+Description=VMind Calculator PostgreSQL isolated restore drill
+After=postgresql@16-main.service vmind-runtime-postgres-backup.service
+Requires=postgresql@16-main.service
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+Environment=PGHOST=/var/run/postgresql
+Environment=VMIND_BACKUP_DIR=/var/backups/vmind-runtime-postgres
+ExecStart=/usr/local/sbin/vmind-runtime-postgres-restore-drill
+Nice=15
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadOnlyPaths=/var/backups/vmind-runtime-postgres
+ReadWritePaths=/var/lib/vmind-runtime-restore-drill
+StateDirectory=vmind-runtime-restore-drill
+StateDirectoryMode=0700

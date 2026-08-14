@@ -173,6 +173,7 @@ export interface ServiceApiKeyOptions {
   serviceId?: string;
   displayName?: string;
   allowPublish?: boolean;
+  previousApiKey?: string;
 }
 
 // Tarayici cerezinden bagimsiz, iptal edilebilir Bearer anahtari.
@@ -181,7 +182,7 @@ export interface ServiceApiKeyOptions {
 // iptal edilip yenilenebilir.
 export class ServiceApiKeyAuth {
   readonly identity: Identity;
-  private readonly apiKey: string;
+  private readonly apiKeys: string[];
 
   constructor(apiKey: string, options: ServiceApiKeyOptions = {}) {
     const key = apiKey.trim();
@@ -196,7 +197,11 @@ export class ServiceApiKeyAuth {
     if (displayName.length === 0 || displayName.length > 80) {
       throw new Error('WEB_SERVICE_NAME 1-80 karakter olmali.');
     }
-    this.apiKey = key;
+    const previous = options.previousApiKey?.trim();
+    if (previous && (previous.length < 32 || previous.length > 512 || /\s/.test(previous))) {
+      throw new Error('WEB_SERVICE_API_KEY_PREVIOUS 32-512 karakterlik, bosluksuz bir anahtar olmali.');
+    }
+    this.apiKeys = [...new Set([key, ...(previous ? [previous] : [])])];
     this.identity = {
       userId: `service:${serviceId.toLowerCase()}`,
       displayName,
@@ -208,7 +213,7 @@ export class ServiceApiKeyAuth {
   resolve(authorization: string | string[] | undefined): Identity | null {
     if (typeof authorization !== 'string') return null;
     const match = /^Bearer ([^\s]+)$/i.exec(authorization);
-    if (!match?.[1] || !secretEquals(match[1], this.apiKey)) return null;
+    if (!match?.[1] || !this.apiKeys.some((apiKey) => secretEquals(match[1]!, apiKey))) return null;
     return this.identity;
   }
 }
@@ -222,6 +227,7 @@ export function serviceApiKeyAuthFromEnv(
     serviceId: (env['WEB_SERVICE_ID'] ?? 'openclaw').trim(),
     displayName: (env['WEB_SERVICE_NAME'] ?? 'OpenClaw WhatsApp').trim(),
     allowPublish: env['WEB_SERVICE_ALLOW_PUBLISH'] === '1',
+    previousApiKey: env['WEB_SERVICE_API_KEY_PREVIOUS'],
   });
 }
 

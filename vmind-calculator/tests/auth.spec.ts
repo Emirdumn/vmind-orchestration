@@ -8,6 +8,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import {
   PublicGuestAuthProvider,
+  ServiceApiKeyAuth,
   SharedSecretAuthProvider,
   VmindTokenAuthProvider,
   authConfigFromEnv,
@@ -15,6 +16,17 @@ import {
 } from '../src/web/auth.js';
 
 const PASSWORD = 'cok-uzun-bir-sifre-2026';
+
+describe('Servis API anahtarı rotasyonu', () => {
+  it('rotasyon sırasında yeni ve önceki Bearer anahtarını kabul ediyor', () => {
+    const current = 'current-service-key-that-is-long-enough-2026';
+    const previous = 'previous-service-key-that-is-long-enough-2026';
+    const auth = new ServiceApiKeyAuth(current, { previousApiKey: previous });
+    expect(auth.resolve(`Bearer ${current}`)?.actorType).toBe('service');
+    expect(auth.resolve(`Bearer ${previous}`)?.actorType).toBe('service');
+    expect(auth.resolve('Bearer wrong')).toBeNull();
+  });
+});
 
 describe('SharedSecretAuthProvider', () => {
   it('dogru sifre ile giris ve oturum cozumu', async () => {

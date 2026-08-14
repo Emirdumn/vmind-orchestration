@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+: "${VMIND_HEALTH_URL:?VMIND_HEALTH_URL gerekli}"
+: "${WEB_MONITOR_API_KEY:?WEB_MONITOR_API_KEY gerekli}"
+temporary=$(mktemp)
+monitor_headers=$(mktemp)
+admin_headers=$(mktemp)
+crm_headers=$(mktemp)
+chmod 600 "$temporary" "$monitor_headers" "$admin_headers" "$crm_headers"
+printf 'Authorization: Bearer %s\n' "$WEB_MONITOR_API_KEY" >"$monitor_headers"
+cleanup() { rm -f -- "$temporary" "$monitor_headers" "$admin_headers" "$crm_headers"; }
+trap cleanup EXIT
+
+alert() {
+  local message=$1
+  logger -p daemon.err -t vmind-monitor -- "$message"
+  if [[ -n "${VMIND_ALERT_WEBHOOK_URL:-}" ]]; then
+    VMIND_ALERT_MESSAGE="$message" node --input-type=module -e '
+      const response = await fetch(process.env.VMIND_ALERT_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: process.env.VMIND_ALERT_MESSAGE }),
+        signal: AbortSignal.timeout(8000),
+      });
+      if (!response.ok) process.exitCode = 1;
+    ' || true
+  fi
+}
+
+if ! curl --silent --show-error --fail-with-body --max-time 10 \
+  --header "@$monitor_headers" "$VMIND_HEALTH_URL" >"$temporary"; then
+  alert 'VMind readiness kontrolü HTTP seviyesinde başarısız.'
+  exit 1
+fi
+if ! node -e '
+  const fs = require("node:fs");
+  const body = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+  if (body.status !== "ready") process.exit(1);
+' "$temporary"; then
+  alert 'VMind readiness yanıtı hazır değil veya geçersiz.'
+  exit 1
+fi
+
+if [[ -n "${VMIND_ADMIN_OVERVIEW_URL:-}" && -n "${WEB_ADMIN_API_KEY:-}" ]]; then
+  printf 'Authorization: Bearer %s\n' "$WEB_ADMIN_API_KEY" >"$admin_headers"
+  if ! curl --silent --show-error --fail-with-body --max-time 10 \
+    --header "@$admin_headers" "$VMIND_ADMIN_OVERVIEW_URL" >"$temporary"; then
+    alert 'VMind admin maliyet özeti alınamadı.'
+    exit 1
+  fi
+  if [[ -n "${VMIND_ALERT_DAILY_COST_USD:-}" ]]; then
+    if ! node -e '
+      const fs = require("node:fs");
+      const body = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+      const threshold = Number(process.argv[2]);
+      const cost = Number(body?.today?.costUsd);
+      if (!Number.isFinite(cost) || !Number.isFinite(threshold) || cost > threshold) process.exit(1);
+    ' "$temporary" "$VMIND_ALERT_DAILY_COST_USD"; then
+      alert 'VMind günlük LLM maliyeti alarm eşiğini aştı veya ölçülemedi.'
+      exit 1
+    fi
+  fi
+fi
+
+if [[ -n "${VMIND_CRM_HEALTH_URL:-}" || -n "${VMIND_CRM_SITE_SECRET:-}" ]]; then
+  : "${VMIND_CRM_HEALTH_URL:?CRM health URL ve secret birlikte verilmelidir}"
+  : "${VMIND_CRM_SITE_SECRET:?CRM health URL ve secret birlikte verilmelidir}"
+  timestamp=$(date -u +%s)
+  signature=$(VMIND_CRM_TIMESTAMP="$timestamp" node --input-type=module -e '
+    import { createHmac } from "node:crypto";
+    const secret = process.env.VMIND_CRM_SITE_SECRET ?? "";
+    if (secret.length < 32) process.exit(2);
+    process.stdout.write(createHmac("sha256", secret).update(`${process.env.VMIND_CRM_TIMESTAMP}.`).digest("hex"));
+  ')
+  printf 'X-VMind-CRM-Timestamp: %s\nX-VMind-CRM-Signature: v1=%s\n' \
+    "$timestamp" "$signature" >"$crm_headers"
+  if ! curl --silent --show-error --fail-with-body --max-time 10 \
+    --header "@$crm_headers" "$VMIND_CRM_HEALTH_URL" >"$temporary"; then
+    alert 'VMind CRM/PostgreSQL sağlık kontrolü başarısız.'
+    exit 1
+  fi
+  if ! node -e '
+    const fs = require("node:fs");
+    const body = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+    if (body.ok !== true || body.database !== "ready") process.exit(1);
+  ' "$temporary"; then
+    alert 'VMind CRM sağlık yanıtı hazır değil veya geçersiz.'
+    exit 1
+  fi
+fi
+
+logger -p daemon.info -t vmind-monitor -- 'VMind readiness, CRM ve maliyet kontrolleri başarılı.'

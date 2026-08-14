@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+: "${RESTIC_REPOSITORY:?RESTIC_REPOSITORY gerekli}"
+: "${RESTIC_PASSWORD_FILE:?RESTIC_PASSWORD_FILE gerekli}"
+backup_dir=${VMIND_BACKUP_DIR:-/var/backups/vmind-runtime-postgres}
+tag=${VMIND_BACKUP_TAG:-vmind-calculator}
+shopt -s nullglob
+backups=("$backup_dir"/*.dump)
+(( ${#backups[@]} > 0 )) || { echo 'offsite için yerel dump yok' >&2; exit 1; }
+latest=${backups[-1]}
+checksum="$latest.sha256"
+[[ -r "$checksum" ]] || { echo 'offsite için checksum yok' >&2; exit 1; }
+(cd "$backup_dir" && sha256sum -c "$(basename "$checksum")")
+
+exec 9>/run/lock/vmind-postgres-offsite.lock
+flock -n 9 || { echo 'offsite backup zaten çalışıyor' >&2; exit 0; }
+restic backup "$latest" "$checksum" --tag "$tag" --host "$(hostname -f)"
+restic forget --tag "$tag" --keep-daily 14 --keep-weekly 8 --keep-monthly 12 --prune
+restic check
