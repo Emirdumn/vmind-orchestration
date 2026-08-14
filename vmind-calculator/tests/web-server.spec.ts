@@ -163,6 +163,12 @@ async function login(displayName = 'Emir'): Promise<string> {
 
 const withCookie = (cookie: string): Record<string, string> => ({ Cookie: cookie });
 
+const guidedConfig = {
+  profile: 'recommended', workload: 'web', exposure: 'public', capacity: 'powerful',
+  instanceCount: 2, diskTier: 'premium', diskGb: 500, loadBalancer: 'app',
+  backupCount: 4, egressGb: 1024, floatingIpCount: 1, currency: 'TL', notes: '',
+};
+
 describe('Yetkilendirme', () => {
   it('giris formunun sekli kimlik gerektirmez', async () => {
     const response = await fetch(`${base}/api/auth/config`);
@@ -248,6 +254,8 @@ describe('Yönetim API sınırı', () => {
     calculation: null,
   };
   const store: RuntimeStore = {
+    get: async () => null,
+    put: async () => {},
     init: async () => {},
     assertCanSpend: async () => {},
     remaining: async () => ({ total: 5, user: 1 }),
@@ -266,6 +274,7 @@ describe('Yönetim API sınırı', () => {
       estimates: { total: 1, published: 0 },
       crm: { contacts: 1, opportunities: 1, openOpportunities: 1 },
       today: { llmCalls: 2, inputTokens: 100, outputTokens: 50, costUsd: 0.01 },
+      cache: { entries: 3, activeEntries: 2, hits: 7 },
     }),
     adminRuns: async () => [],
     adminRunDetail: async () => null,
@@ -291,7 +300,9 @@ describe('Yönetim API sınırı', () => {
       headers: { Authorization: `Bearer ${adminKey}` },
     });
     expect(response.status).toBe(200);
-    expect((await json(response)).today.costUsd).toBe(0.01);
+    const payload = await json(response);
+    expect(payload.today.costUsd).toBe(0.01);
+    expect(payload.cache.hits).toBe(7);
   });
 
   it('CRM güncellemesini alan ve aşama listesiyle sınırlandırıyor', async () => {
@@ -307,6 +318,65 @@ describe('Yönetim API sınırı', () => {
     });
     expect(updated.status).toBe(200);
     expect((await json(updated)).stage).toBe('Proposal Sent');
+  });
+});
+
+describe('Tool-first tıklamalı akış', () => {
+  it('standart CSV yüklemesini deterministik config olarak önizliyor', async () => {
+    const cookie = await login();
+    const response = await fetch(`${base}/api/import/spreadsheet`, {
+      method: 'POST',
+      headers: {
+        ...withCookie(cookie),
+        'Content-Type': 'text/csv',
+        'X-VMind-Filename': encodeURIComponent('ihtiyaç.csv'),
+      },
+      body: 'Sunucu Adedi;vCPU;RAM GB;Disk GB\n2;8;16;500',
+    });
+    expect(response.status).toBe(200);
+    const body = await json(response);
+    expect(body.route).toBe('guided');
+    expect(body.config).toMatchObject({ instanceCount: 2, capacity: 'powerful', diskGb: 500 });
+  });
+
+  it('LLM anahtarı/istemcisi olmadan başlar ve sıfır tokenla onaya gelir', async () => {
+    close();
+    await startServer({ withLlm: false });
+    const cookie = await login();
+    const response = await fetch(`${base}/api/flow/guided`, {
+      method: 'POST',
+      headers: { ...withCookie(cookie), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ config: guidedConfig }),
+    });
+    expect(response.status).toBe(202);
+    const body = await json(response);
+    expect(body.route).toBe('tool-first');
+
+    let view: Record<string, any> | undefined;
+    for (let attempt = 0; attempt < 30; attempt++) {
+      const current = await fetch(`${base}/api/flow/${body.sessionId}`, {
+        headers: withCookie(cookie),
+      });
+      view = await json(current);
+      if (view.gate?.kind === 'approve' || view.state === 'failed') break;
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+    expect(view?.state).toBe('waiting');
+    expect(view?.gate?.kind).toBe('approve');
+    expect(view?.spentUsd).toBe(0);
+    expect(view?.editEnabled).toBe(false);
+    expect(view?.gate?.summary?.estimate?.list.map((item: { service: string }) => item.service))
+      .toEqual(['compute', 'load-balancer', 'router', 'backup']);
+  });
+
+  it('geçersiz config için LLM çalıştırmadan 400 döner', async () => {
+    const cookie = await login();
+    const response = await fetch(`${base}/api/flow/guided`, {
+      method: 'POST',
+      headers: { ...withCookie(cookie), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ config: { ...guidedConfig, instanceCount: 0 } }),
+    });
+    expect(response.status).toBe(400);
   });
 });
 

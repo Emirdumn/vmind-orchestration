@@ -5,6 +5,8 @@
  * Bu yüzden burada `credentials: 'same-origin'` dışında kimlik yönetimi yok.
  */
 
+import type { GuidedQuoteConfig } from './guidedQuote';
+
 export interface AuthField {
   name: string;
   label: string;
@@ -202,6 +204,7 @@ export interface SessionView {
   result: FlowResult | null;
   error: string | null;
   spentUsd: number;
+  editEnabled: boolean;
 }
 
 export interface AdminOverview {
@@ -211,7 +214,12 @@ export interface AdminOverview {
   estimates: { total: number; published: number };
   crm: { contacts: number; opportunities: number; openOpportunities: number };
   today: { llmCalls: number; inputTokens: number; outputTokens: number; costUsd: number };
+  cache: { entries: number; activeEntries: number; hits: number };
 }
+
+export type SpreadsheetImport =
+  | { route: 'guided'; config: GuidedQuoteConfig; sourceRows: number; message: string }
+  | { route: 'natural'; salesText: string; sourceRows: number; message: string };
 
 export interface AdminRun {
   runId: string;
@@ -343,6 +351,16 @@ export const api = {
 
   me: () => call<Me>('/api/me'),
 
+  importSpreadsheet: (file: File) =>
+    call<SpreadsheetImport>('/api/import/spreadsheet', {
+      method: 'POST',
+      headers: {
+        'Content-Type': file.type || 'application/octet-stream',
+        'X-VMind-Filename': encodeURIComponent(file.name),
+      },
+      body: file,
+    }),
+
   startFlow: (
     salesText: string,
     customer?: CustomerCrmContext,
@@ -352,6 +370,17 @@ export const api = {
       method: 'POST',
       ...(turnstileToken ? { headers: { 'X-Turnstile-Token': turnstileToken } } : {}),
       body: JSON.stringify({ salesText, ...(customer ? { customer } : {}) }),
+    }),
+
+  startGuidedFlow: (
+    config: GuidedQuoteConfig,
+    customer?: CustomerCrmContext,
+    turnstileToken?: string,
+  ) =>
+    call<{ sessionId: string; route: 'tool-first' }>('/api/flow/guided', {
+      method: 'POST',
+      ...(turnstileToken ? { headers: { 'X-Turnstile-Token': turnstileToken } } : {}),
+      body: JSON.stringify({ config, ...(customer ? { customer } : {}) }),
     }),
 
   /**

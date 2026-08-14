@@ -15,6 +15,7 @@ import {
 } from './components';
 import { AdminDashboard } from './AdminDashboard';
 import { GuidedQuoteBuilder } from './GuidedQuoteBuilder';
+import type { GuidedQuoteConfig } from './guidedQuote';
 import { useFlow } from './useFlow';
 
 const ORNEK =
@@ -203,7 +204,7 @@ function Workspace({
   const [formError, setFormError] = useState<string | null>(null);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [turnstileReset, setTurnstileReset] = useState(0);
-  const { view, error, starting, start, answer, edit, reset } = useFlow();
+  const { view, error, starting, start, startGuided, answer, edit, reset } = useFlow();
 
   const crmCustomer: CustomerCrmContext | undefined =
     customer.phoneE164.trim() && customer.privacyConsent && me.privacyNoticeVersion
@@ -215,26 +216,47 @@ function Workspace({
         privacyNoticeVersion: me.privacyNoticeVersion,
       }
     : undefined;
-  const beginFlow = (salesText: string): void => {
+  const validateAndConsumeProof = (): { allowed: true; proof?: string } | { allowed: false } => {
     setFormError(null);
     if (customer.phoneE164.trim() && !customer.privacyConsent) {
       setFormError('Telefon bilgisini CRM’e kaydetmek için veri işleme onayı gereklidir.');
-      return;
+      return { allowed: false };
     }
     if (customer.phoneE164.trim() && !me.privacyNoticeVersion) {
       setFormError('Gizlilik bildirimi sürümü yapılandırılmadığı için müşteri kaydı alınamıyor.');
-      return;
+      return { allowed: false };
     }
     if (me.turnstileSiteKey && !turnstileToken) {
       setFormError('Devam etmek için robot doğrulamasını tamamlayın.');
-      return;
+      return { allowed: false };
     }
     const proof = turnstileToken ?? undefined;
     if (me.turnstileSiteKey) {
       setTurnstileToken(null);
       setTurnstileReset((current) => current + 1);
     }
+    return { allowed: true, ...(proof ? { proof } : {}) };
+  };
+  const beginFlow = (salesText: string): void => {
+    const access = validateAndConsumeProof();
+    if (!access.allowed) return;
+    const proof = access.proof;
     void start(salesText, crmCustomer, proof);
+  };
+  const beginGuided = (config: GuidedQuoteConfig): void => {
+    const access = validateAndConsumeProof();
+    if (!access.allowed) return;
+    void startGuided(config, crmCustomer, access.proof);
+  };
+  const beginSpreadsheet = async (file: File): Promise<'guided' | 'natural'> => {
+    const imported = await api.importSpreadsheet(file);
+    if (imported.route === 'guided') {
+      beginGuided(imported.config);
+      return 'guided';
+    }
+    setText(imported.salesText);
+    beginFlow(imported.salesText);
+    return 'natural';
   };
   const resetWorkspace = (): void => {
     reset();
@@ -350,7 +372,8 @@ function Workspace({
           )}
           <GuidedQuoteBuilder
             starting={starting}
-            onStart={beginFlow}
+            onStart={beginGuided}
+            onImport={beginSpreadsheet}
             onEditText={(guidedText) => {
               setText(guidedText);
               requestAnimationFrame(() =>
@@ -429,10 +452,12 @@ function Workspace({
               />
               {gate.summary.price && <PriceTable price={gate.summary.price} />}
               {gate.summary.audit && <AuditPanel audit={gate.summary.audit} />}
-              <ApprovalEditPanel
-                summary={gate.summary}
-                onEdit={(instruction) => edit(gate.id, instruction)}
-              />
+              {view.editEnabled && (
+                <ApprovalEditPanel
+                  summary={gate.summary}
+                  onEdit={(instruction) => edit(gate.id, instruction)}
+                />
+              )}
               <Assumptions assumptions={gate.summary.assumptions} />
               <ApproveGate
                 summary={gate.summary}

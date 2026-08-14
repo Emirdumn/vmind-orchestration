@@ -16,7 +16,6 @@ import type { Auditor } from './auditor.js';
 import type { RequirementExtractor } from './extractor.js';
 import { criticalUnknowns, hasServiceIntent } from './extractor.js';
 import { deriveMonthlyEgress, normalizeNetworkTopology } from './network-units.js';
-import type { SolutionDesigner } from './designer.js';
 import { parseRemoteEstimate, reconcile } from './reconciler.js';
 import type {
   AuditQuestion,
@@ -121,8 +120,14 @@ export interface FlowResult {
 export interface OrchestratorDeps {
   catalog: Catalog;
   auditor: Auditor;
-  extractor?: RequirementExtractor;
-  designer?: SolutionDesigner;
+  extractor?: Pick<RequirementExtractor, 'extract'>;
+  designer?: {
+    design(
+      ctx: ToolContext,
+      spec: RequirementSpec,
+      clarifications?: Record<string, string>,
+    ): Promise<EstimateDraft>;
+  };
 }
 
 export class Orchestrator {
@@ -139,6 +144,7 @@ export class Orchestrator {
     ctx: ToolContext,
     salesText: string,
     callbacks: OrchestratorCallbacks = {},
+    initialSpec?: RequirementSpec,
   ): Promise<FlowResult> {
     const events: FlowEvent[] = [];
     const assumptions: AssumptionRecord[] = [];
@@ -174,10 +180,10 @@ export class Orchestrator {
     };
 
     // --- 1. ANLA ---------------------------------------------------------
-    let spec: RequirementSpec | undefined;
+    let spec: RequirementSpec | undefined = initialSpec;
     let clarifications: Record<string, string> = {};
     let strongProfileActivated = false;
-    if (this.deps.extractor) {
+    if (this.deps.extractor && !spec) {
       emit('understand', 'Satisci metni yapisal ihtiyaca cevriliyor.');
       spec = await this.deps.extractor.extract(salesText);
       emit('understand', `Ihtiyac cikarildi. ${spec.unknowns.length} belirsizlik var.`, spec);

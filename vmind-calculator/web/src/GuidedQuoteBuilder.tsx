@@ -96,13 +96,17 @@ export function GuidedQuoteBuilder({
   starting,
   onStart,
   onEditText,
+  onImport,
 }: {
   starting: boolean;
-  onStart: (text: string) => void;
+  onStart: (config: GuidedQuoteConfig) => void;
   onEditText: (text: string) => void;
+  onImport: (file: File) => Promise<'guided' | 'natural'>;
 }) {
   const [config, setConfig] = useState<GuidedQuoteConfig>({ ...PROFILE_DEFAULTS.recommended });
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importStatus, setImportStatus] = useState<string | null>(null);
   const prompt = useMemo(() => buildGuidedQuotePrompt(config), [config]);
   const risk = profileRisk(config);
 
@@ -130,6 +134,40 @@ export function GuidedQuoteBuilder({
           </p>
         </div>
         <span className="guided-step">1 dakikada hazır</span>
+      </div>
+
+      <div className="spreadsheet-import">
+        <label>
+          <span>Excel veya CSV’den başla</span>
+          <input
+            type="file"
+            accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"
+            disabled={starting || importing}
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (!file) return;
+              setImporting(true);
+              setImportStatus(null);
+              void onImport(file).then(
+                (route) => setImportStatus(
+                  route === 'guided'
+                    ? 'Tablo tanındı; LLM kullanmadan teklif başlatıldı.'
+                    : 'Serbest tablo güçlü yorumlama katmanına aktarıldı.',
+                ),
+                (error: unknown) => setImportStatus(
+                  error instanceof Error ? error.message : 'Dosya yüklenemedi.',
+                ),
+              ).finally(() => {
+                setImporting(false);
+                event.target.value = '';
+              });
+            }}
+          />
+        </label>
+        <small className="muted">
+          Standart sütunlar araçlarla sıfır token; belirsiz tablolar katmanlı modelle yorumlanır. En fazla 2 MB.
+        </small>
+        {importStatus && <p className="small">{importStatus}</p>}
       </div>
 
       <fieldset>
@@ -276,7 +314,7 @@ export function GuidedQuoteBuilder({
       )}
 
       <div className="row guided-actions">
-        <button disabled={starting} onClick={() => onStart(prompt)}>
+        <button disabled={starting} onClick={() => onStart(config)}>
           {starting ? 'Başlatılıyor…' : 'Bu seçimlerle teklif hazırla'}
         </button>
         <button className="ghost" disabled={starting} onClick={() => onEditText(prompt)}>

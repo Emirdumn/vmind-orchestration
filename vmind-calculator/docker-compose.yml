@@ -75,6 +75,7 @@ services:
       VMIND_DATABASE_URL: ${VMIND_DATABASE_URL:-}
       VMIND_TENANT_ID: ${VMIND_TENANT_ID:-00000000-0000-0000-0000-000000000001}
       VMIND_PROMPT_VERSION: ${VMIND_PROMPT_VERSION:-phase2}
+      VMIND_LLM_CACHE_TTL_SECONDS: ${VMIND_LLM_CACHE_TTL_SECONDS:-86400}
 
       # OpenClaw VM'deki CRM rotasina host uzerindeki sifreli SSH tuneliyle
       # ulasilir. Ikisinden biri yoksa uygulama acilista yapilandirmayi reddeder.
@@ -84,8 +85,15 @@ services:
       # --- LLM sağlayıcı ---
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       OPENROUTER_MODEL: ${OPENROUTER_MODEL:-anthropic/claude-opus-5}
+      OPENROUTER_MODEL_FAST: ${OPENROUTER_MODEL_FAST:-}
+      OPENROUTER_MODEL_BALANCED: ${OPENROUTER_MODEL_BALANCED:-}
+      OPENROUTER_MODEL_STRONG: ${OPENROUTER_MODEL_STRONG:-}
       OPENROUTER_MAX_TOKENS: ${OPENROUTER_MAX_TOKENS:-8000}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-opus-5}
+      ANTHROPIC_MODEL_FAST: ${ANTHROPIC_MODEL_FAST:-}
+      ANTHROPIC_MODEL_BALANCED: ${ANTHROPIC_MODEL_BALANCED:-}
+      ANTHROPIC_MODEL_STRONG: ${ANTHROPIC_MODEL_STRONG:-}
 
       # Ters vekil TLS sonlandırıyorsa çerez `Secure` kalmalı (varsayılan).
       # Yalnızca TLS'siz yerel denemede WEB_INSECURE_COOKIE=1 verin.

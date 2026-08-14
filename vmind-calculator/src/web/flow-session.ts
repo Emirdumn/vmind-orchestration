@@ -57,6 +57,8 @@ export interface SessionView {
   result: FlowResult | null;
   error: string | null;
   spentUsd: number;
+  /** Onay öncesi serbest metin düzenleme için LLM editörü bağlı mı? */
+  editEnabled: boolean;
 }
 
 interface Waiter {
@@ -255,6 +257,7 @@ export class FlowSession {
       result: this.result,
       error: this.error,
       spentUsd: this.spentUsd,
+      editEnabled: this.approvalEditor !== null,
     };
   }
 

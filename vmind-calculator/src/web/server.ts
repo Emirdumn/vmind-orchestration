@@ -29,6 +29,11 @@ import { Auditor } from '../agents/auditor.js';
 import { RequirementExtractor } from '../agents/extractor.js';
 import { SolutionDesigner } from '../agents/designer.js';
 import { SolutionReviser } from '../agents/reviser.js';
+import {
+  RoutedLlm,
+  modelRouterConfigFromEnv,
+  type ModelRouteDecision,
+} from '../agents/model-router.js';
 import { Orchestrator } from '../agents/orchestrator.js';
 import type { AuditQuestion } from '../agents/types.js';
 import {
@@ -75,9 +80,17 @@ import {
   publicAccessFromEnv,
   type PublicAccessGuard,
 } from './public-access.js';
+import {
+  DeterministicGuidedDesigner,
+  GuidedQuoteInputSchema,
+  guidedQuoteToSpec,
+  type GuidedQuoteInput,
+} from './guided-flow.js';
+import { parseSpreadsheetBuffer } from './structured-import.js';
 
 const SESSION_COOKIE = 'vmind_agent_session';
 const MAX_BODY_BYTES = 64 * 1024;
+const MAX_SPREADSHEET_BYTES = 2 * 1024 * 1024;
 const MAX_SALES_TEXT = 4000;
 
 export interface ServerDeps {
@@ -168,6 +181,19 @@ async function readJsonBody(req: IncomingMessage): Promise<Record<string, unknow
     throw new HttpError(400, 'Gövde bir JSON nesnesi olmalı.');
   }
   return parsed as Record<string, unknown>;
+}
+
+async function readRawBody(req: IncomingMessage, maxBytes: number): Promise<Buffer> {
+  const chunks: Buffer[] = [];
+  let size = 0;
+  for await (const chunk of req) {
+    const buffer = chunk as Buffer;
+    size += buffer.length;
+    if (size > maxBytes) throw new HttpError(413, 'Yüklenen dosya çok büyük.');
+    chunks.push(buffer);
+  }
+  if (size === 0) throw new HttpError(400, 'Yüklenecek dosya gerekli.');
+  return Buffer.concat(chunks);
 }
 
 function readCookie(req: IncomingMessage, name: string): string | undefined {
@@ -459,6 +485,67 @@ export function createAgentServer(deps: ServerDeps) {
       return true;
     }
 
+    if (pathname === '/api/import/spreadsheet' && method === 'POST') {
+      requireIdentity(req);
+      const encodedName = typeof req.headers['x-vmind-filename'] === 'string'
+        ? req.headers['x-vmind-filename']
+        : '';
+      let fileName = '';
+      try { fileName = decodeURIComponent(encodedName); } catch { /* aşağıdaki doğrulama */ }
+      if (!fileName || fileName.length > 240 || !/\.(csv|xlsx)$/i.test(fileName)) {
+        throw new HttpError(400, 'Dosya adı .csv veya .xlsx ile bitmelidir.');
+      }
+      const body = await readRawBody(req, MAX_SPREADSHEET_BYTES);
+      try {
+        sendJson(res, 200, await parseSpreadsheetBuffer(fileName, body));
+      } catch {
+        throw new HttpError(400, 'Dosya okunamadı veya desteklenen tablo biçimine uymuyor.');
+      }
+      return true;
+    }
+
+    if (pathname === '/api/flow/guided' && method === 'POST') {
+      const identity = requireIdentity(req);
+      await deps.publicAccess?.assertFlowStart(
+        req,
+        typeof req.headers['x-turnstile-token'] === 'string'
+          ? req.headers['x-turnstile-token']
+          : undefined,
+      );
+      const body = await readJsonBody(req);
+      const parsed = GuidedQuoteInputSchema.safeParse(body['config']);
+      if (!parsed.success) throw new HttpError(400, 'Tıklamalı teklif yapılandırması geçersiz.');
+      const config = parsed.data;
+      const spec = guidedQuoteToSpec(config);
+      const customer = customerContext(body['customer']);
+
+      if (deps.auth.kind === 'disabled') deps.registry.removeForUser(identity.userId);
+      const session = new FlowSession(identity.userId);
+      deps.registry.register(session);
+      let runtimeRun: RuntimeRun | undefined;
+      try {
+        if (deps.runtimeStore) {
+          runtimeRun = await deps.runtimeStore.startRun({
+            sessionId: session.sessionId,
+            identity,
+            salesText: spec.rationale,
+            channel: requestChannel(req, identity),
+            provider: 'deterministic',
+            model: 'tool-first/guided-v1',
+          });
+        }
+      } catch (error) {
+        deps.registry.remove(session.sessionId);
+        throw error;
+      }
+      void runFlow(session, identity, spec.rationale, runtimeRun, customer, {
+        kind: 'guided',
+        config,
+      });
+      sendJson(res, 202, { sessionId: session.sessionId, route: 'tool-first' });
+      return true;
+    }
+
     if (pathname === '/api/flow' && method === 'POST') {
       const identity = requireIdentity(req);
       await deps.publicAccess?.assertFlowStart(
@@ -513,7 +600,7 @@ export function createAgentServer(deps: ServerDeps) {
         deps.registry.remove(session.sessionId);
         throw error;
       }
-      void runFlow(session, identity, salesText, runtimeRun, customer);
+      void runFlow(session, identity, salesText, runtimeRun, customer, { kind: 'natural' });
       sendJson(res, 202, { sessionId: session.sessionId });
       return true;
     }
@@ -615,6 +702,9 @@ export function createAgentServer(deps: ServerDeps) {
     salesText: string,
     runtimeRun?: RuntimeRun,
     customer?: CrmCustomerContext,
+    workflow:
+      | { kind: 'natural' }
+      | { kind: 'guided'; config: GuidedQuoteInput } = { kind: 'natural' },
   ): Promise<void> {
     const trail = new AuditTrail();
     trail.sessionStart({
@@ -638,7 +728,7 @@ export function createAgentServer(deps: ServerDeps) {
 
     // Harcama atıfı BU akışa kapanışla bağlı — eşzamanlı akışlar karışmaz.
     const pendingUsageWrites: Array<Promise<unknown>> = [];
-    const llm = deps.createLlm?.((usage) => {
+    const llm = workflow.kind === 'natural' ? deps.createLlm?.((usage) => {
       const provider = deps.llmProvider ?? 'openrouter';
       trail.llmUsage({ provider, ...usage });
       session.recordSpend(usage.costUsd);
@@ -652,7 +742,12 @@ export function createAgentServer(deps: ServerDeps) {
           ),
         );
       }
-    });
+    }) : undefined;
+
+    const initialSpec =
+      workflow.kind === 'guided' ? guidedQuoteToSpec(workflow.config) : undefined;
+    const guidedDesigner =
+      workflow.kind === 'guided' ? new DeterministicGuidedDesigner(workflow.config) : undefined;
 
     const orchestrator = new Orchestrator({
       catalog: deps.catalog,
@@ -660,7 +755,9 @@ export function createAgentServer(deps: ServerDeps) {
       // deterministik uretiyor. Her denetim turunda yeniden LLM'e baglamsal
       // not sordurmak akisi saniyeler yerine dakikalara tasiyordu.
       auditor: new Auditor(deps.rules),
-      ...(llm
+      ...(guidedDesigner
+        ? { designer: guidedDesigner }
+        : llm
         ? {
             extractor: new RequirementExtractor(llm),
             designer: new SolutionDesigner(llm),
@@ -743,7 +840,7 @@ export function createAgentServer(deps: ServerDeps) {
               : undefined,
           ),
         onEvent: session.onEvent,
-      });
+      }, initialSpec);
       if (customer && deps.crmSync) {
         try {
           const synced = await deps.crmSync.syncQuote({
@@ -1014,11 +1111,16 @@ export async function startFromEnv(root: string): Promise<void> {
   let llmLabel = 'YOK — sunucuda LLM anahtarı tanımlı değil';
   let llmProvider: LlmProvider | undefined;
   let llmModel: string | undefined;
+  let routerConfig: ReturnType<typeof modelRouterConfigFromEnv> | undefined;
   try {
     const probe = createLlm({ onUsage: () => {} });
     llmLabel = `${probe.provider} / ${probe.model}`;
     llmProvider = probe.provider;
-    llmModel = probe.model;
+    routerConfig = modelRouterConfigFromEnv(probe.provider);
+    llmModel = 'model-router/v1';
+    llmLabel =
+      `${probe.provider} router · hızlı=${routerConfig.fastModel} · ` +
+      `dengeli=${routerConfig.balancedModel} · güçlü=${routerConfig.strongModel}`;
     llmAvailable = true;
   } catch (error) {
     if (!(error instanceof MissingCredentialsError)) throw error;
@@ -1046,9 +1148,27 @@ export async function startFromEnv(root: string): Promise<void> {
     staticRoot,
     allowPublish,
     // Akış başına yeni istemci: maliyet callback'i o akışa bağlı.
-    ...(llmAvailable
+    ...(llmAvailable && routerConfig
       ? {
-          createLlm: (onUsage: UsageSink): LlmClient => createLlm({ onUsage }).client,
+          createLlm: (onUsage: UsageSink): LlmClient =>
+            new RoutedLlm(
+              routerConfig,
+              (decision: ModelRouteDecision) =>
+                createLlm({
+                  model: decision.model,
+                  onUsage: (usage) =>
+                    onUsage({
+                      ...usage,
+                      routeTier: decision.tier,
+                      routeReason: decision.reason,
+                    }),
+                }).client,
+              {
+                ...(runtimeStore ? { cache: runtimeStore } : {}),
+                promptVersion: process.env['VMIND_PROMPT_VERSION'] ?? 'phase2',
+                cacheTtlSeconds: Number(process.env['VMIND_LLM_CACHE_TTL_SECONDS'] ?? 86_400),
+              },
+            ),
         }
       : {}),
   });

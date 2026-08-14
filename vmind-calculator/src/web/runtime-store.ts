@@ -4,6 +4,7 @@ import pg from 'pg';
 
 import type { FlowResult } from '../agents/orchestrator.js';
 import type { LlmProvider, UsageReport } from '../agents/llm.js';
+import type { StructuredCachePut, StructuredResponseCache } from '../agents/model-router.js';
 import type { AuditEvent, AuditTrail } from '../core/telemetry/audit.js';
 import { redactPii } from '../core/telemetry/pii.js';
 import type { Identity } from './auth.js';
@@ -22,17 +23,19 @@ export interface RuntimeRun {
   conversationId: string;
   principalId: string;
   sessionId: string;
-  provider: LlmProvider;
+  provider: RuntimeProvider;
   model: string;
   nextUsageSeq: number;
 }
+
+export type RuntimeProvider = LlmProvider | 'deterministic';
 
 export interface StartRunInput {
   sessionId: string;
   identity: Identity;
   salesText: string;
   channel: string;
-  provider: LlmProvider;
+  provider: RuntimeProvider;
   model: string;
 }
 
@@ -54,6 +57,7 @@ export interface AdminOverview {
   estimates: { total: number; published: number };
   crm: { contacts: number; opportunities: number; openOpportunities: number };
   today: { llmCalls: number; inputTokens: number; outputTokens: number; costUsd: number };
+  cache: { entries: number; activeEntries: number; hits: number };
 }
 
 export interface AdminRunRow {
@@ -146,7 +150,7 @@ export interface AdminOpportunityUpdate {
   nextFollowUp?: string | null;
 }
 
-export interface RuntimeStore {
+export interface RuntimeStore extends StructuredResponseCache {
   init(): Promise<void>;
   assertCanSpend(identity: Identity): Promise<void>;
   remaining(identity: Identity): Promise<{ total: number | null; user: number | null }>;
@@ -318,6 +322,8 @@ export class PostgresRuntimeStore implements RuntimeStore {
         run_overview: string | null;
         daily_usage: string | null;
         consent_notice_version: string | null;
+        response_cache: string | null;
+        route_tier: string | null;
       }>(
         `SELECT
            to_regclass('agent.audit_events')::text AS audit_events,
@@ -327,7 +333,13 @@ export class PostgresRuntimeStore implements RuntimeStore {
              SELECT column_name FROM information_schema.columns
               WHERE table_schema = 'crm' AND table_name = 'contacts'
                 AND column_name = 'consent_notice_version'
-           ) AS consent_notice_version`,
+           ) AS consent_notice_version,
+           to_regclass('agent.response_cache')::text AS response_cache,
+           (
+             SELECT column_name FROM information_schema.columns
+              WHERE table_schema = 'agent' AND table_name = 'llm_usage'
+                AND column_name = 'route_tier'
+           ) AS route_tier`,
       );
       const row = result.rows[0];
       if (row?.audit_events !== 'agent.audit_events') {
@@ -338,6 +350,9 @@ export class PostgresRuntimeStore implements RuntimeStore {
       }
       if (row.consent_notice_version !== 'consent_notice_version') {
         throw new Error('004_contact_consent_audit.sql uygulanmamış.');
+      }
+      if (row.response_cache !== 'agent.response_cache' || row.route_tier !== 'route_tier') {
+        throw new Error('006_model_routing_cache.sql uygulanmamış.');
       }
       const columns = await this.pool.query<{ column_name: string }>(
         `SELECT column_name FROM information_schema.columns
@@ -653,8 +668,8 @@ export class PostgresRuntimeStore implements RuntimeStore {
         await client.query(
           `INSERT INTO agent.llm_usage
              (usage_id, tenant_id, run_id, provider, model, input_tokens,
-              output_tokens, cache_read_tokens, cost_usd, usage_seq)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+              output_tokens, cache_read_tokens, cost_usd, usage_seq, route_tier, route_reason)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
           [
             usageId,
             this.tenantId,
@@ -666,6 +681,8 @@ export class PostgresRuntimeStore implements RuntimeStore {
             usage.cacheReadTokens ?? 0,
             usage.costUsd ?? null,
             usageSeq,
+            usage.routeTier ?? null,
+            usage.routeReason ? safeText(usage.routeReason, 500) : null,
           ],
         );
         await client.query(
@@ -693,6 +710,52 @@ export class PostgresRuntimeStore implements RuntimeStore {
         client.release();
       }
     });
+  }
+
+  /** Önbellek hızlandırıcıdır; arızası teklif akışını durdurmaz. */
+  async get(cacheKey: string): Promise<unknown | null> {
+    try {
+      const result = await this.pool.query<{ response_json: unknown }>(
+        `UPDATE agent.response_cache
+            SET hit_count = hit_count + 1, last_hit_at = now(), updated_at = now()
+          WHERE tenant_id = $1 AND cache_key = $2 AND expires_at > now()
+          RETURNING response_json`,
+        [this.tenantId, cacheKey],
+      );
+      return result.rows[0]?.response_json ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  /** PII kontrolü router'da yapılır; veritabanı yalnızca doğrulanmış JSON alır. */
+  async put(entry: StructuredCachePut): Promise<void> {
+    try {
+      const ttlSeconds = Math.min(Math.max(Math.trunc(entry.ttlSeconds), 60), 604_800);
+      await this.pool.query(
+        `INSERT INTO agent.response_cache
+           (tenant_id, cache_key, model, schema_name, prompt_version, response_json, expires_at)
+         VALUES ($1, $2, $3, $4, $5, $6, now() + ($7::int * interval '1 second'))
+         ON CONFLICT (tenant_id, cache_key)
+         DO UPDATE SET model = EXCLUDED.model,
+                       schema_name = EXCLUDED.schema_name,
+                       prompt_version = EXCLUDED.prompt_version,
+                       response_json = EXCLUDED.response_json,
+                       expires_at = EXCLUDED.expires_at,
+                       updated_at = now()`,
+        [
+          this.tenantId,
+          entry.cacheKey,
+          safeText(entry.model, 200),
+          safeText(entry.schemaName, 120),
+          safeText(entry.promptVersion, 120),
+          jsonObject(entry.response),
+          ttlSeconds,
+        ],
+      );
+    } catch {
+      // Cache yazılamaması fiyatlama ve kota doğruluğunu etkilemez.
+    }
   }
 
   async finishRun(run: RuntimeRun, input: FinishRunInput): Promise<void> {
@@ -870,6 +933,9 @@ export class PostgresRuntimeStore implements RuntimeStore {
         input_tokens_today: string;
         output_tokens_today: string;
         cost_usd_today: string;
+        cache_entries: string;
+        cache_active_entries: string;
+        cache_hits: string;
       }>(
         `SELECT
           (SELECT COUNT(*) FROM identity.principals WHERE tenant_id = $1)::text AS principals,
@@ -890,7 +956,12 @@ export class PostgresRuntimeStore implements RuntimeStore {
           (SELECT COALESCE(SUM(output_tokens), 0) FROM billing.usage_ledger
             WHERE tenant_id = $1 AND occurred_at >= date_trunc('day', now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC')::text AS output_tokens_today,
           (SELECT COALESCE(SUM(cost_usd), 0) FROM billing.usage_ledger
-            WHERE tenant_id = $1 AND occurred_at >= date_trunc('day', now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC')::text AS cost_usd_today`,
+            WHERE tenant_id = $1 AND occurred_at >= date_trunc('day', now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC')::text AS cost_usd_today,
+          (SELECT COUNT(*) FROM agent.response_cache WHERE tenant_id = $1)::text AS cache_entries,
+          (SELECT COUNT(*) FROM agent.response_cache
+            WHERE tenant_id = $1 AND expires_at > now())::text AS cache_active_entries,
+          (SELECT COALESCE(SUM(hit_count), 0) FROM agent.response_cache
+            WHERE tenant_id = $1)::text AS cache_hits`,
         [this.tenantId],
       );
       const row = result.rows[0]!;
@@ -917,6 +988,11 @@ export class PostgresRuntimeStore implements RuntimeStore {
           inputTokens: amount(row.input_tokens_today),
           outputTokens: amount(row.output_tokens_today),
           costUsd: amount(row.cost_usd_today),
+        },
+        cache: {
+          entries: amount(row.cache_entries),
+          activeEntries: amount(row.cache_active_entries),
+          hits: amount(row.cache_hits),
         },
       };
     });

@@ -168,6 +168,7 @@ export function AdminDashboard() {
         <div><span>Akışlar</span><strong>{overview.runs.total}</strong><small>{overview.runs.failed} hatalı</small></div>
         <div><span>Teklifler</span><strong>{overview.estimates.total}</strong><small>{overview.estimates.published} yayınlandı</small></div>
         <div><span>Açık fırsatlar</span><strong>{overview.crm.openOpportunities}</strong><small>{overview.crm.contacts} kişi</small></div>
+        <div><span>Önbellekten kurtarılan çağrı</span><strong>{overview.cache.hits}</strong><small>{overview.cache.activeEntries} aktif kayıt</small></div>
       </section>
 
       <section className="panel admin-section">

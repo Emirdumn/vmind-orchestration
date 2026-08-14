@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ApiError, api, type CustomerCrmContext, type SessionView } from './api';
+import type { GuidedQuoteConfig } from './guidedQuote';
 
 /**
  * Akışı başlatır ve durumunu canlı takip eder.
@@ -53,6 +54,27 @@ export function useFlow() {
           ? `${problem.message}${problem.scope === 'total' ? ' (günlük toplam)' : ''}`
           : problem.message,
       );
+    } finally {
+      if (alive.current) setStarting(false);
+    }
+  }, []);
+
+  const startGuided = useCallback(async (
+    config: GuidedQuoteConfig,
+    customer?: CustomerCrmContext,
+    turnstileToken?: string,
+  ) => {
+    setError(null);
+    setView(null);
+    setStarting(true);
+    try {
+      const { sessionId: id } = await api.startGuidedFlow(config, customer, turnstileToken);
+      if (!alive.current) return;
+      setSessionId(id);
+    } catch (caught) {
+      if (!alive.current) return;
+      const problem = caught as ApiError;
+      setError(problem.message);
     } finally {
       if (alive.current) setStarting(false);
     }
@@ -124,5 +146,5 @@ export function useFlow() {
     setError(null);
   }, [sessionId]);
 
-  return { sessionId, view, error, starting, start, answer, edit, reset };
+  return { sessionId, view, error, starting, start, startGuided, answer, edit, reset };
 }

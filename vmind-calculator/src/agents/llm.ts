@@ -82,6 +82,9 @@ export interface UsageReport {
   costUsd?: number;
   cacheReadTokens?: number;
   model: string;
+  /** Uygulama model router'ı kullandıysa seçilen katman ve deterministik gerekçe. */
+  routeTier?: 'fast' | 'balanced' | 'strong';
+  routeReason?: string;
 }
 
 export type UsageSink = (usage: UsageReport) => void;

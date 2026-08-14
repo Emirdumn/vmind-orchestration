@@ -59,6 +59,8 @@ export interface LlmUsage {
   costUsd?: number;
   /** Önbellekten okunan token (varsa) — maliyet analizi için. */
   cacheReadTokens?: number;
+  routeTier?: 'fast' | 'balanced' | 'strong';
+  routeReason?: string;
 }
 
 export interface AuditSummary {
