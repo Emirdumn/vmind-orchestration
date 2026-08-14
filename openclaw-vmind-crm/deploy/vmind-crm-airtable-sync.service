@@ -1,0 +1,8 @@
+[Unit]
+Description=VMind CRM deterministic Airtable sync
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/node /home/openclaw/.openclaw/extensions/vmind-crm/deploy/airtable-mcp-sync.mjs
+TimeoutStartSec=90

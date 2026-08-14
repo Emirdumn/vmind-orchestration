@@ -1,0 +1,233 @@
+# FAZ 4.A — Teklif denetim kurallari
+#
+# Bu dosya KOD DEGIL VERI. Satis ekibi kural ekleyebilmeli.
+#
+# Alanlar:
+#   id       benzersiz kural kodu
+#   severity blocker | recommended | optional   (anlamlari: src/core/rules/types.ts)
+#   scope    item (varsayilan) | estimate
+#   services yalnizca bu servis kodlarindaki kalemlerde calis (scope: item)
+#   when     kosul ifadesi — dilbilgisi: src/core/rules/expr.ts
+#   message  satisciya gosterilecek aciklama
+#   ask      satisciya sorulacak soru
+#   default  cevap gelmezse yapilacak varsayim (her sorunun bir varsayilani OLMALI)
+#
+# Kullanilabilir yardimcilar:
+#   item, data, service, currency, itemCount
+#   has(servis)  count(servis)  hasStandalone(servis)  totalComputeCount()
+#   anyItemHas(servis, alan)  anyFloatingIp()  anyDataTransfer()  anyBackup()
+#   itemMonthly()  totalMonthly()  hasUnknownProductCode()
+#
+# NOT: `when` icinde atama, dongu ve fonksiyon tanimi YOKTUR. Var olmayan bir yol
+# (`data.backup.unit` gibi) hata vermez, `undefined` doner.
+
+rules:
+  # =========================================================================
+  # BLOCKER — teklif matematiksel olarak yanlis/eksik olur, yayinlanamaz
+  # =========================================================================
+
+  - id: UNKNOWN_PRODUCT_CODE
+    severity: blocker
+    when: "hasUnknownProductCode()"
+    message: >-
+      Bu kalemde katalogda bulunmayan bir urun kodu var. Fiyat motoru bilinmeyen kodu
+      hata vermeden 0 TL olarak geciyor — teklif oldugundan dusuk cikar.
+
+  - id: ZERO_COST_ITEM
+    severity: blocker
+    services: [compute, storage, load-balancer, kubernetes, data-transfer, floating-ip]
+    when: "itemMonthly() == 0"
+    message: >-
+      Bu kalemin aylik tutari 0. Ucretsiz bir kaynak degilse eksik yapilandirilmis
+      demektir; teklif sessizce dusuk cikiyor.
+
+  - id: OBJ_STORAGE_NO_TRANSFER
+    severity: blocker
+    services: [object-storage]
+    when: "!data.network"
+    message: >-
+      Object Storage eklendi ama Network Data Transfer tanimlanmadi — disari cikan
+      trafik hic fiyatlanmiyor. Object storage'in fatura kaleminin buyuk kismi
+      genelde depolama degil egress'tir.
+    ask: "Aylik tahmini indirme (egress) trafigi ne kadar?"
+    default: "1 TB/ay varsayilacak"
+
+  - id: OBJ_STORAGE_EMPTY
+    severity: blocker
+    services: [object-storage]
+    when: "!data.storage && !data.network"
+    message: >-
+      Object Storage kalemi tamamen bos — ne depolama ne trafik tanimli.
+      Platform bu kalemi 0 TL olarak geciyor.
+    ask: "Ne kadar veri saklanacak?"
+    default: "500 GB varsayilacak"
+
+  - id: BACKUP_ZERO_COUNT
+    severity: blocker
+    services: [backup]
+    when: "(data.estimatedCount ?? 0) == 0"
+    message: >-
+      Backup secili ama saklanacak yedek adedi 0 — platform bu kalemi hesaplamadan
+      atliyor, satir bile olusmuyor.
+    ask: "Ayda kac yedek saklanacak?"
+    default: "4 yedek/ay varsayilacak"
+
+  - id: COMPUTE_BACKUP_ZERO_COUNT
+    severity: blocker
+    services: [compute]
+    when: "data.backup && (data.backup.estimatedCount ?? 0) == 0"
+    message: >-
+      Sunucuya yedekleme eklendi ama aylik yedek adedi 0 — kalem tamamen atlaniyor,
+      teklifte yedekleme ucreti gorunmuyor.
+    ask: "Her sunucu icin ayda kac yedek saklanacak?"
+    default: "4 yedek/ay varsayilacak"
+
+  # Canli arayuzde tespit edilen PLATFORM HATASI — bkz. docs/pricing-port-notes.md §12
+  - id: COMPUTE_BACKUP_TB_IGNORED
+    severity: blocker
+    services: [compute]
+    when: "data.backup.unit == 'TB'"
+    message: >-
+      Sunucu yedeklemesinde birim TB secilmis. PLATFORM HATASI: compute icindeki
+      backup hesabi birimi her zaman GB kabul eder ve bu secimi yok sayar — teklif
+      1024 kat DUSUK cikar. Boyutu GB cinsinden girin (1 TB = 1024 GB).
+    ask: "Yedeklenecek kaynak boyutunu GB olarak girer misiniz?"
+    default: "TB degeri 1024 ile carpilip GB olarak yazilacak"
+
+  - id: FLOATING_IP_DOUBLE_COUNT
+    severity: blocker
+    scope: estimate
+    when: "hasStandalone('floating-ip') && anyItemHas('compute', 'floatingIp')"
+    message: >-
+      Floating IP hem ayri bir servis kalemi hem de compute altinda tanimli —
+      ayni IP'ler iki kez fiyatlaniyor olabilir.
+    ask: "Floating IP'ler sunuculara mi ait, yoksa ayri mi kullanilacak?"
+    default: "Ayri kalem birakilacak, compute altindakiler korunacak"
+
+  - id: ROUTER_EMPTY
+    severity: blocker
+    services: [router]
+    when: "!data.floatingIp && !data.network"
+    message: >-
+      Router kalemi bos — ne floating IP ne de trafik tanimli. 0 TL olarak geciyor.
+    ask: "Router uzerinden ne kadar trafik bekleniyor?"
+    default: "500 GB/ay varsayilacak"
+
+  # =========================================================================
+  # RECOMMENDED — teknik olarak calisir ama muhtemelen istenen bu degil
+  # =========================================================================
+
+  - id: COMPUTE_NO_BLOCK_STORAGE
+    severity: recommended
+    services: [compute]
+    when: "!data.storage"
+    message: >-
+      Sunucuda yalnizca flavor'in yerel diski var; kalici block storage yok.
+      Instance yeniden olusturulursa veri kaybolur.
+    ask: "Sunucu basina ne kadar kalici disk gerekiyor?"
+    default: "Ek disk eklenmeyecek"
+
+  - id: COMPUTE_NO_TRANSFER
+    severity: recommended
+    services: [compute]
+    when: "!data.network && !data.router && !has('router')"
+    message: >-
+      Sunucular veya merkezi Router icin disari cikan trafik tanimlanmamis — egress fiyatlanmiyor.
+    ask: "Sunuculardan aylik ne kadar veri disari cikacak? GB/TB yazin; Mbps yaziyorsaniz ortalama kullanim yuzdesini de belirtin (orn. 100 Mbps, %30)."
+    default: "500 GB/ay varsayilacak"
+
+  - id: LB_NO_TRANSFER
+    severity: recommended
+    services: [load-balancer]
+    when: "!data.network && !has('router')"
+    message: >-
+      Load Balancer'da veya merkezi Router'da data transfer tanimlanmamis. LB'den
+      gecen trafik genelde teklifin en buyuk degisken kalemidir.
+    ask: "Load Balancer uzerinden aylik ne kadar trafik gececek?"
+    default: "1 TB/ay varsayilacak"
+
+  - id: LB_WITHOUT_HA
+    severity: recommended
+    scope: estimate
+    when: "has('load-balancer') && totalComputeCount() < 2"
+    message: >-
+      Load Balancer var ama arkasinda ikiden az sunucu — yuksek erisilebilirlik
+      saglanmiyor. Tek sunucu duserse LB'nin yonlendirecegi hedef kalmaz.
+    ask: "Arkasina en az 2 sunucu koyalim mi?"
+    default: "Mevcut sunucu sayisi korunacak"
+
+  - id: NO_PUBLIC_ACCESS
+    severity: recommended
+    scope: estimate
+    when: "has('compute') && !anyFloatingIp() && !has('load-balancer')"
+    message: >-
+      Hicbir kaynagin public IP'si yok ve load balancer da tanimli degil —
+      disaridan erisim planlanmamis gorunuyor.
+    ask: "Sunuculara internetten erisim gerekiyor mu?"
+    default: "Erisim gerekmedigi varsayilacak"
+
+  - id: K8S_WORKER_NO_STORAGE
+    severity: recommended
+    services: [kubernetes]
+    when: "!data.worker.storage"
+    message: >-
+      Kubernetes worker havuzunda kalici disk yok. PersistentVolume kullanan
+      is yukleri icin block storage gerekir.
+    ask: "Worker basina ne kadar kalici disk gerekiyor?"
+    default: "Worker'lara disk eklenmeyecek"
+
+  - id: NO_BACKUP_ANYWHERE
+    severity: recommended
+    scope: estimate
+    when: "has('compute') && !anyBackup()"
+    message: >-
+      Teklifte hicbir yedekleme kalemi yok. Uretim is yuklerinde yedeklilik
+      genellikle sozlesme gereksinimidir.
+    ask: "Yedekleme dahil edilsin mi?"
+    default: "Yedekleme eklenmeyecek"
+
+  # =========================================================================
+  # OPTIONAL — upsell firsati, yalnizca raporda listelenir
+  # =========================================================================
+
+  - id: SUGGEST_LOAD_BALANCER
+    severity: optional
+    scope: estimate
+    when: "totalComputeCount() >= 2 && !has('load-balancer')"
+    message: >-
+      Birden fazla sunucu var ama load balancer yok. Trafigi dagitmak ve
+      yuksek erisilebilirlik icin App Load Balancer onerilebilir.
+
+  - id: SUGGEST_OBJECT_STORAGE
+    severity: optional
+    scope: estimate
+    when: "has('compute') && !has('object-storage')"
+    message: >-
+      Statik dosya, medya, log veya yedek arsivi icin Object Storage degerlendirin;
+      bu kullanimlarda sunucuya bagli Block Storage yerine daha uygun ve olceklenebilir
+      bir secenek olabilir. Veritabani veya dusuk gecikmeli dosya sistemi icin uygun degildir.
+
+  - id: CONSIDER_BLOCK_STORAGE_FOR_OBJECT_WORKLOAD
+    severity: optional
+    scope: estimate
+    when: "has('object-storage')"
+    message: >-
+      Object Storage S3 uyumlu statik dosya, log ve arsiv icin uygundur. Uygulama bir
+      dosya sistemi, veritabani diski veya dusuk gecikmeli rastgele I/O bekliyorsa bunun
+      yerine Compute'a bagli Premium SSD Block Storage kullanin.
+
+  - id: SUGGEST_PREMIUM_SSD
+    severity: optional
+    services: [compute]
+    when: "data.storage.productCode == 'bd0bbcfb-c178-4d21-b661-1b67c43b8c60'"
+    message: >-
+      Standart HDD secilmis. Veritabani veya I/O yogun is yukleri icin
+      PortvMind-Premium-SSD onerilir (yaklasik 2 kat fiyat, belirgin performans farki).
+
+  - id: SUGGEST_BACKUP_FOR_STORAGE
+    severity: optional
+    scope: estimate
+    when: "has('storage') && !anyBackup()"
+    message: >-
+      Bagimsiz block storage var ama yedekleme yok. Cloud Backup Service
+      teklife eklenebilir.

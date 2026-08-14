@@ -1,0 +1,50 @@
+{
+  "_source": "calculator.portvmind.com/my-estimate — canli ozet ekranindan yakalandi",
+  "_capturedAt": "2026-07-29",
+  "_note": "Teklif localStorage.VCLOUD_ESTIMATE'e yazilip sayfa yeniden yuklendi; tutarlar sayfanin kendi 'Calculation' tablosundan okundu. Ozet ekrani saatligi 4, aylik tutari 2 ondalikla gosteriyor.",
+  "_covers": ["load-balancer", "compute", "floating-ip", "data-transfer"],
+  "name": "GOLDEN-02",
+  "currency": "USD",
+  "list": [
+    {
+      "id": "g2-lb",
+      "service": "load-balancer",
+      "data": {
+        "productCode": "LB-001",
+        "network": { "productCode": "NETW-OUT-001", "traffic": 2, "unit": "TB" }
+      }
+    },
+    {
+      "id": "g2-compute",
+      "service": "compute",
+      "data": {
+        "productCode": "fd9ee6ed-a56d-483e-98c9-1a05d634ffcb",
+        "count": 3,
+        "storage": {
+          "productCode": "096439fe-26d6-4bd0-bdf0-11e40f73753e",
+          "size": 100,
+          "unit": "GB",
+          "volumeTypeName": "PortvMind-Premium-SSD"
+        }
+      }
+    },
+    {
+      "id": "g2-fip",
+      "service": "floating-ip",
+      "data": { "productCode": "FIP-001", "count": 1 }
+    }
+  ],
+  "displayed": {
+    "hourly": "0.1747",
+    "monthly": "225.35",
+    "hourlyDecimals": 4,
+    "monthlyDecimals": 2
+  },
+  "displayedLines": [
+    { "label": "Load Balancer App LoadBalancer", "hourly": "0.0494", "monthly": "35.60" },
+    { "label": "Data Transfer 2 TB", "hourly": "-", "monthly": "99.53" },
+    { "label": "g1.medium 3", "hourly": "0.0753", "monthly": "54.22" },
+    { "label": "Block Storage - PortvMind-Premium-SSD", "hourly": "0.0458", "monthly": "33.00" },
+    { "label": "Floating IP 1", "hourly": "0.0042", "monthly": "3.00" }
+  ]
+}

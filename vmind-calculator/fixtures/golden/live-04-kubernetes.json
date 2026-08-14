@@ -1,0 +1,48 @@
+{
+  "_source": "calculator.portvmind.com/my-estimate — canli ozet ekranindan yakalandi",
+  "_capturedAt": "2026-07-29",
+  "_note": "TL para birimi. Kubernetes storage tuhafligini (SONUC count ile carpilir, compute'un aksine miktar degil) ekranda dogrular: worker disk satiri 'Worker - 4 instances x 1 TB'.",
+  "_covers": ["kubernetes"],
+  "name": "GOLDEN-04",
+  "currency": "TL",
+  "list": [
+    {
+      "id": "g4-k8s",
+      "service": "kubernetes",
+      "data": {
+        "master": {
+          "productCode": "fd9ee6ed-a56d-483e-98c9-1a05d634ffcb",
+          "count": 3,
+          "storage": {
+            "productCode": "096439fe-26d6-4bd0-bdf0-11e40f73753e",
+            "size": 50,
+            "unit": "GB",
+            "volumeTypeName": "PortvMind-Premium-SSD"
+          }
+        },
+        "worker": {
+          "productCode": "a5bb79dc-3453-493d-8e85-3092c3316f24",
+          "count": 4,
+          "storage": {
+            "productCode": "bd0bbcfb-c178-4d21-b661-1b67c43b8c60",
+            "size": 1,
+            "unit": "TB",
+            "volumeTypeName": "PortvMind-Standard-HDD"
+          }
+        }
+      }
+    }
+  ],
+  "displayed": {
+    "hourly": "40.1761",
+    "monthly": "28926.79",
+    "hourlyDecimals": 4,
+    "monthlyDecimals": 2
+  },
+  "displayedLines": [
+    { "label": "Master - g1.medium 3", "hourly": "3.0846", "monthly": "2220.91" },
+    { "label": "Worker - gpu.t4s.xlarge 4", "hourly": "21.7800", "monthly": "15681.60" },
+    { "label": "Block Storage Master - 3 instances x 50 GB", "hourly": "0.9854", "monthly": "709.50" },
+    { "label": "Block Storage Worker - 4 instances x 1 TB", "hourly": "14.3261", "monthly": "10314.78" }
+  ]
+}

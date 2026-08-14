@@ -1,0 +1,1206 @@
+{
+  "result": {
+    "success": true,
+    "type": 0,
+    "message": null,
+    "status": null
+  },
+  "items": [
+    {
+      "service": "LOAD_BALANCER",
+      "productCode": "LB-001",
+      "productName": "App Loadbalancer 2C2GB",
+      "productDescription": "App Loadbalancer 2 vCPU - 2 GB RAM",
+      "productUUID": "2b16fba2-7f16-46da-9151-cf50689ccf77",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2023-12-31T21:00:00+00:00",
+          "price": 2.1753,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2023-12-31T21:00:00+00:00",
+          "price": 0.04944,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "VOLUME",
+      "productCode": "VL-001",
+      "productName": "Volume-GB",
+      "productDescription": "Fiyatlama GB x Saat olarak hesaplanıyor.",
+      "productUUID": "03437b93-8ad6-4832-aa11-77244cb631ad",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2023-12-31T21:00:00+00:00",
+          "price": 0.00656944,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2023-12-31T21:00:00+00:00",
+          "price": 0.00015278,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "NETWORK",
+      "productCode": "FIP-001",
+      "productName": "FloatingIp",
+      "productDescription": null,
+      "productUUID": "8b28f721-9d11-4074-a54d-254d5e6636ae",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2023-12-31T21:00:00+00:00",
+          "price": 0.16250001,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2023-12-31T21:00:00+00:00",
+          "price": 0.00416667,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "NETWORK",
+      "productCode": "NETW-OUT-001",
+      "productName": "NETW-OUT-001",
+      "productDescription": "Outbound Trafik",
+      "productUUID": "eafa7453-fbb7-42d6-b09b-3e41f6523175",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2023-12-31T21:00:00+00:00",
+          "price": 1.8954,
+          "currency": "TL",
+          "pricingUnit": "GB"
+        },
+        {
+          "startDate": "2023-12-31T21:00:00+00:00",
+          "price": 0.0486,
+          "currency": "USD",
+          "pricingUnit": "GB"
+        }
+      ]
+    },
+    {
+      "service": "VOLUME",
+      "productCode": "VL-002",
+      "productName": "Snapshot-GB",
+      "productDescription": "Fiyatlama GB x Saat olarak hesaplanıyor.",
+      "productUUID": "24ea6983-790d-46b8-ad22-e3dac687fd66",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2023-12-31T21:00:00+00:00",
+          "price": 0.00656944,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2023-12-31T21:00:00+00:00",
+          "price": 0.00015278,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "VPS",
+      "productCode": "pvExpress-Basic",
+      "productName": "pvExpress Basic",
+      "productDescription": null,
+      "productUUID": "b6aa72c1-94b3-4bc7-a199-bdce95a6d4b9",
+      "detailJson": "{\"flavorId\":\"b654b89b-4f09-411b-84ec-3f2eba5b8fcb\",\"vcpu\":1,\"ram\":1,\"disk\":20,\"network\":250}",
+      "prices": [
+        {
+          "startDate": "2025-04-30T21:00:00+00:00",
+          "price": 412,
+          "currency": "TL",
+          "pricingUnit": "UNIT"
+        },
+        {
+          "startDate": "2025-04-30T21:00:00+00:00",
+          "price": 10.05,
+          "currency": "USD",
+          "pricingUnit": "UNIT"
+        },
+        {
+          "startDate": "2025-04-30T21:00:00+00:00",
+          "price": 8.86,
+          "currency": "EUR",
+          "pricingUnit": "UNIT"
+        }
+      ]
+    },
+    {
+      "service": "VPS",
+      "productCode": "pvExpress-Small",
+      "productName": "pvExpress Small",
+      "productDescription": null,
+      "productUUID": "2df4f6cc-924d-428b-b3c4-78d39b68bc11",
+      "detailJson": "{\"flavorId\":\"5f570de7-e31a-48ea-baae-60367619cf97\",\"vcpu\":1,\"ram\":2,\"disk\":40,\"network\":500}",
+      "prices": [
+        {
+          "startDate": "2025-04-30T21:00:00+00:00",
+          "price": 781,
+          "currency": "TL",
+          "pricingUnit": "UNIT"
+        },
+        {
+          "startDate": "2025-04-30T21:00:00+00:00",
+          "price": 19.05,
+          "currency": "USD",
+          "pricingUnit": "UNIT"
+        },
+        {
+          "startDate": "2025-04-30T21:00:00+00:00",
+          "price": 16.78,
+          "currency": "EUR",
+          "pricingUnit": "UNIT"
+        }
+      ]
+    },
+    {
+      "service": "VPS",
+      "productCode": "pvExpress-Medium",
+      "productName": "pvExpress Medium",
+      "productDescription": null,
+      "productUUID": "c1d2a168-dcb8-4ef7-ab05-ae78e0a772b9",
+      "detailJson": "{\"flavorId\":\"b3141d97-6def-4e3b-b90e-6cb87989808c\",\"vcpu\":2,\"ram\":4,\"disk\":60,\"network\":750}",
+      "prices": [
+        {
+          "startDate": "2025-04-30T21:00:00+00:00",
+          "price": 1264,
+          "currency": "TL",
+          "pricingUnit": "UNIT"
+        },
+        {
+          "startDate": "2025-04-30T21:00:00+00:00",
+          "price": 30.83,
+          "currency": "USD",
+          "pricingUnit": "UNIT"
+        },
+        {
+          "startDate": "2025-04-30T21:00:00+00:00",
+          "price": 27.16,
+          "currency": "EUR",
+          "pricingUnit": "UNIT"
+        }
+      ]
+    },
+    {
+      "service": "VPS",
+      "productCode": "pvExpress-Large",
+      "productName": "pvExpress Large",
+      "productDescription": null,
+      "productUUID": "80018a62-af7c-40c1-9964-6f394c0b3e9f",
+      "detailJson": "{\"flavorId\":\"fd5d0bcf-d76a-468f-aa79-3082673d432d\",\"vcpu\":2,\"ram\":8,\"disk\":100,\"network\":1000}",
+      "prices": [
+        {
+          "startDate": "2025-04-30T21:00:00+00:00",
+          "price": 1894,
+          "currency": "TL",
+          "pricingUnit": "UNIT"
+        },
+        {
+          "startDate": "2025-04-30T21:00:00+00:00",
+          "price": 46.2,
+          "currency": "USD",
+          "pricingUnit": "UNIT"
+        },
+        {
+          "startDate": "2025-04-30T21:00:00+00:00",
+          "price": 40.71,
+          "currency": "EUR",
+          "pricingUnit": "UNIT"
+        }
+      ]
+    },
+    {
+      "service": "VPS",
+      "productCode": "pvExpress-2xLarge",
+      "productName": "pvExpress 2xLarge",
+      "productDescription": null,
+      "productUUID": "6660b4e9-844a-4998-89f7-ebe2adc3611d",
+      "detailJson": "{\"flavorId\":\"6d1596ff-ad6b-4b52-8b13-cca1f02d1c44\",\"vcpu\":4,\"ram\":16,\"disk\":200,\"network\":2000}",
+      "prices": [
+        {
+          "startDate": "2025-04-30T21:00:00+00:00",
+          "price": 3788,
+          "currency": "TL",
+          "pricingUnit": "UNIT"
+        },
+        {
+          "startDate": "2025-04-30T21:00:00+00:00",
+          "price": 92.4,
+          "currency": "USD",
+          "pricingUnit": "UNIT"
+        },
+        {
+          "startDate": "2025-04-30T21:00:00+00:00",
+          "price": 81.41,
+          "currency": "EUR",
+          "pricingUnit": "UNIT"
+        }
+      ]
+    },
+    {
+      "service": "VPS",
+      "productCode": "pvExpress-4xLarge",
+      "productName": "pvExpress 4xLarge",
+      "productDescription": null,
+      "productUUID": "78f762d7-6a1d-4676-94cd-da65b7b833de",
+      "detailJson": "{\"flavorId\":\"7153ecab-7bc0-48b3-8a67-a42de2fa3fa8\",\"vcpu\":8,\"ram\":32,\"disk\":400,\"network\":4000}",
+      "prices": [
+        {
+          "startDate": "2025-04-30T21:00:00+00:00",
+          "price": 7577,
+          "currency": "TL",
+          "pricingUnit": "UNIT"
+        },
+        {
+          "startDate": "2025-04-30T21:00:00+00:00",
+          "price": 184.8,
+          "currency": "USD",
+          "pricingUnit": "UNIT"
+        },
+        {
+          "startDate": "2025-04-30T21:00:00+00:00",
+          "price": 162.83,
+          "currency": "EUR",
+          "pricingUnit": "UNIT"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "5afc50cd-3f80-47c5-8596-bb303dfa5e17",
+      "productName": "g1.nano",
+      "productDescription": null,
+      "productUUID": "539dbe84-9138-4d27-a4a6-515b1558ac76",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 0.2191,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 0.0053,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 0.00466981,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "4d3c3930-42c7-48f4-ac0b-01c624c4d3a6",
+      "productName": "g1.micro",
+      "productDescription": null,
+      "productUUID": "2a416ca4-7ded-406f-9f7c-fdb69a785557",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 0.3174,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 0.0077,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 0.00678444,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "73dee111-ff30-4837-b3c1-9284c422485e",
+      "productName": "g1.small",
+      "productDescription": null,
+      "productUUID": "c5e48b42-bcd7-4684-b1a5-28e879f1b7d5",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 0.5141,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 0.0125,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 0.0110137,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "fd9ee6ed-a56d-483e-98c9-1a05d634ffcb",
+      "productName": "g1.medium",
+      "productDescription": null,
+      "productUUID": "c763fb3e-bf70-4dc2-98a5-ec1e44a50d19",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 1.0282,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 0.0251,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 0.0221155,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "d3072fd4-9a17-4d03-9f86-149c84bf8006",
+      "productName": "g1.large",
+      "productDescription": null,
+      "productUUID": "403ee8ac-df7b-4938-bb45-29ae2e2b2b32",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 1.815,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 0.0443,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 0.03903254,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "27214b9a-5f54-43e6-9d2c-aba341a7d41a",
+      "productName": "g1.xlarge",
+      "productDescription": null,
+      "productUUID": "e07aa1bb-0c6d-47e3-a85e-bb3736f5a687",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 3.63,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 0.0885,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 0.07797697,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "90f729ed-7dee-43bc-9c42-ed8f8baaf06d",
+      "productName": "g1.2xlarge",
+      "productDescription": null,
+      "productUUID": "32dd56c0-018a-444c-99a6-7241ef7cc63b",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 7.26,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 0.1771,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 0.15604204,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "f1cbc38a-1bb0-424c-9c49-f2edd3766042",
+      "productName": "g1.4xlarge",
+      "productDescription": null,
+      "productUUID": "764e6792-d1e9-4e90-b89b-9d97a5ad8718",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 14.52,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 0.3541,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-05-27T21:00:00+00:00",
+          "price": 0.31199598,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "a5bb79dc-3453-493d-8e85-3092c3316f24",
+      "productName": "gpu.t4s.xlarge",
+      "productDescription": null,
+      "productUUID": "b8009dd5-4393-4c21-b392-39bd7d5431e8",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 5.445,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 0.1328,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 0.15604204,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "LOAD_BALANCER",
+      "productCode": "LB-002",
+      "productName": "Net Loadbalancer 2C2GB",
+      "productDescription": "Net Loadbalancer 2 vCPU - 2 GB RAM",
+      "productUUID": "638b212e-6bf9-4b58-9d5d-ba288dd726c3",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2023-12-31T21:00:00+00:00",
+          "price": 0.301938,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2023-12-31T21:00:00+00:00",
+          "price": 0.007742,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "5138c6bf-9b23-4b0d-811d-fe4ae0ad040f",
+      "productName": "gpu.t4s.2xlarge",
+      "productDescription": null,
+      "productUUID": "f04ba060-e12a-4f56-ba73-37354aa0b58d",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 10.89,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 0.2656,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 0.23264743,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "a29c3a9a-34ee-4a53-9fad-25ff016e479f",
+      "productName": "gpu.t4m.xlarge",
+      "productDescription": null,
+      "productUUID": "ab94de6d-da45-4258-be69-cea166d3eda8",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 10.89,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 0.2656,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 0.23264743,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "82625601-a21e-4bfc-956d-151db2d4a750",
+      "productName": "gpu.t4m.2xlarge",
+      "productDescription": null,
+      "productUUID": "19b59bde-b1ea-4a8f-955a-58013ec3e9fd",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 21.78,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 0.5312,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 0.46529486,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "OBJECT_STORAGE",
+      "productCode": "OBS-001",
+      "productName": "Object Storage Standart",
+      "productDescription": "Object Storage Standart Price",
+      "productUUID": "0cdfd8d2-1fa0-4dc6-b05f-6437392f309f",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 0.00116586,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 0.00002778,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 0.00002401,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "VOLUME",
+      "productCode": "BC-001",
+      "productName": "Backup Volume",
+      "productDescription": "Fiyatlama GB x Saat olarak hesaplanıyor.",
+      "productUUID": "810ba55d-6885-42ab-a4d3-e22c98799312",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 0.00116586,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 0.00002778,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 0.00002401,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "952e1619-0112-48bf-9657-7f28929d1abc",
+      "productName": "ex_gpu.h100s.xlarge",
+      "productDescription": null,
+      "productUUID": "859fdf58-62ec-4edb-9dd3-7a6209e34d84",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 195.835024,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 4.51,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 3.7702199,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "e26bfd82-772d-46ed-848a-8b1d44a2ad0e",
+      "productName": "ex_gpu.h100m.4xlarge",
+      "productDescription": null,
+      "productUUID": "bef2aa5a-29c9-46e9-89c9-62fa84853d8d",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 564.4912,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 13,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 10.86759615,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "8b2dc1c9-ee56-4c88-9177-72cbbd716b13",
+      "productName": "ex_gpu.h100m.3xlarge",
+      "productDescription": null,
+      "productUUID": "67300205-2310-4005-9cf6-241ceb429d64",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 423.3684,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 9.75,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 8.15069712,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "fed8f5d6-303d-4421-9cc8-1baaba3f7bfc",
+      "productName": "ex_gpu.h100m.2xlarge",
+      "productDescription": null,
+      "productUUID": "63a0cc52-99b8-43e7-9e16-3363765b25f7",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 392.104272,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 9.03,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 7.54879948,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "488ae8fc-1dce-424b-bcbc-fc6fec164753",
+      "productName": "gpu.h100s.xlarge",
+      "productDescription": null,
+      "productUUID": "c8cee162-568b-4e64-87f1-3a8cf2099f64",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 195.835024,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 4.51,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 3.7702199,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "af867917-29a8-490a-af7d-22068ca7a300",
+      "productName": "gpu.h100m.2xlarge",
+      "productDescription": null,
+      "productUUID": "98547c64-570f-416b-8548-2129be148c1a",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 392.104272,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 9.03,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 7.54879948,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "e9c91c90-b7bf-4357-af10-782f454bf85f",
+      "productName": "gpu.h100m.3xlarge",
+      "productDescription": null,
+      "productUUID": "cd67c931-71ec-4746-8258-ffc045347c68",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 423.3684,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 9.75,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 8.15069712,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "deda8bdd-b9ff-4973-bbac-1b771dafde15",
+      "productName": "gpu.h100m.4xlarge",
+      "productDescription": null,
+      "productUUID": "0383e23f-efe3-4d45-ae30-6576ae9316a0",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 564.4912,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 13,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2024-12-31T21:00:00+00:00",
+          "price": 10.86759615,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "9236d7c3-1247-4ebb-9d9e-57f3c6a9db0c",
+      "productName": "m1.large",
+      "productDescription": null,
+      "productUUID": "e826c0ea-ff47-4b42-8e0e-7f5aff78a939",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2026-04-05T21:00:00+00:00",
+          "price": 2.87690458,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2026-04-05T21:00:00+00:00",
+          "price": 0.064634,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2026-04-05T21:00:00+00:00",
+          "price": 0.05599367,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "473854dc-3e9d-42e8-a0d2-758dcb98e4e9",
+      "productName": "m1.xlarge",
+      "productDescription": null,
+      "productUUID": "3c14aeec-6447-45ad-90e9-3b4520b67e30",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2026-04-05T21:00:00+00:00",
+          "price": 5.75380917,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2026-04-05T21:00:00+00:00",
+          "price": 0.129268,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2026-04-05T21:00:00+00:00",
+          "price": 0.11198735,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "25483aa9-972c-43f4-b7bb-85744cbe2152",
+      "productName": "m1.2xlarge",
+      "productDescription": null,
+      "productUUID": "6c109623-e6a3-4ff0-a1b6-8ec5a5ee075c",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2026-04-05T21:00:00+00:00",
+          "price": 11.50761834,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2026-04-05T21:00:00+00:00",
+          "price": 0.258536,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2026-04-05T21:00:00+00:00",
+          "price": 0.2239747,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "afad1d49-746d-4237-9827-488b44a1c1cb",
+      "productName": "m1.4xlarge",
+      "productDescription": null,
+      "productUUID": "1680a4b4-ae36-4809-b2b4-ff732e9c1f42",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2026-04-05T21:00:00+00:00",
+          "price": 23.01523667,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2026-04-05T21:00:00+00:00",
+          "price": 0.517072,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2026-04-05T21:00:00+00:00",
+          "price": 0.44794939,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "2db059da-36c8-461d-80b2-a258b3acae67",
+      "productName": "m1.8xlarge",
+      "productDescription": null,
+      "productUUID": "e46685fa-a1b8-4bb7-b58c-92ac64b9fc79",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2026-04-05T21:00:00+00:00",
+          "price": 46.03047334,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2026-04-05T21:00:00+00:00",
+          "price": 1.034144,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2026-04-05T21:00:00+00:00",
+          "price": 0.89589879,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "88d645e5-11c8-49e7-91c0-0a69033319f1",
+      "productName": "m1.12xlarge",
+      "productDescription": null,
+      "productUUID": "3952ad18-af23-4b72-8c3e-cf43a7162744",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2026-05-12T21:00:00+00:00",
+          "price": 83.62484265,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2026-05-12T21:00:00+00:00",
+          "price": 1.842176,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2026-05-12T21:00:00+00:00",
+          "price": 1.56835495,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "beffb26e-0d1f-4c90-8945-12044064789e",
+      "productName": "g1.8xlarge",
+      "productDescription": null,
+      "productUUID": "c3f6035a-ec65-4b92-8abc-ab13e01b4309",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2026-06-09T21:00:00+00:00",
+          "price": 32.66621916,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2026-06-09T21:00:00+00:00",
+          "price": 0.708352,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2026-06-09T21:00:00+00:00",
+          "price": 0.61299081,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "COMPUTE",
+      "productCode": "d638d95a-ea08-4ef7-8116-3b031850c53a",
+      "productName": "g1.16xlarge",
+      "productDescription": null,
+      "productUUID": "bed0676c-3545-489e-aa60-91563f36d81a",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2026-06-09T21:00:00+00:00",
+          "price": 65.33243832,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2026-06-09T21:00:00+00:00",
+          "price": 1.416704,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2026-06-09T21:00:00+00:00",
+          "price": 1.22598163,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "VOLUME",
+      "productCode": "bd0bbcfb-c178-4d21-b661-1b67c43b8c60",
+      "productName": "PortvMind-Standard-HDD",
+      "productDescription": "HDD CEPH DISK",
+      "productUUID": "3f36589f-3432-46f8-9dcc-23bae8179b9f",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2026-06-28T21:00:00+00:00",
+          "price": 0.00349758,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2026-06-28T21:00:00+00:00",
+          "price": 0.00007517,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2026-06-28T21:00:00+00:00",
+          "price": 0.00006596,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    },
+    {
+      "service": "VOLUME",
+      "productCode": "096439fe-26d6-4bd0-bdf0-11e40f73753e",
+      "productName": "PortvMind-Premium-SSD",
+      "productDescription": "Pure Storage COST",
+      "productUUID": "97a38dd2-cc67-460a-a9c0-08df1aaf1b6e",
+      "detailJson": null,
+      "prices": [
+        {
+          "startDate": "2026-06-28T21:00:00+00:00",
+          "price": 0.00656944,
+          "currency": "TL",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2026-06-28T21:00:00+00:00",
+          "price": 0.00015278,
+          "currency": "USD",
+          "pricingUnit": "HOUR"
+        },
+        {
+          "startDate": "2026-06-28T21:00:00+00:00",
+          "price": 0.0001239,
+          "currency": "EUR",
+          "pricingUnit": "HOUR"
+        }
+      ]
+    }
+  ]
+}

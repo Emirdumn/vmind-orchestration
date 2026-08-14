@@ -1,0 +1,22 @@
+[
+  {
+    "path": "plugins.entries.vmind-crm.enabled",
+    "value": true
+  },
+  {
+    "path": "plugins.entries.vmind-crm.hooks.allowConversationAccess",
+    "value": true
+  },
+  {
+    "path": "tools.alsoAllow",
+    "value": [
+      "exec",
+      "message",
+      "vmind_crm_get_context",
+      "vmind_crm_save_need",
+      "vmind_crm_save_calculation",
+      "vmind_crm_request_sales_contact",
+      "vmind_crm_set_communication_status"
+    ]
+  }
+]

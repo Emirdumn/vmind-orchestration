@@ -1,0 +1,27 @@
+node_modules/
+dist/
+.rollback/
+coverage/
+*.tsbuildinfo
+
+# --- SIRLAR — asla commit'lenmemeli ---
+.env
+.env.local
+key.key
+*.key
+!.env.example
+
+# Makineye ozel yerel ayarlar (izin kurallari) — paylasilmaz
+.claude/settings.local.json
+*.bak
+*.log
+.vitest/
+tmp/
+
+# harcama defteri — sunucuya ozel, commit edilmez
+var/
+
+
+# frontend build ciktisi ve bagimliliklari
+web/node_modules/
+web/dist/

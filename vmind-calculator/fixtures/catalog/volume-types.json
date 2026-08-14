@@ -1,0 +1,26 @@
+{
+  "result": {
+    "success": true,
+    "type": 0,
+    "message": null,
+    "status": null
+  },
+  "items": [
+    {
+      "id": "bd0bbcfb-c178-4d21-b661-1b67c43b8c60",
+      "name": "PortvMind-Standard-HDD",
+      "productCode": "bd0bbcfb-c178-4d21-b661-1b67c43b8c60",
+      "priceTL": 0.00349758,
+      "priceEUR": 0.00006596,
+      "priceUSD": 0.00007517
+    },
+    {
+      "id": "096439fe-26d6-4bd0-bdf0-11e40f73753e",
+      "name": "PortvMind-Premium-SSD",
+      "productCode": "096439fe-26d6-4bd0-bdf0-11e40f73753e",
+      "priceTL": 0.00656944,
+      "priceEUR": 0.0001239,
+      "priceUSD": 0.00015278
+    }
+  ]
+}

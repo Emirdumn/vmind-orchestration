@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  schedule:
+    # Faz 2.C: katalog & bundle drift kontrolu her gun 06:00 UTC
+    - cron: '0 6 * * *'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+
+  drift:
+    # Yalnizca zamanlanmis calismada: canli katalogla snapshot'i karsilastirir.
+    # Durdurucu (blocker) bulgu varsa cikis kodu 1 -> is basarisiz olur.
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: npm run drift
+        env:
+          VMIND_API_KEY: ${{ secrets.VMIND_API_KEY }}

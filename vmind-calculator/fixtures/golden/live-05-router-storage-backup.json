@@ -1,0 +1,45 @@
+{
+  "_source": "calculator.portvmind.com/my-estimate — canli ozet ekranindan yakalandi",
+  "_capturedAt": "2026-07-29",
+  "_note": "TL. Standalone backup'in etiket tuhafligini ekranda dogrular: miktar GB'ye cevrilmis (6144) ama satir etiketi ORIJINAL birimle yazilmis -> '3 backups x 2048 TB'. Ozet satiri ise Math.round ile '3 Backups (6144 GB total)'.",
+  "_covers": ["router", "storage", "backup", "floating-ip", "data-transfer"],
+  "name": "GOLDEN-05",
+  "currency": "TL",
+  "list": [
+    {
+      "id": "g5-router",
+      "service": "router",
+      "data": {
+        "floatingIp": { "productCode": "FIP-001", "count": 2 },
+        "network": { "productCode": "NETW-OUT-001", "traffic": 400, "unit": "GB" }
+      }
+    },
+    {
+      "id": "g5-storage",
+      "service": "storage",
+      "data": {
+        "productCode": "096439fe-26d6-4bd0-bdf0-11e40f73753e",
+        "size": 500,
+        "unit": "GB",
+        "volumeTypeName": "PortvMind-Premium-SSD"
+      }
+    },
+    {
+      "id": "g5-backup",
+      "service": "backup",
+      "data": { "productCode": "BC-001", "sourceSize": 2, "unit": "TB", "estimatedCount": 3 }
+    }
+  ],
+  "displayed": {
+    "hourly": "10.7728",
+    "monthly": "8514.55",
+    "hourlyDecimals": 4,
+    "monthlyDecimals": 2
+  },
+  "displayedLines": [
+    { "label": "Floating IP 2", "hourly": "0.3250", "monthly": "234.00" },
+    { "label": "Data Transfer 400 GB", "hourly": "-", "monthly": "758.16" },
+    { "label": "Block Storage - PortvMind-Premium-SSD 500 GB", "hourly": "3.2847", "monthly": "2365.00" },
+    { "label": "Cloud Backup Service 3 backups x 2048 TB", "hourly": "7.1630", "monthly": "5157.39" }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "name": "vmind-price-calculator-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "VMind satis ekibi icin dogal dilden teklif ureten multi-agent sistem",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "snapshot:catalog": "tsx scripts/snapshot-catalog.ts",
+    "drift": "tsx scripts/catalog-drift.ts",
+    "mcp": "tsx src/mcp/server.ts",
+    "eval": "tsx evals/run-eval.ts",
+    "demo": "tsx scripts/demo.ts",
+    "publish:test": "tsx scripts/publish-test.ts",
+    "web": "node --env-file-if-exists=.env --import tsx src/web/main.ts",
+    "web:build": "npm --prefix web install --no-audit --no-fund && npm --prefix web run build",
+    "web:dev": "npm --prefix web run dev"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.115.0",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "pg": "^8.23.0",
+    "yaml": "^2.9.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/pg": "^8.21.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

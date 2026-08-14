@@ -1,0 +1,105 @@
+# VMind Teklif Ajanı — sunucu dağıtımı
+#
+#   docker compose up -d --build
+#
+# Anahtar `.env` dosyasından okunur; imaja GİRMEZ. `.env` gitignore'da.
+
+services:
+  agent:
+    build: .
+    restart: unless-stopped
+
+    # Varsayılan olarak YALNIZCA localhost'a bağlanır. TLS'i önündeki ters
+    # vekil (nginx/Caddy) sonlandırır. Doğrudan internete açmak, çerezin
+    # `Secure` bayrağını anlamsız kılar ve token'ı düz metin taşır.
+    ports:
+      - '127.0.0.1:8080:8080'
+
+    # PostgreSQL hostta yalnızca Docker köprü adresinde dinler. Bu ad, imaja
+    # sabit bir 172.x adresi gömmeyi önler ve genel ağa rota oluşturmaz.
+    extra_hosts:
+      - 'host.docker.internal:172.29.77.1'
+
+    networks:
+      - runtime
+
+    environment:
+      # --- kimlik doğrulama ---
+      # "vmind-token": satışçı VMind konsol token'ını bir kez yapıştırır,
+      # sunucu platforma sorarak DOĞRULAR. Kimliğin kaynağı VMind.
+      WEB_AUTH_MODE: ${WEB_AUTH_MODE:-vmind-token}
+
+      # Yalnızca WEB_AUTH_MODE=shared-secret için (yerel deneme). Bu ikisi
+      # listelenmezse konteynere HİÇ ulaşmaz: `.env` yalnızca compose'un kendi
+      # değişken yorumlaması içindir, otomatik olarak konteynere geçmez —
+      # sunucu da açılmayı reddeder. Sunulan bir seçeneğin çalışması gerekir.
+      WEB_SHARED_PASSWORD: ${WEB_SHARED_PASSWORD:-}
+      WEB_ALLOW_WEAK_AUTH: ${WEB_ALLOW_WEAK_AUTH:-}
+
+      # OpenClaw/vGPT icin insandan bagimsiz Bearer servis hesabi.
+      # Anahtari WhatsApp mesajina yazmayin; OpenClaw secret/env ayarina koyun.
+      WEB_SERVICE_API_KEY: ${WEB_SERVICE_API_KEY:-}
+      WEB_SERVICE_ID: ${WEB_SERVICE_ID:-openclaw}
+      WEB_SERVICE_NAME: ${WEB_SERVICE_NAME:-OpenClaw WhatsApp}
+      WEB_SERVICE_ALLOW_PUBLISH: ${WEB_SERVICE_ALLOW_PUBLISH:-}
+
+      # --- yayınlama ---
+      # "1" → onaydan sonra teklif VMind'a kaydedilir ve calculator linki
+      # üretilir. ⛔ Her onaylanan teklif KALICI kayıt bırakır; silme ucu yok.
+      # Varsayılan boş = KAPALI: yanlış yapılandırılmış bir sunucu sessizce
+      # kayıt üretmesin.
+      WEB_ALLOW_PUBLISH: ${WEB_ALLOW_PUBLISH:-}
+
+      # --- harcama sınırı (USD/gün) ---
+      LLM_DAILY_TOTAL_USD: ${LLM_DAILY_TOTAL_USD:-5}
+      LLM_DAILY_PER_USER_USD: ${LLM_DAILY_PER_USER_USD:-1}
+
+      # Faz 2: PostgreSQL yalnızca iki VM arasındaki WireGuard adresinden
+      # erişilir. Tanımlı değilse yerel geliştirme JSON defteriyle devam eder.
+      VMIND_DATABASE_URL: ${VMIND_DATABASE_URL:-}
+      VMIND_TENANT_ID: ${VMIND_TENANT_ID:-00000000-0000-0000-0000-000000000001}
+      VMIND_PROMPT_VERSION: ${VMIND_PROMPT_VERSION:-phase2}
+
+      # OpenClaw VM'deki CRM rotasina host uzerindeki sifreli SSH tuneliyle
+      # ulasilir. Ikisinden biri yoksa uygulama acilista yapilandirmayi reddeder.
+      VMIND_CRM_SITE_URL: ${VMIND_CRM_SITE_URL:-}
+      VMIND_CRM_SITE_SECRET: ${VMIND_CRM_SITE_SECRET:-}
+
+      # --- LLM sağlayıcı ---
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENROUTER_MODEL: ${OPENROUTER_MODEL:-anthropic/claude-opus-5}
+      OPENROUTER_MAX_TOKENS: ${OPENROUTER_MAX_TOKENS:-8000}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+
+      # Ters vekil TLS sonlandırıyorsa çerez `Secure` kalmalı (varsayılan).
+      # Yalnızca TLS'siz yerel denemede WEB_INSECURE_COOKIE=1 verin.
+      WEB_INSECURE_COOKIE: ${WEB_INSECURE_COOKIE:-}
+
+    # JSON defteri Faz 2 boyunca PostgreSQL'in geri dönüş/uzlaştırma aynasıdır.
+    # Konteyner yeniden yaratıldığında kaybolmaması gerekir.
+    volumes:
+      - budget:/app/var
+
+    # Kural motoru ve fiyat hesabı dışarıya yazmaz; kök dosya sistemi salt-okunur
+    # olabilir. Tek yazılabilir yer defter volume'u ve /tmp.
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+
+volumes:
+  budget:
+
+# Docker'ın otomatik 172.x seçimine bağlı kalmayan, yalnızca bu hostta yaşayan
+# sabit ağ. PostgreSQL sadece 172.29.77.1 üzerinde dinler.
+networks:
+  runtime:
+    external: true
+    name: vmind-agent-runtime

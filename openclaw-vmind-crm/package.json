@@ -1,0 +1,28 @@
+{
+  "name": "@vmind/openclaw-vmind-crm",
+  "version": "1.2.0",
+  "type": "module",
+  "scripts": {
+    "test": "node test-crm.mjs && node test-runtime.mjs && node test-calculator-url.mjs && node test-site-api.mjs",
+    "test:postgres": "node test-postgres.mjs",
+    "test:schema-guard": "node test-schema-guard.mjs",
+    "db:migrate": "node deploy/migrate-postgres.mjs",
+    "db:import-sqlite": "node deploy/sqlite-to-postgres.mjs",
+    "db:verify": "node deploy/verify-postgres.mjs"
+  },
+  "dependencies": {
+    "pg": "^8.16.3"
+  },
+  "peerDependencies": {
+    "openclaw": ">=2026.7.1-2"
+  },
+  "openclaw": {
+    "extensions": [
+      "./index.js"
+    ],
+    "compat": {
+      "pluginApi": ">=2026.7.1-2",
+      "minGatewayVersion": "2026.7.1-2"
+    }
+  }
+}

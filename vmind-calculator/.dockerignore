@@ -1,0 +1,35 @@
+# ⛔ SIRLAR — imaja ASLA girmez.
+# Docker imaj katmanları kalıcıdır: bir dosya bir katmanda görünüp sonraki
+# katmanda silinse bile imajı çeken herkes onu geri çıkarabilir. Bu yüzden
+# anahtarlar buradan engellenir, Dockerfile'da silinmez.
+key.key
+*.key
+.env
+.env.*
+!.env.example
+
+# Harcama defteri — sunucuya özel, volume'dan gelir
+var/
+
+# Geliştirme artıkları
+node_modules
+web/node_modules
+web/dist
+.git
+.gitignore
+.claude
+
+# Test ve dokümanlar — çalışma zamanında gerekmiyor
+tests/
+evals/
+docs/
+fixtures/golden/
+*.md
+!README.md
+
+# Derleme çıktıları ve geçici dosyalar
+dist/
+coverage/
+*.log
+*.bak
+*.tmp

@@ -1,0 +1,24 @@
+[Unit]
+Description=VMind Calculator to CRM restricted SSH tunnel
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+ExecStart=/usr/bin/ssh -NT \
+  -i /home/ubuntu/.ssh/vmind-crm-tunnel \
+  -o BatchMode=yes \
+  -o IdentitiesOnly=yes \
+  -o ExitOnForwardFailure=yes \
+  -o ServerAliveInterval=30 \
+  -o ServerAliveCountMax=3 \
+  -o StrictHostKeyChecking=yes \
+  -o UserKnownHostsFile=/home/ubuntu/.ssh/known_hosts.vmind-crm \
+  -L 172.29.77.1:18790:127.0.0.1:18789 \
+  ubuntu@43.229.94.110
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

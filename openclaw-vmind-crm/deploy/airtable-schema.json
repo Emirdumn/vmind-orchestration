@@ -1,0 +1,65 @@
+{
+  "tables": [
+    {
+      "name": "CONTACT",
+      "primaryField": "Contact ID",
+      "fields": [
+        ["Contact ID", "singleLineText"],
+        ["Phone", "phoneNumber"],
+        ["Name", "singleLineText"],
+        ["Company", "singleLineText"],
+        ["Communication Status", "singleSelect"],
+        ["Consent Updated At", "dateTime"],
+        ["Created At", "dateTime"],
+        ["Updated At", "dateTime"]
+      ]
+    },
+    {
+      "name": "OPPORTUNITY",
+      "primaryField": "Opportunity ID",
+      "fields": [
+        ["Opportunity ID", "singleLineText"],
+        ["Contact ID", "singleLineText"],
+        ["Customer Need", "multilineText"],
+        ["Recommended Service", "singleLineText"],
+        ["Stage", "singleSelect"],
+        ["Estimated Value", "number"],
+        ["Currency", "singleSelect"],
+        ["Owner", "singleLineText"],
+        ["Next Follow-up", "date"],
+        ["Source", "singleSelect"],
+        ["Created At", "dateTime"],
+        ["Updated At", "dateTime"]
+      ]
+    },
+    {
+      "name": "CALCULATION",
+      "primaryField": "Calculation ID",
+      "fields": [
+        ["Calculation ID", "singleLineText"],
+        ["Calculator ID", "singleLineText"],
+        ["Opportunity ID", "singleLineText"],
+        ["Calculator URL", "url"],
+        ["Configuration Summary", "multilineText"],
+        ["Amount", "number"],
+        ["Currency", "singleSelect"],
+        ["Version", "number"],
+        ["Created At", "dateTime"]
+      ]
+    },
+    {
+      "name": "TASK",
+      "primaryField": "Task ID",
+      "fields": [
+        ["Task ID", "singleLineText"],
+        ["Opportunity ID", "singleLineText"],
+        ["Type", "singleSelect"],
+        ["Status", "singleSelect"],
+        ["Owner", "singleLineText"],
+        ["Due At", "dateTime"],
+        ["Created At", "dateTime"],
+        ["Updated At", "dateTime"]
+      ]
+    }
+  ]
+}

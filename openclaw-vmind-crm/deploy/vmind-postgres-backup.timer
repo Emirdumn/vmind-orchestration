@@ -1,0 +1,11 @@
+[Unit]
+Description=Nightly VMind PostgreSQL backup
+
+[Timer]
+OnCalendar=*-*-* 02:20:00 Europe/Istanbul
+Persistent=true
+RandomizedDelaySec=10m
+Unit=vmind-postgres-backup.service
+
+[Install]
+WantedBy=timers.target

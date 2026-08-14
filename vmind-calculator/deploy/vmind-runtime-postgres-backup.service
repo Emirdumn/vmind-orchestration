@@ -1,0 +1,19 @@
+[Unit]
+Description=VMind Calculator PostgreSQL local custom-format backup
+After=postgresql@16-main.service
+Requires=postgresql@16-main.service
+
+[Service]
+Type=oneshot
+User=postgres
+Group=postgres
+Environment=PGHOST=/var/run/postgresql
+Environment=PGDATABASE=vmind_runtime
+Environment=PGUSER=postgres
+ExecStart=/usr/local/sbin/vmind-runtime-postgres-backup
+Nice=10
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/backups/vmind-runtime-postgres

@@ -1,0 +1,32 @@
+{
+  "_source": "calculator.portvmind.com/configure/compute — canli arayuzden tarayici ile yakalandi",
+  "_capturedAt": "2026-07-29",
+  "_note": "estimate.current Redux state'inden birebir kopyalandi; displayed degerleri sayfanin altindaki 'Calculation' seridinden okundu.",
+  "currency": "USD",
+  "service": "compute",
+  "data": {
+    "count": 4,
+    "productCode": "25483aa9-972c-43f4-b7bb-85744cbe2152",
+    "description": "",
+    "storage": {
+      "productCode": "096439fe-26d6-4bd0-bdf0-11e40f73753e",
+      "size": 100,
+      "unit": "GB"
+    },
+    "backup": {
+      "productCode": "BC-001",
+      "sourceSize": 1,
+      "unit": "GB",
+      "estimatedCount": 1
+    }
+  },
+  "displayed": {
+    "hourly": "1.095367 USD",
+    "monthly": "788.6643 USD"
+  },
+  "_readable": {
+    "flavor": "m1.2xlarge @ 0.258536 USD/saat x 4",
+    "volumeType": "PortvMind-Premium-SSD @ 0.00015278 USD/GB/saat x (100 GB x 4)",
+    "backupProduct": "BC-001 Backup Volume @ 0.00002778 USD/saat x (4 x 1 GB x 1)"
+  }
+}

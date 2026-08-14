@@ -1,0 +1,20 @@
+node_modules/
+dist/
+coverage/
+
+# Runtime secrets and machine-local configuration.
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.secret
+
+# Runtime data, backups and test artifacts.
+var/
+backups/
+*.sqlite
+*.sqlite3
+*.db
+*.log
+*.tmp

@@ -1,0 +1,22 @@
+{
+  "id": "vmind-crm",
+  "name": "VMind CRM",
+  "description": "Controlled WhatsApp CRM tools plus a signed website ingestion route, backed by tenant-scoped PostgreSQL.",
+  "version": "1.2.0",
+  "activation": {
+    "onStartup": true
+  },
+  "contracts": {
+    "tools": [
+      "vmind_crm_get_context",
+      "vmind_crm_save_need",
+      "vmind_crm_save_calculation",
+      "vmind_crm_request_sales_contact",
+      "vmind_crm_set_communication_status"
+    ]
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false
+  }
+}

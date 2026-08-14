@@ -1,0 +1,34 @@
+{
+  "_source": "calculator.portvmind.com/my-estimate — canli ozet ekranindan yakalandi",
+  "_capturedAt": "2026-07-29",
+  "_note": "Object storage'in kendi egress'i ile bagimsiz data-transfer kalemi bir arada. Ikisinin de SAATLIK toplama girmedigi ekranda gorulur: toplam saatlik yalnizca object storage'in depolama tutari.",
+  "_covers": ["object-storage", "data-transfer"],
+  "name": "GOLDEN-03",
+  "currency": "USD",
+  "list": [
+    {
+      "id": "g3-obj",
+      "service": "object-storage",
+      "data": {
+        "storage": { "productCode": "OBS-001", "size": 5, "unit": "TB" },
+        "network": { "productCode": "NETW-OUT-001", "traffic": 800, "unit": "GB" }
+      }
+    },
+    {
+      "id": "g3-dt",
+      "service": "data-transfer",
+      "data": { "productCode": "NETW-OUT-001", "traffic": 3, "unit": "TB" }
+    }
+  ],
+  "displayed": {
+    "hourly": "0.1422",
+    "monthly": "290.59",
+    "hourlyDecimals": 4,
+    "monthlyDecimals": 2
+  },
+  "displayedLines": [
+    { "label": "Object Storage 5 TB", "hourly": "0.1422", "monthly": "102.41" },
+    { "label": "Data Transfer 800 GB", "hourly": "-", "monthly": "38.88" },
+    { "label": "Data Transfer 3 TB", "hourly": "-", "monthly": "149.30" }
+  ]
+}
