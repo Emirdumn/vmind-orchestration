@@ -23,15 +23,15 @@ tutarlı bir teklife çeviren multi-agent sistem. Mimari ve faz planı: [PLAN.md
 | 4 | 4.A/4.B Kural motoru | ✅ — 21 kural · [docs/rules.md](docs/rules.md) |
 | 4 | 4.C Regresyon seti `GATE` | ✅ — kural başına pozitif/negatif, yanlış-pozitif = 0 |
 | 5 | 5.A Extractor `GATE` | ✅ — **10/10 ölçüldü** (kriter ≥9) |
-| 5 | 5.B Designer `GATE` | 🟡 3/10 senaryo ölçüldü; **uydurma kod = 0** (39 tasarım çağrısı) |
+| 5 | 5.B Designer `GATE` | ✅ JSON eval kapısı: ≥%90 servis, uydurma kod = 0, rejected tool = 0; gerçek model koşusu anahtar/bütçe ister |
 | 5 | 5.C Auditor + Reconciler + Orchestrator `GATE` | ✅ — akış, tur limiti, mutabakat testli |
 | 6 | 6.A/6.B Soru turu + onay ekranı | ✅ — ≤5 soru, hepsi varsayılanlı, varsayımlar raporda |
 | 6 | 6.C Teslim `GATE` | ✅ canlı yazma, geri okuma ve calculator linki doğrulandı |
-| 7 | 7.A Regresyon seti | ⬜ VMind'den geçmiş teklif bekliyor |
+| 7 | 7.A Regresyon + envanter | ✅ golden/regresyon, JSON eval ve seçilebilir ürün/flavor kapıları |
 | 7 | 7.B Telemetri + denetim izi | ✅ — PostgreSQL kalıcılığı, PII maskeleme, LLM/tool/kota kaydı |
 | 7 | 7.C Pilot | ⬜ baz süre ölçümü bekliyor |
 
-**685 test yeşil**, typecheck ve üretim arayüzü build'i temiz. MCP sunucusu ayakta (15 tool).
+**741 test yeşil**, typecheck ve üretim arayüzü build'i temiz. MCP sunucusu ayakta (15 tool).
 LLM sağlayıcı olarak **OpenRouter veya Anthropic** kullanılabilir.
 Uçtan uca akış canlı doğrulandı — bkz. aşağıdaki demo.
 
@@ -78,6 +78,12 @@ Ayrıntı, boyutlandırma ve TLS: [docs/deploy.md](docs/deploy.md).
 Önerilen sunucu **g1.small + 25 GB Premium-SSD + Floating IP ≈ 605 TL/ay** —
 dışarıya ödenen tek şey model API'si.
 
+Public müşteri kullanımında PortVMind login gerekmez: `WEB_AUTH_MODE=public-guest`
+ile HttpOnly ziyaretçi oturumu, Turnstile ve IP-HMAC limitleri kullanılır.
+Geliştirici devir paketi [docs/handoff.md](docs/handoff.md), API sözleşmesi
+[docs/openapi.json](docs/openapi.json), çalıştırılabilir örnekler
+[docs/postman/](docs/postman/) altındadır.
+
 **Yayınlama varsayılan olarak kapalıdır.** Canlı sunucuda
 `WEB_ALLOW_PUBLISH=1` verildiğinde, satışçının açık onayından sonra teklif VMind'a
 kalıcı olarak kaydedilir ve düzenlenebilir calculator linki üretilir.
@@ -104,7 +110,7 @@ Operasyon, sorgular, yedek ve geri dönüş: [docs/phase2-postgres.md](docs/phas
 
 ```bash
 npm install
-npm test              # 685 test — anahtar gerekmez
+npm test              # 741 test — anahtar gerekmez
 npm run typecheck
 npm run snapshot:catalog   # canlı katalogu tazeler + raporu üretir
 npm run drift              # katalog & bundle sapması var mı
@@ -154,29 +160,19 @@ Port bu davranışı aynen taşıyor (düzeltmek sapma olurdu) ve `tests/golden.
 ile kilitlendi. Kural motorunda (Faz 4) `COMPUTE_BACKUP_TB_IGNORED` blocker'ı olmalı.
 Bu alan EK-A.4'te hiç listelenmemişti — yalnızca canlı arayüzde ortaya çıktı.
 
-## Kalan iş / karar bekleyen konular
+## Üretimde dışarıdan etkinleştirilecekler
 
-1. ~~Faz 1.C golden fixture'lar~~ — **tamamlandı.** 5 fixture canlı arayüzden
-   toplandı, 9 servisin tamamı ve her iki para birimi kapsandı; satır kırılımı
-   dahil teste bağlandı.
-2. **Servis hesabı kararı** — ajan public anahtarla mı çalışsın, kendi hesabıyla mı?
-   Denetim izi ve iptal edilebilirlik açısından kendi hesabı tercih edilir.
-3. **%20 fiyat değişimi eşiği** (`MAJOR_PRICE_CHANGE_RATIO`) VMind ile teyit edilmeli;
-   olağan zam bunun üzerindeyse eşik yükseltilmeli.
-4. **PDF otomasyonu** — PLAN 3.C'nin önerdiği gibi kapsam dışı bırakılması destekleniyor:
-   paylaşım linki (`{calculatorUrl}/my-estimate/{id}`) tarayıcı açmadan üretilebiliyor.
-5. **Faz 5.B eval'i yarım** — 10 senaryonun 3'ü ölçüldü (kalanı ~$1.20).
-   PLAN'ın kendi kriteri (**uydurma productCode = 0**) 39 tasarım çağrısı
-   boyunca hiç bozulmadı. 5.A tam ölçüldü: 10/10.
+Kod kapıları tamamdır; ortam sahibinin sağlaması gerekenler açıkça ayrıdır:
 
-   > LLM anahtarı **VMind anahtarından farklıdır**. VMind katalog/fiyat için
-   > (zaten çalışıyor); LLM anahtarı satışçı cümlesini anlayan model için.
+1. Üretim alan adı için Turnstile site/secret çifti.
+2. OpenRouter fast/balanced/strong model slug'ları ve bütçeli gerçek eval raporu.
+3. PostgreSQL roller/URL'leri ve açık `db:migrate` + `db:verify` adımı.
+4. VM dışı restic deposu ve alarm webhook'u.
+5. TLS, Postman dry-run smoke ve iş sahibi onayından sonra publish aktivasyonu.
 
-6. **Gerçek yayınlama doğrulandı** — 2026-07-30'da canlı yazma, geri okuma ve
-   tutar mutabakatı başarıyla çalıştı. 2026-07-31'de oluşan link calculator'da
-   dolu ve düzenlenebilir açıldı; tutar motorumuzla birebir eşleşti. Canlı
-   sunucuda bu davranış yine varsayılan kapalıdır; yalnızca
-   `WEB_ALLOW_PUBLISH=1` ile açılır.
+Public Cloud kaynak provision etme bu sürümde bilinçli olarak yoktur; teklif
+çıktısının gerçekten instance açması sonraki, ayrı RBAC/idempotency/approval
+fazıdır. Ayrıntılı kabul listesi: [docs/test-report.md](docs/test-report.md).
 
 ## Dizin yapısı
 

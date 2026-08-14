@@ -1,0 +1,414 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "VMind Teklif Ajanı API",
+    "version": "1.0.0",
+    "description": "Public site, servis entegrasyonu, yönetim ve sağlık uçlarının devir sözleşmesi. Fiyat ve ürün seçimi doğrulanmış tool katmanından gelir; kalıcı yayın yalnız insan onayı ve sunucu yetkisiyle yapılır.",
+    "license": { "name": "Proprietary", "identifier": "LicenseRef-Proprietary" }
+  },
+  "servers": [
+    { "url": "https://teklif.43-229-94-48.sslip.io", "description": "Mevcut VMind teklif sitesi; devralan ekip kendi TLS alan adıyla değiştirir" }
+  ],
+  "tags": [
+    { "name": "Health", "description": "Süreç ve zorunlu bağımlılık sağlığı" },
+    { "name": "Authentication", "description": "Public tarayıcı oturumu ve kimlik özeti" },
+    { "name": "Quote Flow", "description": "Tool-first veya katmanlı model teklif akışı" },
+    { "name": "Import", "description": "CSV/XLSX yapılandırılmış ihtiyaç içe aktarma" },
+    { "name": "Administration", "description": "Ayrı admin Bearer ile PostgreSQL yönetim görünümü" }
+  ],
+  "paths": {
+    "/api/health/live": {
+      "get": {
+        "tags": ["Health"],
+        "operationId": "getLiveness",
+        "summary": "Süreç liveness kontrolü",
+        "security": [],
+        "responses": {
+          "200": { "description": "Süreç ayakta", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Liveness" } } } },
+          "429": { "$ref": "#/components/responses/TooManyRequests" }
+        }
+      }
+    },
+    "/api/health/ready": {
+      "get": {
+        "tags": ["Health"],
+        "operationId": "getReadiness",
+        "summary": "PostgreSQL, katalog ve LLM readiness kontrolü",
+        "security": [{ "monitorBearer": [] }],
+        "responses": {
+          "200": { "description": "Servis hazır", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Readiness" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "503": { "description": "En az bir zorunlu bileşen hazır değil", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Readiness" } } } }
+        }
+      }
+    },
+    "/api/auth/config": {
+      "get": {
+        "tags": ["Authentication"],
+        "operationId": "getAuthConfig",
+        "summary": "Etkin kimlik modunu ve giriş alanlarını döndürür",
+        "security": [],
+        "responses": {
+          "200": { "description": "Kimlik yapılandırması", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AuthConfig" } } } },
+          "429": { "$ref": "#/components/responses/TooManyRequests" }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "operationId": "login",
+        "summary": "Tarayıcı oturumu açar",
+        "description": "public-guest modunda boş nesne yeterlidir. shared-secret veya vmind-token modunda /api/auth/config içindeki alanları gönderin. Başarılı yanıt HttpOnly vmind_session çerezi kurar.",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "additionalProperties": { "type": "string", "maxLength": 8192 }, "examples": [{}, { "displayName": "Emir", "password": "yerel-secret" }, { "token": "vmind-token" }] } } }
+        },
+        "responses": {
+          "200": { "description": "Oturum açıldı", "headers": { "Set-Cookie": { "schema": { "type": "string" } } }, "content": { "application/json": { "schema": { "type": "object", "required": ["displayName"], "properties": { "displayName": { "type": "string" } } } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "operationId": "logout",
+        "summary": "Tarayıcı oturumunu kapatır",
+        "security": [],
+        "responses": { "200": { "$ref": "#/components/responses/Ok" }, "429": { "$ref": "#/components/responses/TooManyRequests" } }
+      }
+    },
+    "/api/me": {
+      "get": {
+        "tags": ["Authentication"],
+        "operationId": "getCurrentIdentity",
+        "summary": "Kimlik, kota ve özellik durumunu döndürür",
+        "security": [{ "sessionCookie": [] }, { "serviceBearer": [] }],
+        "responses": {
+          "200": { "description": "Geçerli kimlik", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CurrentIdentity" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/api/status": {
+      "get": {
+        "tags": ["Quote Flow"],
+        "operationId": "getRuntimeStatus",
+        "summary": "Kota defteri ve açık akış durumunu döndürür",
+        "security": [{ "sessionCookie": [] }, { "serviceBearer": [] }],
+        "responses": {
+          "200": { "description": "Runtime durumu", "content": { "application/json": { "schema": { "type": "object", "additionalProperties": true } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/api/import/spreadsheet": {
+      "post": {
+        "tags": ["Import"],
+        "operationId": "importSpreadsheet",
+        "summary": "CSV/XLSX içeriğini tool-first veya doğal akış girdisine dönüştürür",
+        "description": "Standart alanlar tanınırsa LLM çağrılmaz. Belirsiz tabloda en fazla 100x30 hücre ve 4000 karakterlik güvenli özet doğal akışa döner. Dosya üst sınırı sunucuda 2 MiB, satır üst sınırı 5000'dir.",
+        "security": [{ "sessionCookie": [] }, { "serviceBearer": [] }],
+        "parameters": [
+          { "name": "X-VMind-Filename", "in": "header", "required": true, "schema": { "type": "string", "maxLength": 240, "pattern": "\\.(csv|xlsx)$" }, "example": "ihtiyac.xlsx" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "text/csv": { "schema": { "type": "string", "format": "binary" } },
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": { "schema": { "type": "string", "format": "binary" } }
+          }
+        },
+        "responses": {
+          "200": { "description": "Yönlendirilmiş import", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SpreadsheetImport" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "413": { "$ref": "#/components/responses/PayloadTooLarge" }
+        }
+      }
+    },
+    "/api/flow/guided": {
+      "post": {
+        "tags": ["Quote Flow"],
+        "operationId": "startGuidedFlow",
+        "summary": "LLM kullanmadan tıklamalı teklif akışı başlatır",
+        "security": [{ "sessionCookie": [] }, { "serviceBearer": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/TurnstileToken" }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "required": ["config"], "properties": { "config": { "$ref": "#/components/schemas/GuidedQuoteConfig" }, "customer": { "$ref": "#/components/schemas/CustomerContext" } }, "additionalProperties": false } } }
+        },
+        "responses": {
+          "202": { "description": "Akış başladı", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SessionCreated" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "429": { "$ref": "#/components/responses/TooManyRequests" }
+        }
+      }
+    },
+    "/api/flow": {
+      "post": {
+        "tags": ["Quote Flow"],
+        "operationId": "startNaturalFlow",
+        "summary": "Katmanlı model yönlendirmeli doğal dil teklif akışı başlatır",
+        "security": [{ "sessionCookie": [] }, { "serviceBearer": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/TurnstileToken" }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "required": ["salesText"], "properties": { "salesText": { "type": "string", "minLength": 1, "maxLength": 4000 }, "customer": { "$ref": "#/components/schemas/CustomerContext" } }, "additionalProperties": false }, "example": { "salesText": "2 adet web sunucusu, premium disk, App LB, VPN ve aylık 1 TB dış trafik istiyorum." } } }
+        },
+        "responses": {
+          "202": { "description": "Akış başladı", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SessionCreated" } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "429": { "$ref": "#/components/responses/TooManyRequests" },
+          "503": { "$ref": "#/components/responses/Unavailable" }
+        }
+      }
+    },
+    "/api/flow/{sessionId}": {
+      "get": {
+        "tags": ["Quote Flow"],
+        "operationId": "getFlow",
+        "summary": "Akış görünümünü okur; isteğe bağlı uzun yoklama yapar",
+        "security": [{ "sessionCookie": [] }, { "serviceBearer": [] }],
+        "parameters": [
+          { "$ref": "#/components/parameters/SessionId" },
+          { "name": "wait", "in": "query", "required": false, "schema": { "type": "integer", "minimum": 0, "maximum": 25000, "default": 0 }, "description": "Değişiklik için beklenecek en uzun milisaniye." }
+        ],
+        "responses": {
+          "200": { "description": "Akış görünümü", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SessionView" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/api/flow/{sessionId}/answer": {
+      "post": {
+        "tags": ["Quote Flow"],
+        "operationId": "answerFlowGate",
+        "summary": "Aktif netleştirme, kural veya onay kapısını cevaplar",
+        "description": "Onay kapısında approved=true ve publish=true yalnız yetkili kimlikte çalışır. approvedBy istemciden alınmaz; sunucu doğrulanmış kimlikle üzerine yazar.",
+        "security": [{ "sessionCookie": [] }, { "serviceBearer": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/SessionId" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GateAnswer" } } } },
+        "responses": {
+          "200": { "description": "Cevap kabul edildi", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GateAnswerResult" } } } },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "409": { "description": "Kapı kapanmış, yinelenmiş veya düzenleme sürüyor", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GateAnswerResult" } } } }
+        }
+      }
+    },
+    "/api/flow/{sessionId}/edit": {
+      "post": {
+        "tags": ["Quote Flow"],
+        "operationId": "editApproval",
+        "summary": "Açık onay özetini doğal dille düzenler",
+        "security": [{ "sessionCookie": [] }, { "serviceBearer": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/SessionId" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "required": ["gateId", "instruction"], "properties": { "gateId": { "type": "string", "maxLength": 64 }, "instruction": { "type": "string", "minLength": 1, "maxLength": 2000 } }, "additionalProperties": false } } } },
+        "responses": {
+          "200": { "description": "Düzenleme kabul edildi", "content": { "application/json": { "schema": { "type": "object", "additionalProperties": true } } } },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "429": { "$ref": "#/components/responses/TooManyRequests" }
+        }
+      }
+    },
+    "/api/flow/{sessionId}/close": {
+      "post": {
+        "tags": ["Quote Flow"],
+        "operationId": "closeFlow",
+        "summary": "Akışı bellekten kapatır",
+        "security": [{ "sessionCookie": [] }, { "serviceBearer": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/SessionId" }],
+        "responses": { "200": { "$ref": "#/components/responses/Ok" }, "404": { "$ref": "#/components/responses/NotFound" } }
+      }
+    },
+    "/api/admin/overview": {
+      "get": {
+        "tags": ["Administration"],
+        "operationId": "getAdminOverview",
+        "summary": "Kullanım, maliyet, cache, teklif ve CRM özetini döndürür",
+        "security": [{ "adminBearer": [] }],
+        "responses": { "200": { "description": "Yönetim özeti", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AdminOverview" } } } }, "401": { "$ref": "#/components/responses/Unauthorized" } }
+      }
+    },
+    "/api/admin/runs": {
+      "get": {
+        "tags": ["Administration"],
+        "operationId": "listAdminRuns",
+        "summary": "Model/tool çalışmalarını listeler",
+        "security": [{ "adminBearer": [] }],
+        "parameters": [{ "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 200, "default": 50 } }],
+        "responses": { "200": { "description": "Çalışmalar", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ItemsEnvelope" } } } }, "401": { "$ref": "#/components/responses/Unauthorized" } }
+      }
+    },
+    "/api/admin/runs/{runId}": {
+      "get": {
+        "tags": ["Administration"],
+        "operationId": "getAdminRun",
+        "summary": "PII-maskeli çalışma ayrıntısı ve denetim izini döndürür",
+        "security": [{ "adminBearer": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/RunId" }],
+        "responses": { "200": { "description": "Çalışma ayrıntısı", "content": { "application/json": { "schema": { "type": "object", "additionalProperties": true } } } }, "404": { "$ref": "#/components/responses/NotFound" } }
+      }
+    },
+    "/api/admin/usage": {
+      "get": {
+        "tags": ["Administration"],
+        "operationId": "listAdminUsage",
+        "summary": "Günlük model token ve USD kullanımını döndürür",
+        "security": [{ "adminBearer": [] }],
+        "parameters": [{ "name": "days", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 366, "default": 30 } }],
+        "responses": {
+          "200": {
+            "description": "Günlük kullanım",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ItemsEnvelope" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/api/admin/opportunities": {
+      "get": {
+        "tags": ["Administration"],
+        "operationId": "listAdminOpportunities",
+        "summary": "CRM fırsatlarını ve son Calculator sürümünü listeler",
+        "security": [{ "adminBearer": [] }],
+        "parameters": [
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 200, "default": 50 } },
+          { "name": "stage", "in": "query", "schema": { "$ref": "#/components/schemas/CrmStage" } }
+        ],
+        "responses": { "200": { "description": "Fırsatlar", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ItemsEnvelope" } } } }, "400": { "$ref": "#/components/responses/BadRequest" } }
+      }
+    },
+    "/api/admin/opportunities/{opportunityId}": {
+      "patch": {
+        "tags": ["Administration"],
+        "operationId": "updateAdminOpportunity",
+        "summary": "Fırsat aşaması, sahibi veya takip tarihini günceller",
+        "security": [{ "adminBearer": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/OpportunityId" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "minProperties": 1, "properties": { "stage": { "$ref": "#/components/schemas/CrmStage" }, "owner": { "type": "string", "minLength": 1, "maxLength": 160 }, "nextFollowUp": { "type": ["string", "null"], "format": "date" } }, "additionalProperties": false } } } },
+        "responses": {
+          "200": {
+            "description": "Güncellenen fırsat",
+            "content": { "application/json": { "schema": { "type": "object", "additionalProperties": true } } }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "sessionCookie": { "type": "apiKey", "in": "cookie", "name": "vmind_session", "description": "POST /api/auth/login tarafından kurulan HttpOnly, Secure, SameSite=Strict çerez." },
+      "serviceBearer": { "type": "http", "scheme": "bearer", "bearerFormat": "VMind service API key", "description": "Sunucu-sunucu entegrasyonu için WEB_SERVICE_API_KEY. Varsayılan olarak yayınlama yetkisi yoktur." },
+      "adminBearer": { "type": "http", "scheme": "bearer", "bearerFormat": "VMind admin key" },
+      "monitorBearer": { "type": "http", "scheme": "bearer", "bearerFormat": "VMind monitor key" }
+    },
+    "parameters": {
+      "TurnstileToken": { "name": "X-Turnstile-Token", "in": "header", "required": false, "schema": { "type": "string", "maxLength": 4096 }, "description": "public-guest üretim akış başlangıçlarında zorunlu Cloudflare Turnstile token'ı." },
+      "SessionId": { "name": "sessionId", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } },
+      "RunId": { "name": "runId", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } },
+      "OpportunityId": { "name": "opportunityId", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+    },
+    "responses": {
+      "Ok": {
+        "description": "Başarılı",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": ["ok"],
+              "properties": { "ok": { "const": true } }
+            }
+          }
+        }
+      },
+      "BadRequest": { "description": "Geçersiz istek", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+      "Unauthorized": { "description": "Kimlik yok veya geçersiz", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+      "Forbidden": { "description": "Kimlik var fakat işlem yetkisi yok", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+      "NotFound": { "description": "Kaynak bulunamadı veya kimliğe ait değil", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+      "Conflict": { "description": "Akış kapısı artık bu işlemi kabul etmiyor", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+      "PayloadTooLarge": { "description": "Yük üst sınırı aşıldı", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+      "TooManyRequests": { "description": "IP, akış kapasitesi veya harcama kotası aşıldı", "headers": { "Retry-After": { "schema": { "type": "integer" } } }, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+      "Unavailable": { "description": "LLM veya PostgreSQL gibi zorunlu bileşen kullanılamıyor", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+    },
+    "schemas": {
+      "Error": { "type": "object", "required": ["error"], "properties": { "error": { "type": "string" } }, "additionalProperties": true },
+      "Liveness": { "type": "object", "required": ["status"], "properties": { "status": { "const": "live" } }, "additionalProperties": false },
+      "Readiness": { "type": "object", "required": ["status", "components"], "properties": { "status": { "enum": ["ready", "not-ready"] }, "components": { "type": "object", "required": ["database", "inventory", "llm", "publishing"], "properties": { "database": { "enum": ["ok", "not-configured", "failed"] }, "inventory": { "enum": ["ok", "blocked"] }, "llm": { "enum": ["configured", "missing"] }, "publishing": { "enum": ["enabled", "dry-run"] } }, "additionalProperties": false } }, "additionalProperties": false },
+      "AuthConfig": { "type": "object", "required": ["kind", "fields", "automatic"], "properties": { "kind": { "enum": ["shared-secret", "vmind-token", "public-guest", "disabled"] }, "fields": { "type": "array", "items": { "type": "object", "required": ["name", "label", "secret"], "properties": { "name": { "type": "string" }, "label": { "type": "string" }, "secret": { "type": "boolean" } } } }, "automatic": { "type": "boolean" }, "turnstileSiteKey": { "type": "string" }, "privacyNoticeVersion": { "type": "string" } } },
+      "CurrentIdentity": { "type": "object", "required": ["displayName", "llm", "budget", "catalog", "rules", "publishEnabled", "crmEnabled"], "properties": { "displayName": { "type": "string" }, "llm": { "type": "string" }, "budget": { "$ref": "#/components/schemas/BudgetRemaining" }, "catalog": { "type": "object", "required": ["products", "flavors"], "properties": { "products": { "type": "integer" }, "flavors": { "type": "integer" } } }, "rules": { "type": "integer" }, "publishEnabled": { "type": "boolean" }, "crmEnabled": { "type": "boolean" }, "turnstileSiteKey": { "type": "string" }, "privacyNoticeVersion": { "type": "string" } } },
+      "BudgetRemaining": { "type": "object", "required": ["total", "user"], "properties": { "total": { "type": ["number", "null"] }, "user": { "type": ["number", "null"] } } },
+      "CustomerContext": { "type": "object", "required": ["phoneE164", "privacyConsent", "privacyNoticeVersion"], "properties": { "phoneE164": { "type": "string", "pattern": "^\\+[1-9][0-9]{7,14}$" }, "name": { "type": "string", "maxLength": 160 }, "company": { "type": "string", "maxLength": 240 }, "privacyConsent": { "const": true }, "privacyNoticeVersion": { "type": "string", "pattern": "^[A-Za-z0-9._-]+$", "maxLength": 64 } }, "additionalProperties": false },
+      "GuidedQuoteConfig": { "type": "object", "required": ["profile", "workload", "exposure", "capacity", "instanceCount", "diskTier", "diskGb", "loadBalancer", "backupCount", "egressGb", "floatingIpCount", "currency", "notes"], "properties": { "profile": { "enum": ["recommended", "balanced", "economy"] }, "workload": { "enum": ["web", "business", "database", "general"] }, "exposure": { "enum": ["public", "internal", "vpn"] }, "capacity": { "enum": ["starter", "standard", "powerful"] }, "instanceCount": { "type": "integer", "minimum": 1, "maximum": 99 }, "diskTier": { "enum": ["premium", "standard"] }, "diskGb": { "type": "integer", "minimum": 10, "maximum": 1000000 }, "loadBalancer": { "enum": ["app", "net", "none"] }, "backupCount": { "type": "integer", "minimum": 0, "maximum": 90 }, "egressGb": { "type": "integer", "minimum": 1, "maximum": 100000000 }, "floatingIpCount": { "type": "integer", "minimum": 1, "maximum": 20 }, "currency": { "enum": ["TL", "USD"] }, "notes": { "type": "string", "maxLength": 1000 } }, "additionalProperties": false },
+      "SessionCreated": { "type": "object", "required": ["sessionId"], "properties": { "sessionId": { "type": "string", "format": "uuid" }, "route": { "enum": ["tool-first"] } }, "additionalProperties": false },
+      "FlowEvent": { "type": "object", "required": ["stage", "message"], "properties": { "stage": { "type": "string" }, "message": { "type": "string" } } },
+      "Gate": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": ["kind", "id", "unknowns"],
+            "properties": {
+              "kind": { "const": "clarify" },
+              "id": { "type": "string" },
+              "unknowns": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["question", "reason"],
+                  "properties": {
+                    "question": { "type": "string" },
+                    "reason": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": ["kind", "id", "round", "questions"],
+            "properties": {
+              "kind": { "const": "questions" },
+              "id": { "type": "string" },
+              "round": { "type": "integer" },
+              "questions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["ruleId", "question", "defaultAnswer", "severity"],
+                  "properties": {
+                    "ruleId": { "type": "string" },
+                    "question": { "type": "string" },
+                    "defaultAnswer": { "type": "string" },
+                    "severity": { "enum": ["blocker", "recommended", "optional"] }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": ["kind", "id", "summary"],
+            "properties": {
+              "kind": { "const": "approve" },
+              "id": { "type": "string" },
+              "summary": { "type": "object", "additionalProperties": true }
+            }
+          }
+        ]
+      },
+      "SessionView": { "type": "object", "required": ["sessionId", "state", "events", "gate", "result", "error", "spentUsd", "editEnabled"], "properties": { "sessionId": { "type": "string", "format": "uuid" }, "state": { "enum": ["running", "waiting", "done", "failed", "expired"] }, "events": { "type": "array", "items": { "$ref": "#/components/schemas/FlowEvent" } }, "gate": { "oneOf": [{ "$ref": "#/components/schemas/Gate" }, { "type": "null" }] }, "result": { "oneOf": [{ "type": "object", "additionalProperties": true }, { "type": "null" }] }, "error": { "type": ["string", "null"] }, "spentUsd": { "type": "number", "minimum": 0 }, "editEnabled": { "type": "boolean" } } },
+      "GateAnswer": { "type": "object", "required": ["gateId", "payload"], "properties": { "gateId": { "type": "string", "maxLength": 64 }, "payload": { "oneOf": [{ "type": "object", "additionalProperties": { "type": "string" } }, { "type": "array", "items": { "type": "object", "required": ["ruleId"], "properties": { "ruleId": { "type": "string" }, "answer": { "type": "string" } } } }, { "type": "object", "required": ["approved"], "properties": { "approved": { "type": "boolean" }, "publish": { "type": "boolean", "default": false } } }] } }, "additionalProperties": false },
+      "GateAnswerResult": { "type": "object", "required": ["accepted", "view"], "properties": { "accepted": { "type": "boolean" }, "view": { "$ref": "#/components/schemas/SessionView" } } },
+      "SpreadsheetImport": { "oneOf": [{ "type": "object", "required": ["route", "config", "sourceRows", "message"], "properties": { "route": { "const": "guided" }, "config": { "$ref": "#/components/schemas/GuidedQuoteConfig" }, "sourceRows": { "type": "integer" }, "message": { "type": "string" } } }, { "type": "object", "required": ["route", "salesText", "sourceRows", "message"], "properties": { "route": { "const": "natural" }, "salesText": { "type": "string" }, "sourceRows": { "type": "integer" }, "message": { "type": "string" } } }] },
+      "CrmStage": { "enum": ["New", "Need Identified", "Qualified", "Calculation Created", "Proposal Sent", "Follow-up", "Sales Contact Requested", "Won", "Lost"] },
+      "ItemsEnvelope": { "type": "object", "required": ["items"], "properties": { "items": { "type": "array", "items": { "type": "object", "additionalProperties": true } } }, "additionalProperties": false },
+      "AdminOverview": { "type": "object", "required": ["generatedAt", "principals", "runs", "estimates", "crm", "today", "cache"], "properties": { "generatedAt": { "type": "string", "format": "date-time" }, "principals": { "type": "integer" }, "runs": { "type": "object", "additionalProperties": { "type": "integer" } }, "estimates": { "type": "object", "additionalProperties": { "type": "integer" } }, "crm": { "type": "object", "additionalProperties": { "type": "integer" } }, "today": { "type": "object", "properties": { "llmCalls": { "type": "integer" }, "inputTokens": { "type": "integer" }, "outputTokens": { "type": "integer" }, "costUsd": { "type": "number" } } }, "cache": { "type": "object", "properties": { "entries": { "type": "integer" }, "activeEntries": { "type": "integer" }, "hits": { "type": "integer" } } } } }
+    }
+  }
+}

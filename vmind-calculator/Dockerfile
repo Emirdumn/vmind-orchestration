@@ -69,8 +69,8 @@ RUN mkdir -p /app/var && chown -R node:node /app/var
 USER node
 EXPOSE 8080
 
-# Kimlik gerektirmeyen tek uç; 200 dönmesi sunucunun ayakta olduğunu gösterir.
+# Kimlik gerektirmeyen liveness ucu; 200 sürecin ayakta olduğunu gösterir.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||8080)+'/api/auth/config').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+  CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||8080)+'/api/health/live').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 
 CMD ["node_modules/.bin/tsx", "src/web/main.ts"]

@@ -7,4 +7,13 @@ Start with:
 - `docs/vmind-agentic-operations-hub/README.md`
 - `docs/vmind-agentic-operations-hub/06-cursor-start-here.md`
 
-The project is currently a Vite + React + Shadcn workspace. The next step is to turn the documented product concept into an internal operations assistant workbench.
+The root workspace also contains the productionized VMind Quote Agent:
+
+- `vmind-calculator/README.md`
+- `vmind-calculator/docs/handoff.md`
+- `vmind-calculator/docs/openapi.json`
+- `vmind-calculator/docs/postman/`
+
+The quote agent is an independent Node/React service with PostgreSQL telemetry,
+CRM sync, tool-first pricing, tiered LLM routing, OpenAPI/Postman contracts and
+production operations runbooks.

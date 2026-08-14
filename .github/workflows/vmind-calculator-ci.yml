@@ -1,0 +1,120 @@
+name: VMind Calculator CI
+
+on:
+  push:
+    paths:
+      - 'vmind-calculator/**'
+      - 'openclaw-vmind-crm/**'
+      - '.github/workflows/vmind-calculator-ci.yml'
+  pull_request:
+    paths:
+      - 'vmind-calculator/**'
+      - 'openclaw-vmind-crm/**'
+      - '.github/workflows/vmind-calculator-ci.yml'
+  schedule:
+    - cron: '0 6 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  application:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: vmind-calculator
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.3'
+          cache: npm
+          cache-dependency-path: |
+            vmind-calculator/package-lock.json
+            vmind-calculator/web/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run inventory:check
+      - run: npm run handoff:verify
+      - name: Tool-first API dry-run smoke
+        shell: bash
+        run: |
+          WEB_AUTH_MODE=disabled WEB_ALLOW_WEAK_AUTH=1 WEB_ALLOW_PUBLISH=0 \
+          WEB_SERVICE_API_KEY=vmind_ci_service_key_0123456789abcdef \
+          HOST=127.0.0.1 PORT=18080 \
+          node --import tsx src/web/main.ts >/tmp/vmind-ci-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:18080/api/health/live >/dev/null; then break; fi
+            sleep 1
+          done
+          VMIND_SMOKE_BASE_URL=http://127.0.0.1:18080 \
+          VMIND_SMOKE_SERVICE_KEY=vmind_ci_service_key_0123456789abcdef \
+          npm run smoke:api
+      - run: npm run web:build
+      - run: npm audit --omit=dev --audit-level=high
+      - run: npm --prefix web audit --omit=dev --audit-level=high
+      - run: docker build --tag vmind-calculator:ci .
+
+  postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: openclaw-vmind-crm
+    env:
+      PG_ADMIN_URL: postgres://postgres:postgres@127.0.0.1:5432/postgres
+      VMIND_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/vmind_test
+      VMIND_TEST_PG_URL: postgres://postgres:postgres@127.0.0.1:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.3'
+          cache: npm
+          cache-dependency-path: |
+            openclaw-vmind-crm/package-lock.json
+            vmind-calculator/package-lock.json
+      - run: npm ci
+      - run: npm ci
+        working-directory: vmind-calculator
+      - run: npm test
+      - run: psql "$PG_ADMIN_URL" -v ON_ERROR_STOP=1 -c 'CREATE DATABASE vmind_test'
+      - run: npm run db:migrate
+      - run: npm run db:verify
+      - run: npm run test:postgres
+      - run: npm run test:postgres
+        working-directory: vmind-calculator
+      - run: npm run test:schema-guard
+      - run: npm audit --omit=dev --audit-level=high
+
+  drift:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: vmind-calculator
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.3'
+          cache: npm
+          cache-dependency-path: vmind-calculator/package-lock.json
+      - run: npm ci
+      - run: npm run drift
+        env:
+          VMIND_API_KEY: ${{ secrets.VMIND_API_KEY }}

@@ -25,9 +25,10 @@ services:
 
     environment:
       # --- kimlik doğrulama ---
-      # "vmind-token": satışçı VMind konsol token'ını bir kez yapıştırır,
-      # sunucu platforma sorarak DOĞRULAR. Kimliğin kaynağı VMind.
-      WEB_AUTH_MODE: ${WEB_AUTH_MODE:-vmind-token}
+      # Public müşteri sitesi varsayılanı: PortVMind login istemez; HttpOnly
+      # ziyaretçi oturumu + Turnstile + IP-HMAC limitleri kullanır. Turnstile
+      # secret'ları yoksa üretim guard'ı fail-closed açılışı reddeder.
+      WEB_AUTH_MODE: ${WEB_AUTH_MODE:-public-guest}
 
       # public-guest: müşteri şifre görmez; her tarayıcı ayrı HttpOnly oturum
       # alır. IP ham olarak saklanmaz, HMAC hash yalnız hız/kota kapısında

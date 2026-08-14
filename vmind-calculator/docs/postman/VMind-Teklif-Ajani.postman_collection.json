@@ -1,0 +1,210 @@
+{
+  "info": {
+    "_postman_id": "e6fe5bb8-2c35-4b16-95a3-ddd2d44dd57d",
+    "name": "VMind Teklif Ajanı API",
+    "description": "OpenAPI 1.0 devir sözleşmesinin çalıştırılabilir örnekleri. Üretimde public-guest tarayıcı akışında cookie+Turnstile, sunucu entegrasyonunda ayrı service Bearer kullanılır. Admin ve monitor anahtarları birbirinin yerine kullanılamaz. Kalıcı yayın örneği bilerek yoktur; dry-run onayı kullanılır.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "[getLiveness] Liveness",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/health/live", "host": ["{{baseUrl}}"], "path": ["api", "health", "live"] } },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('200 live', () => { pm.response.to.have.status(200); pm.expect(pm.response.json().status).to.eql('live'); });"] } }]
+        },
+        {
+          "name": "[getReadiness] Readiness",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{monitorKey}}", "type": "string" }] },
+            "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/health/ready", "host": ["{{baseUrl}}"], "path": ["api", "health", "ready"] }
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('ready veya kontrollü 503', () => { pm.expect([200, 503]).to.include(pm.response.code); });"] } }]
+        }
+      ]
+    },
+    {
+      "name": "Browser Authentication",
+      "item": [
+        {
+          "name": "[getAuthConfig] Auth config",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/auth/config", "host": ["{{baseUrl}}"], "path": ["api", "auth", "config"] } }
+        },
+        {
+          "name": "[login] Public guest login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('login sonucu', () => { pm.expect([200, 401]).to.include(pm.response.code); });"] } }]
+        },
+        {
+          "name": "[getCurrentIdentity] Me with service key",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{serviceKey}}", "type": "string" }] },
+            "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/me", "host": ["{{baseUrl}}"], "path": ["api", "me"] }
+          }
+        },
+        {
+          "name": "[logout] Browser logout",
+          "request": {
+            "method": "POST", "header": [], "url": { "raw": "{{baseUrl}}/api/auth/logout", "host": ["{{baseUrl}}"], "path": ["api", "auth", "logout"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Quote Flow",
+      "item": [
+        {
+          "name": "[getRuntimeStatus] Runtime status",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{serviceKey}}", "type": "string" }] },
+            "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/status", "host": ["{{baseUrl}}"], "path": ["api", "status"] }
+          }
+        },
+        {
+          "name": "[startGuidedFlow] Start guided — zero LLM",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{serviceKey}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "X-Turnstile-Token", "value": "{{turnstileToken}}", "disabled": true }],
+            "body": { "mode": "raw", "raw": "{\n  \"config\": {\n    \"profile\": \"recommended\",\n    \"workload\": \"web\",\n    \"exposure\": \"public\",\n    \"capacity\": \"powerful\",\n    \"instanceCount\": 2,\n    \"diskTier\": \"premium\",\n    \"diskGb\": 500,\n    \"loadBalancer\": \"app\",\n    \"backupCount\": 4,\n    \"egressGb\": 1024,\n    \"floatingIpCount\": 1,\n    \"currency\": \"TL\",\n    \"notes\": \"\"\n  }\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/flow/guided", "host": ["{{baseUrl}}"], "path": ["api", "flow", "guided"] }
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('202 accepted', () => pm.response.to.have.status(202));", "if (pm.response.code === 202) pm.environment.set('sessionId', pm.response.json().sessionId);"] } }]
+        },
+        {
+          "name": "[startNaturalFlow] Start natural — routed LLM",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{serviceKey}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "X-Turnstile-Token", "value": "{{turnstileToken}}", "disabled": true }],
+            "body": { "mode": "raw", "raw": "{\n  \"salesText\": \"2 adet web sunucusu, premium disk, App LB, VPN ve aylık 1 TB dış trafik istiyorum.\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/flow", "host": ["{{baseUrl}}"], "path": ["api", "flow"] }
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('202 accepted', () => pm.response.to.have.status(202));", "if (pm.response.code === 202) pm.environment.set('sessionId', pm.response.json().sessionId);"] } }]
+        },
+        {
+          "name": "[getFlow] Poll current flow",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{serviceKey}}", "type": "string" }] },
+            "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/flow/{{sessionId}}?wait=1000", "host": ["{{baseUrl}}"], "path": ["api", "flow", "{{sessionId}}"], "query": [{ "key": "wait", "value": "1000" }] }
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('flow readable', () => pm.response.to.have.status(200));", "if (pm.response.code === 200 && pm.response.json().gate) pm.environment.set('gateId', pm.response.json().gate.id);"] } }]
+        },
+        {
+          "name": "[answerFlowGate] Answer/skip current questions",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{serviceKey}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"gateId\": \"{{gateId}}\",\n  \"payload\": {}\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/flow/{{sessionId}}/answer", "host": ["{{baseUrl}}"], "path": ["api", "flow", "{{sessionId}}", "answer"] }
+          }
+        },
+        {
+          "name": "[editApproval] Edit approval gate",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{serviceKey}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"gateId\": \"{{gateId}}\",\n  \"instruction\": \"Backup sayısını ayda 8 yap ve fiyatı yeniden hesapla.\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/flow/{{sessionId}}/edit", "host": ["{{baseUrl}}"], "path": ["api", "flow", "{{sessionId}}", "edit"] }
+          }
+        },
+        {
+          "name": "[answerFlowGate] Approve dry-run only",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{serviceKey}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"gateId\": \"{{gateId}}\",\n  \"payload\": { \"approved\": true, \"publish\": false }\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/flow/{{sessionId}}/answer", "host": ["{{baseUrl}}"], "path": ["api", "flow", "{{sessionId}}", "answer"] }
+          }
+        },
+        {
+          "name": "[closeFlow] Close flow",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{serviceKey}}", "type": "string" }] },
+            "method": "POST", "header": [], "url": { "raw": "{{baseUrl}}/api/flow/{{sessionId}}/close", "host": ["{{baseUrl}}"], "path": ["api", "flow", "{{sessionId}}", "close"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Import",
+      "item": [
+        {
+          "name": "[importSpreadsheet] Import standard CSV — zero LLM",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{serviceKey}}", "type": "string" }] },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "text/csv" },
+              { "key": "X-VMind-Filename", "value": "ihtiyac.csv" }
+            ],
+            "body": { "mode": "raw", "raw": "Sunucu Adedi,CPU,RAM GB,Disk GB,Disk Tipi,Load Balancer,Para Birimi\n2,4,8,100,Premium,App,TL" },
+            "url": { "raw": "{{baseUrl}}/api/import/spreadsheet", "host": ["{{baseUrl}}"], "path": ["api", "import", "spreadsheet"] }
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('standard CSV is guided', () => { pm.response.to.have.status(200); pm.expect(pm.response.json().route).to.eql('guided'); });"] } }]
+        }
+      ]
+    },
+    {
+      "name": "Administration",
+      "item": [
+        {
+          "name": "[getAdminOverview] Overview",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{adminKey}}", "type": "string" }] },
+            "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/admin/overview", "host": ["{{baseUrl}}"], "path": ["api", "admin", "overview"] }
+          }
+        },
+        {
+          "name": "[listAdminRuns] Runs",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{adminKey}}", "type": "string" }] },
+            "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/admin/runs?limit=50", "host": ["{{baseUrl}}"], "path": ["api", "admin", "runs"], "query": [{ "key": "limit", "value": "50" }] }
+          }
+        },
+        {
+          "name": "[getAdminRun] Run detail",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{adminKey}}", "type": "string" }] },
+            "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/admin/runs/{{runId}}", "host": ["{{baseUrl}}"], "path": ["api", "admin", "runs", "{{runId}}"] }
+          }
+        },
+        {
+          "name": "[listAdminUsage] Daily usage",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{adminKey}}", "type": "string" }] },
+            "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/admin/usage?days=30", "host": ["{{baseUrl}}"], "path": ["api", "admin", "usage"], "query": [{ "key": "days", "value": "30" }] }
+          }
+        },
+        {
+          "name": "[listAdminOpportunities] Opportunities",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{adminKey}}", "type": "string" }] },
+            "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/admin/opportunities?limit=50", "host": ["{{baseUrl}}"], "path": ["api", "admin", "opportunities"], "query": [{ "key": "limit", "value": "50" }] }
+          }
+        },
+        {
+          "name": "[updateAdminOpportunity] Update opportunity — manual",
+          "request": {
+            "description": "Durum değiştirir. opportunityId boş bırakıldığı sürece çalışmaz; yalnız bilinçli CRM kabul testinde gerçek UUID girin.",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{adminKey}}", "type": "string" }] },
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"stage\": \"Follow-up\",\n  \"nextFollowUp\": null\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/admin/opportunities/{{opportunityId}}", "host": ["{{baseUrl}}"], "path": ["api", "admin", "opportunities", "{{opportunityId}}"] }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": []
+}

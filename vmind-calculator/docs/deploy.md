@@ -65,8 +65,15 @@ cp .env.example .env
 `.env` içinde **en az** şunu doldurun:
 
 ```ini
-OPENROUTER_API_KEY=sk-or-v1-...
-WEB_AUTH_MODE=vmind-token
+OPENROUTER_API_KEY=<secret-manager-degeri>
+OPENROUTER_MODEL_FAST=<erisilebilir-fast-model>
+OPENROUTER_MODEL_BALANCED=<erisilebilir-balanced-model>
+OPENROUTER_MODEL_STRONG=<erisilebilir-strong-model>
+WEB_AUTH_MODE=public-guest
+WEB_PUBLIC_IP_HASH_SECRET=<rastgele-en-az-32-karakter>
+TURNSTILE_SITE_KEY=<site-key>
+TURNSTILE_SECRET_KEY=<secret-key>
+TURNSTILE_EXPECTED_HOSTNAME=teklif.sirketiniz.com
 WEB_ALLOW_PUBLISH=0
 LLM_DAILY_TOTAL_USD=5
 LLM_DAILY_PER_USER_USD=1
@@ -95,8 +102,8 @@ Açılışta şunu görmelisiniz:
 
 ```
 VMind Teklif Ajanı — http://0.0.0.0:8080
-  kimlik doğrulama : vmind-token
-  LLM              : openrouter / anthropic/claude-opus-5
+  kimlik doğrulama : public-guest
+  LLM              : openrouter / model-router-v1
   katalog          : 44 ürün, 21 kural
   harcama sınırı   : günlük $5, kişi başı $1
   yayınlama        : KAPALI (yalnızca dry-run)
@@ -160,15 +167,17 @@ docker compose ps              # HEALTHCHECK durumu
 docker compose logs --tail=50 agent
 ```
 
-Harcama durumu, giriş yapmış bir kullanıcıyla:
+Süreç ve bağımlılık sağlığı:
 
 ```bash
-curl -b cookies.txt https://teklif.sirketiniz.com/api/status
+curl https://teklif.sirketiniz.com/api/health/live
+curl -H "Authorization: Bearer $WEB_MONITOR_API_KEY" \
+  https://teklif.sirketiniz.com/api/health/ready
 ```
 
-`ledgerHealthy: false` dönerse **defter diske yazılamıyor** demektir —
-volume izinlerini kontrol edin. Bu sessiz kalmamalı: yazılamayan defter,
-her yeniden başlatmada günlük kotayı yeniden açar.
+Readiness 503 dönerse PostgreSQL, katalog veya LLM bileşenlerinden biri hazır
+değildir. Ayrıntılı systemd alarm ve restore zinciri:
+`docs/operations-runbook.md`.
 
 ---
 
@@ -185,12 +194,8 @@ Dürüstçe, gizlemeden:
    yerinde kalır: dry-run varsayılanı, blocker kontrolü, açık insan onayı ve
    yazma yetkisi. Bu yol canlı yazma + geri okuma + calculator'da açma ile
    doğrulandı. Açıkken her onaylanan teklif kalıcı kayıt bırakır.
-3. **Kimlik doğrulama token yapıştırma ile.** VMind konsolu `POST /auth/signin`
-   için Cloudflare Turnstile (CAPTCHA) + MFA istiyor; bir sunucunun arka planda
-   şifreyle giriş yapması mümkün değil. Doğru mekanizma platformda **mevcut**
-   (`/api/access` → Application Credentials, `accessRules` ile uca
-   kısıtlanabilir) ama kimlik bilgisini token'a çevirme ucu belgelenmemiş.
-   Application Credential/SSO iyileştirmesi yapılabilir, ancak calculator linki
-   üretme akışının teknik engeli değildir.
+3. **Public müşteri login'i yoktur.** `public-guest` ayrı HttpOnly oturum,
+   Turnstile ve IP-HMAC limiti kullanır. Sunucu entegrasyonları PortVMind
+   parolası değil ayrı, iptal edilebilir `WEB_SERVICE_API_KEY` Bearer kullanır.
 4. **Eşzamanlı akış sınırı** 50 toplam / kişi başı 3. Aşan istek anlaşılır bir
    mesajla reddedilir.

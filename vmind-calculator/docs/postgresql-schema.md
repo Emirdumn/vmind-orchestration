@@ -1,9 +1,10 @@
 # VMind PostgreSQL veri modeli
 
 Bu şema uygulamanın devredilebilir ana kayıt sistemidir. Airtable zorunlu
-değildir. Calculator, ajan telemetrisi, maliyet/kota ve CRM aynı PostgreSQL
-kümesinde ayrı şemalarda tutulur; uygulama başlangıçta migration çalıştırmaz,
-yalnız beklenen şemayı doğrular.
+değildir. Calculator, ajan telemetrisi, maliyet/kota ve CRM aynı sürümlü SQL
+sözleşmesini kullanır. Üretimde Calculator `vmind_runtime`, CRM `vmind`
+veritabanında tutulabilir; aynı küme şart değildir. Uygulama başlangıçta
+migration çalıştırmaz, yalnız beklenen şemayı doğrular.
 
 ```mermaid
 erDiagram
@@ -107,9 +108,10 @@ npm run db:migrate
 npm run db:verify
 ```
 
-Son yönetim görünümü migration'ı
-`005_tenant_safe_admin_reporting.sql` dosyasıdır. `agent.run_overview` içine
-`tenant_id` ekleyerek bütün admin sorgularında tenant filtresini zorunlu kılar.
+`005_tenant_safe_admin_reporting.sql`, `agent.run_overview` içine `tenant_id`
+ekleyerek bütün admin sorgularında tenant filtresini zorunlu kılar.
+`006_model_routing_cache.sql` model tier/reason telemetrisini ve yalnız PII'siz
+birebir yapısal istekler için exact response cache tablosunu ekler.
 
 ## Örnek API çıktısı
 
@@ -131,6 +133,6 @@ Son yönetim görünümü migration'ı
 }
 ```
 
-Bu örnekte model adı ileride katmanlı router'ın gerçek seçimini taşıyacaktır;
-buton veya doğrulanmış yapılandırılmış giriş LLM kullanmadığında token ve maliyet
-sıfır kalmalıdır.
+Model, route tier ve route reason çalışma kaydında gerçek seçimi taşır; buton
+veya doğrulanmış yapılandırılmış giriş LLM kullanmadığında token ve maliyet sıfır
+kalmalıdır.

@@ -119,3 +119,17 @@ başarılı olmadan eski çift silinmez. PostgreSQL parola rotasyonu rol parolas
 Önerilen periyot: OpenRouter/admin/monitor/servis/CRM 90 gün; olay veya sızıntı
 şüphesinde hemen. Rotation tarihi ve uygulayan kişi secret'ın kendisi olmadan
 değişiklik kaydına yazılır.
+
+## OpenClaw host bağımlılığı
+
+`openclaw-vmind-crm` bir eklentidir; OpenClaw gateway'i kendi paketinin içine
+kopyalamaz. Minimum gateway/plugin API sürümü paket manifestindeki
+`openclaw.compat` alanında belirtilir; OpenClaw npm dependency olarak tekrar
+kurulmaz. Güvenlik taraması iki ayrı kapsamda yapılır:
+
+1. Eklenti dizininde `npm audit --omit=dev --audit-level=high`.
+2. Gateway hostunda kurulu gerçek OpenClaw sürümü için üreticinin upgrade ve
+   audit akışı.
+
+Host upgrade'i önce staging gateway'de CRM tool kayıtları, imzalı site health ve
+tek dry-run teklif ile doğrulanmadan canlıya alınmaz.
