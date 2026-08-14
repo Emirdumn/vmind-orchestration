@@ -62,12 +62,20 @@ describe('site -> CRM payload', () => {
     const sessionId = randomUUID();
     const payload = buildCrmQuotePayload({
       flowSessionId: sessionId,
-      customer: { phoneE164: '0555 123 45 67', name: 'Deniz', company: 'Örnek AŞ' },
+      customer: {
+        phoneE164: '0555 123 45 67',
+        name: 'Deniz',
+        company: 'Örnek AŞ',
+        privacyConsent: true,
+        privacyNoticeVersion: '2026-08-14',
+      },
       result: flowResult(),
     }) as Record<string, any>;
 
     expect(payload.event_id).toBe(`site-quote:${sessionId}`);
     expect(payload.customer.phone_e164).toBe('+905551234567');
+    expect(payload.customer.communication_status).toBe('opted_in');
+    expect(payload.customer.consent_notice_version).toBe('2026-08-14');
     expect(payload.opportunity.customer_need).toContain('Compute: 2 adet');
     expect(payload.opportunity.customer_need).not.toContain('Ham kullanıcı cümlesi');
     expect(payload.opportunity.recommended_service).toBe('compute, load-balancer');
@@ -79,7 +87,11 @@ describe('site -> CRM payload', () => {
   it('yayinlanmamis sonuc icin opportunity yollar, sahte calculator linki uretmez', () => {
     const payload = buildCrmQuotePayload({
       flowSessionId: randomUUID(),
-      customer: { phoneE164: '+905551234567' },
+      customer: {
+        phoneE164: '+905551234567',
+        privacyConsent: true,
+        privacyNoticeVersion: '2026-08-14',
+      },
       result: flowResult(false),
     });
     expect(payload).not.toHaveProperty('calculation');
@@ -118,7 +130,11 @@ describe('SiteCrmSyncClient', () => {
     );
     const result = await client.syncQuote({
       flowSessionId: randomUUID(),
-      customer: { phoneE164: '+905551234567' },
+      customer: {
+        phoneE164: '+905551234567',
+        privacyConsent: true,
+        privacyNoticeVersion: '2026-08-14',
+      },
       result: flowResult(),
     });
     expect(result.ok).toBe(true);

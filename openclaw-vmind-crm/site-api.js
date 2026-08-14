@@ -53,11 +53,32 @@ export function normalizeSiteQuotePayload(input) {
   if (!UUID_RE.test(flowSessionId)) throw new CrmValidationError("Akış kimliği geçersizdir.");
 
   const customer = record(body.customer, "Müşteri");
-  exactKeys(customer, new Set(["phone_e164", "name", "company"]), "Müşteri");
+  exactKeys(
+    customer,
+    new Set([
+      "phone_e164",
+      "name",
+      "company",
+      "communication_status",
+      "consent_notice_version",
+    ]),
+    "Müşteri",
+  );
   const phone = normalizePhone(requiredText(customer.phone_e164, "Müşteri telefonu", 32));
   if (!phone) throw new CrmValidationError("Müşteri telefonu E.164 biçimine çevrilemedi.");
   const customerName = optionalText(customer.name, "Ad", 160);
   const customerCompany = optionalText(customer.company, "Şirket", 240);
+  if (customer.communication_status !== "opted_in") {
+    throw new CrmValidationError("Web sitesi müşteri kaydı için açık iletişim onayı gerekli.");
+  }
+  const consentNoticeVersion = requiredText(
+    customer.consent_notice_version,
+    "Gizlilik bildirimi sürümü",
+    64,
+  );
+  if (!/^[A-Za-z0-9._-]+$/.test(consentNoticeVersion)) {
+    throw new CrmValidationError("Gizlilik bildirimi sürümü geçersizdir.");
+  }
 
   const opportunity = record(body.opportunity, "Fırsat");
   exactKeys(
@@ -109,6 +130,8 @@ export function normalizeSiteQuotePayload(input) {
       phone_e164: phone,
       ...(customerName ? { name: customerName } : {}),
       ...(customerCompany ? { company: customerCompany } : {}),
+      communication_status: "opted_in",
+      consent_notice_version: consentNoticeVersion,
     },
     opportunity: {
       customer_need: requiredText(opportunity.customer_need, "Müşteri ihtiyacı", 2000),
@@ -156,6 +179,9 @@ export async function syncSiteQuote(store, input) {
       : {}),
     ...(payload.customer.name ? { name: payload.customer.name } : {}),
     ...(payload.customer.company ? { company: payload.customer.company } : {}),
+    communication_status: payload.customer.communication_status,
+    consent_notice_version: payload.customer.consent_notice_version,
+    consent_source: "Website",
     qualified: payload.opportunity.qualified,
   });
 

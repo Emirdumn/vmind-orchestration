@@ -680,6 +680,24 @@ describe('Faz 5.C — Orchestrator akisi', () => {
     ).rejects.toThrow(/salt-okunur/);
   });
 
+  it('onay ile kalıcı yayın ayrıysa public taslak hata vermeden tamamlanır', async () => {
+    const { PlatformApiClient } = await import('../src/platform/api-client.js');
+    ctx.client = new PlatformApiClient(); // salt-okunur public istemci
+    ctx.session.addItem('compute', goodCompute);
+    const result = await orchestrator().run(ctx, 'x', {
+      onQuestions: async (questions) => questions.map((q) => ({ ruleId: q.ruleId })),
+      onApprove: async () => ({
+        approved: true,
+        approvedBy: 'Ziyaretçi',
+        publish: false,
+      }),
+    });
+    expect(result.stage).toBe('done');
+    expect(result.published).toBe(false);
+    expect(result.price!.totalMonthCost).toBeGreaterThan(0);
+    expect(ctx.approval.granted).toBe(true);
+  });
+
   it('akis olaylari sirayla kaydediliyor', async () => {
     ctx.session.addItem('compute', goodCompute);
     const result = await orchestrator().run(ctx, 'x', {

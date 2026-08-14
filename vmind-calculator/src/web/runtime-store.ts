@@ -42,6 +42,110 @@ export interface FinishRunInput {
   trail: AuditTrail;
 }
 
+export interface AdminOverview {
+  generatedAt: string;
+  principals: number;
+  runs: {
+    total: number;
+    running: number;
+    completed: number;
+    failed: number;
+  };
+  estimates: { total: number; published: number };
+  crm: { contacts: number; opportunities: number; openOpportunities: number };
+  today: { llmCalls: number; inputTokens: number; outputTokens: number; costUsd: number };
+}
+
+export interface AdminRunRow {
+  runId: string;
+  startedAt: string;
+  finishedAt: string | null;
+  channel: string | null;
+  provider: string;
+  model: string;
+  status: string;
+  resultStage: string | null;
+  published: boolean;
+  principalType: string | null;
+  principalKey: string | null;
+  displayName: string | null;
+  llmCalls: number;
+  inputTokens: number;
+  outputTokens: number;
+  costUsd: number;
+  toolCalls: number;
+  rejectedToolCalls: number;
+  estimateStatus: string | null;
+  currency: string | null;
+  monthlyTotal: number | null;
+  errorCode: string | null;
+}
+
+export interface AdminRunDetail {
+  run: AdminRunRow;
+  messages: Array<{
+    direction: string;
+    contentRedacted: string | null;
+    metadata: Record<string, unknown>;
+    createdAt: string;
+  }>;
+  auditEvents: Array<{
+    eventSeq: number;
+    eventType: string;
+    summary: string;
+    detail: Record<string, unknown>;
+    occurredAt: string;
+  }>;
+}
+
+export interface AdminDailyUsageRow {
+  usageDayUtc: string;
+  principalType: string | null;
+  principalKey: string | null;
+  displayName: string | null;
+  llmCalls: number;
+  inputTokens: number;
+  outputTokens: number;
+  costUsd: number;
+}
+
+export interface AdminOpportunityRow {
+  opportunityId: string;
+  contactId: string;
+  phoneE164: string;
+  name: string | null;
+  company: string | null;
+  communicationStatus: string;
+  consentUpdatedAt: string | null;
+  consentNoticeVersion: string | null;
+  consentSource: string | null;
+  customerNeed: string;
+  recommendedService: string | null;
+  stage: string;
+  estimatedAmountMinor: number | null;
+  currency: string | null;
+  owner: string;
+  nextFollowUp: string | null;
+  source: string;
+  createdAt: string;
+  updatedAt: string;
+  calculation: null | {
+    externalCalculationId: string;
+    calculatorUrl: string;
+    configurationSummary: string;
+    amountMinor: number;
+    currency: string;
+    version: number;
+    createdAt: string;
+  };
+}
+
+export interface AdminOpportunityUpdate {
+  stage?: string;
+  owner?: string;
+  nextFollowUp?: string | null;
+}
+
 export interface RuntimeStore {
   init(): Promise<void>;
   assertCanSpend(identity: Identity): Promise<void>;
@@ -57,6 +161,15 @@ export interface RuntimeStore {
   ): Promise<void>;
   recordUsage(run: RuntimeRun, usage: UsageReport): Promise<void>;
   finishRun(run: RuntimeRun, input: FinishRunInput): Promise<void>;
+  adminOverview(): Promise<AdminOverview>;
+  adminRuns(limit: number): Promise<AdminRunRow[]>;
+  adminRunDetail(runId: string): Promise<AdminRunDetail | null>;
+  adminDailyUsage(days: number): Promise<AdminDailyUsageRow[]>;
+  adminOpportunities(limit: number, stage?: string): Promise<AdminOpportunityRow[]>;
+  adminUpdateOpportunity(
+    opportunityId: string,
+    update: AdminOpportunityUpdate,
+  ): Promise<AdminOpportunityRow | null>;
   close(): Promise<void>;
 }
 
@@ -102,13 +215,26 @@ function jsonObject(value: unknown): Record<string, unknown> {
 
 function principalType(identity: Identity): 'user' | 'service' | 'guest' {
   if (identity.actorType === 'service') return 'service';
-  if (identity.userId.startsWith('local:')) return 'guest';
+  if (identity.userId.startsWith('local:') || identity.userId.startsWith('guest:')) return 'guest';
   return 'user';
 }
 
 function amount(value: unknown): number {
   const parsed = Number(value ?? 0);
   return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function nullableAmount(value: unknown): number | null {
+  return value === null || value === undefined ? null : amount(value);
+}
+
+function iso(value: unknown): string {
+  if (value instanceof Date) return value.toISOString();
+  return String(value);
+}
+
+function nullableIso(value: unknown): string | null {
+  return value === null || value === undefined ? null : iso(value);
 }
 
 function utcDayStart(day?: string): string {
@@ -187,11 +313,39 @@ export class PostgresRuntimeStore implements RuntimeStore {
 
   async init(): Promise<void> {
     await this.guarded('bağlantı doğrulama', async () => {
-      const result = await this.pool.query<{ audit_events: string | null }>(
-        `SELECT to_regclass('agent.audit_events')::text AS audit_events`,
+      const result = await this.pool.query<{
+        audit_events: string | null;
+        run_overview: string | null;
+        daily_usage: string | null;
+        consent_notice_version: string | null;
+      }>(
+        `SELECT
+           to_regclass('agent.audit_events')::text AS audit_events,
+           to_regclass('agent.run_overview')::text AS run_overview,
+           to_regclass('billing.daily_usage')::text AS daily_usage,
+           (
+             SELECT column_name FROM information_schema.columns
+              WHERE table_schema = 'crm' AND table_name = 'contacts'
+                AND column_name = 'consent_notice_version'
+           ) AS consent_notice_version`,
       );
-      if (result.rows[0]?.audit_events !== 'agent.audit_events') {
+      const row = result.rows[0];
+      if (row?.audit_events !== 'agent.audit_events') {
         throw new Error('002_agent_runtime_telemetry.sql uygulanmamış.');
+      }
+      if (row.run_overview !== 'agent.run_overview' || row.daily_usage !== 'billing.daily_usage') {
+        throw new Error('003_runtime_reporting_views.sql uygulanmamış.');
+      }
+      if (row.consent_notice_version !== 'consent_notice_version') {
+        throw new Error('004_contact_consent_audit.sql uygulanmamış.');
+      }
+      const columns = await this.pool.query<{ column_name: string }>(
+        `SELECT column_name FROM information_schema.columns
+          WHERE table_schema = 'agent' AND table_name = 'run_overview'
+            AND column_name = 'tenant_id'`,
+      );
+      if (columns.rowCount !== 1) {
+        throw new Error('005_tenant_safe_admin_reporting.sql uygulanmamış.');
       }
     });
     this.degraded = false;
@@ -697,6 +851,315 @@ export class PostgresRuntimeStore implements RuntimeStore {
         event.at,
       ],
     );
+  }
+
+  async adminOverview(): Promise<AdminOverview> {
+    return this.guarded('yönetim özeti', async () => {
+      const result = await this.pool.query<{
+        principals: string;
+        runs_total: string;
+        runs_running: string;
+        runs_completed: string;
+        runs_failed: string;
+        estimates_total: string;
+        estimates_published: string;
+        contacts: string;
+        opportunities: string;
+        open_opportunities: string;
+        llm_calls_today: string;
+        input_tokens_today: string;
+        output_tokens_today: string;
+        cost_usd_today: string;
+      }>(
+        `SELECT
+          (SELECT COUNT(*) FROM identity.principals WHERE tenant_id = $1)::text AS principals,
+          (SELECT COUNT(*) FROM agent.runs WHERE tenant_id = $1)::text AS runs_total,
+          (SELECT COUNT(*) FROM agent.runs WHERE tenant_id = $1 AND status = 'running')::text AS runs_running,
+          (SELECT COUNT(*) FROM agent.runs WHERE tenant_id = $1 AND status = 'completed')::text AS runs_completed,
+          (SELECT COUNT(*) FROM agent.runs WHERE tenant_id = $1 AND status = 'failed')::text AS runs_failed,
+          (SELECT COUNT(*) FROM calculator.estimates WHERE tenant_id = $1)::text AS estimates_total,
+          (SELECT COUNT(*) FROM calculator.estimates WHERE tenant_id = $1 AND published)::text AS estimates_published,
+          (SELECT COUNT(*) FROM crm.contacts WHERE tenant_id = $1)::text AS contacts,
+          (SELECT COUNT(*) FROM crm.opportunities WHERE tenant_id = $1)::text AS opportunities,
+          (SELECT COUNT(*) FROM crm.opportunities
+            WHERE tenant_id = $1 AND stage NOT IN ('Won', 'Lost'))::text AS open_opportunities,
+          (SELECT COUNT(*) FILTER (WHERE source = 'llm') FROM billing.usage_ledger
+            WHERE tenant_id = $1 AND occurred_at >= date_trunc('day', now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC')::text AS llm_calls_today,
+          (SELECT COALESCE(SUM(input_tokens), 0) FROM billing.usage_ledger
+            WHERE tenant_id = $1 AND occurred_at >= date_trunc('day', now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC')::text AS input_tokens_today,
+          (SELECT COALESCE(SUM(output_tokens), 0) FROM billing.usage_ledger
+            WHERE tenant_id = $1 AND occurred_at >= date_trunc('day', now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC')::text AS output_tokens_today,
+          (SELECT COALESCE(SUM(cost_usd), 0) FROM billing.usage_ledger
+            WHERE tenant_id = $1 AND occurred_at >= date_trunc('day', now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC')::text AS cost_usd_today`,
+        [this.tenantId],
+      );
+      const row = result.rows[0]!;
+      return {
+        generatedAt: new Date().toISOString(),
+        principals: amount(row.principals),
+        runs: {
+          total: amount(row.runs_total),
+          running: amount(row.runs_running),
+          completed: amount(row.runs_completed),
+          failed: amount(row.runs_failed),
+        },
+        estimates: {
+          total: amount(row.estimates_total),
+          published: amount(row.estimates_published),
+        },
+        crm: {
+          contacts: amount(row.contacts),
+          opportunities: amount(row.opportunities),
+          openOpportunities: amount(row.open_opportunities),
+        },
+        today: {
+          llmCalls: amount(row.llm_calls_today),
+          inputTokens: amount(row.input_tokens_today),
+          outputTokens: amount(row.output_tokens_today),
+          costUsd: amount(row.cost_usd_today),
+        },
+      };
+    });
+  }
+
+  private mapAdminRun(row: Record<string, unknown>): AdminRunRow {
+    return {
+      runId: String(row['run_id']),
+      startedAt: iso(row['started_at']),
+      finishedAt: nullableIso(row['finished_at']),
+      channel: row['channel'] === null ? null : String(row['channel']),
+      provider: String(row['provider']),
+      model: String(row['model']),
+      status: String(row['status']),
+      resultStage: row['result_stage'] === null ? null : String(row['result_stage']),
+      published: row['published'] === true,
+      principalType: row['principal_type'] === null ? null : String(row['principal_type']),
+      principalKey: row['principal_key'] === null ? null : String(row['principal_key']),
+      displayName: row['display_name'] === null ? null : String(row['display_name']),
+      llmCalls: amount(row['llm_calls']),
+      inputTokens: amount(row['input_tokens']),
+      outputTokens: amount(row['output_tokens']),
+      costUsd: amount(row['cost_usd']),
+      toolCalls: amount(row['tool_calls']),
+      rejectedToolCalls: amount(row['rejected_tool_calls']),
+      estimateStatus: row['estimate_status'] === null ? null : String(row['estimate_status']),
+      currency: row['currency'] === null ? null : String(row['currency']),
+      monthlyTotal: nullableAmount(row['monthly_total']),
+      errorCode: row['error_code'] === null ? null : String(row['error_code']),
+    };
+  }
+
+  async adminRuns(limit: number): Promise<AdminRunRow[]> {
+    return this.guarded('yönetim çalıştırma listesi', async () => {
+      const result = await this.pool.query<Record<string, unknown>>(
+        `SELECT * FROM agent.run_overview
+          WHERE tenant_id = $1
+          ORDER BY started_at DESC
+          LIMIT $2`,
+        [this.tenantId, limit],
+      );
+      return result.rows.map((row) => this.mapAdminRun(row));
+    });
+  }
+
+  async adminRunDetail(runId: string): Promise<AdminRunDetail | null> {
+    return this.guarded('yönetim çalıştırma detayı', async () => {
+      const runResult = await this.pool.query<Record<string, unknown>>(
+        `SELECT * FROM agent.run_overview WHERE tenant_id = $1 AND run_id = $2`,
+        [this.tenantId, runId],
+      );
+      const row = runResult.rows[0];
+      if (!row) return null;
+      const [messages, audit] = await Promise.all([
+        this.pool.query<Record<string, unknown>>(
+          `SELECT m.direction, m.content_redacted, m.metadata, m.created_at
+             FROM agent.messages m
+             JOIN agent.runs r ON r.run_id = m.run_id AND r.tenant_id = m.tenant_id
+            WHERE m.tenant_id = $1 AND m.run_id = $2 AND r.tenant_id = $1
+            ORDER BY m.created_at`,
+          [this.tenantId, runId],
+        ),
+        this.pool.query<Record<string, unknown>>(
+          `SELECT event_seq, event_type, summary, detail, occurred_at
+             FROM agent.audit_events
+            WHERE tenant_id = $1 AND run_id = $2
+            ORDER BY event_seq`,
+          [this.tenantId, runId],
+        ),
+      ]);
+      return {
+        run: this.mapAdminRun(row),
+        messages: messages.rows.map((message) => ({
+          direction: String(message['direction']),
+          contentRedacted:
+            message['content_redacted'] === null ? null : String(message['content_redacted']),
+          metadata: jsonObject(message['metadata']),
+          createdAt: iso(message['created_at']),
+        })),
+        auditEvents: audit.rows.map((event) => ({
+          eventSeq: amount(event['event_seq']),
+          eventType: String(event['event_type']),
+          summary: String(event['summary']),
+          detail: jsonObject(event['detail']),
+          occurredAt: iso(event['occurred_at']),
+        })),
+      };
+    });
+  }
+
+  async adminDailyUsage(days: number): Promise<AdminDailyUsageRow[]> {
+    return this.guarded('yönetim kullanım özeti', async () => {
+      const result = await this.pool.query<Record<string, unknown>>(
+        `SELECT usage_day_utc, principal_type, principal_key, display_name,
+                llm_calls, input_tokens, output_tokens, cost_usd
+           FROM billing.daily_usage
+          WHERE tenant_id = $1 AND usage_day_utc >= (CURRENT_DATE - ($2::int - 1))
+          ORDER BY usage_day_utc DESC, cost_usd DESC`,
+        [this.tenantId, days],
+      );
+      return result.rows.map((row) => ({
+        usageDayUtc: iso(row['usage_day_utc']).slice(0, 10),
+        principalType: row['principal_type'] === null ? null : String(row['principal_type']),
+        principalKey: row['principal_key'] === null ? null : String(row['principal_key']),
+        displayName: row['display_name'] === null ? null : String(row['display_name']),
+        llmCalls: amount(row['llm_calls']),
+        inputTokens: amount(row['input_tokens']),
+        outputTokens: amount(row['output_tokens']),
+        costUsd: amount(row['cost_usd']),
+      }));
+    });
+  }
+
+  private async queryAdminOpportunities(
+    limit: number,
+    filters: { stage?: string; opportunityId?: string } = {},
+  ): Promise<AdminOpportunityRow[]> {
+    const result = await this.pool.query<Record<string, unknown>>(
+      `SELECT
+         o.opportunity_id, o.contact_id, c.phone_e164, c.name, c.company,
+         c.communication_status, c.consent_updated_at, c.consent_notice_version,
+         c.consent_source, o.customer_need, o.recommended_service, o.stage,
+         o.estimated_amount_minor, o.currency, o.owner, o.next_follow_up,
+         o.source, o.created_at, o.updated_at,
+         calc.external_calculation_id, calc.calculator_url,
+         calc.configuration_summary, calc.amount_minor AS calculation_amount_minor,
+         calc.currency AS calculation_currency, calc.version AS calculation_version,
+         calc.created_at AS calculation_created_at
+       FROM crm.opportunities o
+       JOIN crm.contacts c
+         ON c.tenant_id = o.tenant_id AND c.contact_id = o.contact_id
+       LEFT JOIN LATERAL (
+         SELECT external_calculation_id, calculator_url, configuration_summary,
+                amount_minor, currency, version, created_at
+           FROM crm.calculations
+          WHERE tenant_id = o.tenant_id AND opportunity_id = o.opportunity_id
+          ORDER BY version DESC
+          LIMIT 1
+       ) calc ON true
+       WHERE o.tenant_id = $1
+         AND ($2::text IS NULL OR o.stage = $2)
+         AND ($3::uuid IS NULL OR o.opportunity_id = $3)
+       ORDER BY o.updated_at DESC
+       LIMIT $4`,
+      [this.tenantId, filters.stage ?? null, filters.opportunityId ?? null, limit],
+    );
+    return result.rows.map((row) => ({
+      opportunityId: String(row['opportunity_id']),
+      contactId: String(row['contact_id']),
+      phoneE164: String(row['phone_e164']),
+      name: row['name'] === null ? null : String(row['name']),
+      company: row['company'] === null ? null : String(row['company']),
+      communicationStatus: String(row['communication_status']),
+      consentUpdatedAt: nullableIso(row['consent_updated_at']),
+      consentNoticeVersion:
+        row['consent_notice_version'] === null ? null : String(row['consent_notice_version']),
+      consentSource: row['consent_source'] === null ? null : String(row['consent_source']),
+      customerNeed: String(row['customer_need']),
+      recommendedService:
+        row['recommended_service'] === null ? null : String(row['recommended_service']),
+      stage: String(row['stage']),
+      estimatedAmountMinor: nullableAmount(row['estimated_amount_minor']),
+      currency: row['currency'] === null ? null : String(row['currency']),
+      owner: String(row['owner']),
+      nextFollowUp: nullableIso(row['next_follow_up'])?.slice(0, 10) ?? null,
+      source: String(row['source']),
+      createdAt: iso(row['created_at']),
+      updatedAt: iso(row['updated_at']),
+      calculation:
+        row['external_calculation_id'] === null
+          ? null
+          : {
+              externalCalculationId: String(row['external_calculation_id']),
+              calculatorUrl: String(row['calculator_url']),
+              configurationSummary: String(row['configuration_summary']),
+              amountMinor: amount(row['calculation_amount_minor']),
+              currency: String(row['calculation_currency']),
+              version: amount(row['calculation_version']),
+              createdAt: iso(row['calculation_created_at']),
+            },
+    }));
+  }
+
+  async adminOpportunities(limit: number, stage?: string): Promise<AdminOpportunityRow[]> {
+    return this.guarded('yönetim fırsat listesi', () =>
+      this.queryAdminOpportunities(limit, stage ? { stage } : {}),
+    );
+  }
+
+  async adminUpdateOpportunity(
+    opportunityId: string,
+    update: AdminOpportunityUpdate,
+  ): Promise<AdminOpportunityRow | null> {
+    return this.guarded('yönetim fırsat güncellemesi', async () => {
+      const client = await this.pool.connect();
+      try {
+        await client.query('BEGIN');
+        const before = await client.query<{ stage: string }>(
+          `SELECT stage FROM crm.opportunities
+            WHERE tenant_id = $1 AND opportunity_id = $2
+            FOR UPDATE`,
+          [this.tenantId, opportunityId],
+        );
+        const oldStage = before.rows[0]?.stage;
+        if (!oldStage) {
+          await client.query('ROLLBACK');
+          return null;
+        }
+        await client.query(
+          `UPDATE crm.opportunities
+              SET stage = CASE WHEN $3::boolean THEN $4 ELSE stage END,
+                  owner = CASE WHEN $5::boolean THEN $6 ELSE owner END,
+                  next_follow_up = CASE WHEN $7::boolean THEN $8::date ELSE next_follow_up END,
+                  updated_at = now()
+            WHERE tenant_id = $1 AND opportunity_id = $2`,
+          [
+            this.tenantId,
+            opportunityId,
+            update.stage !== undefined,
+            update.stage ?? null,
+            update.owner !== undefined,
+            update.owner ?? null,
+            update.nextFollowUp !== undefined,
+            update.nextFollowUp ?? null,
+          ],
+        );
+        if (update.stage !== undefined && update.stage !== oldStage) {
+          await client.query(
+            `INSERT INTO crm.stage_events
+               (event_id, tenant_id, opportunity_id, from_stage, to_stage, reason, created_at)
+             VALUES ($1, $2, $3, $4, $5, 'admin-api', now())`,
+            [randomUUID(), this.tenantId, opportunityId, oldStage, update.stage],
+          );
+        }
+        await client.query('COMMIT');
+      } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+      } finally {
+        client.release();
+      }
+      return (await this.queryAdminOpportunities(1, { opportunityId }))[0] ?? null;
+    });
   }
 
   async close(): Promise<void> {

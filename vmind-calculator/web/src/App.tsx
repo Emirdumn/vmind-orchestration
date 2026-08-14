@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ApiError, api, type AuthConfig, type CustomerCrmContext, type Me } from './api';
 import {
@@ -13,13 +13,88 @@ import {
   RecommendationsPanel,
   RequirementOverview,
 } from './components';
+import { AdminDashboard } from './AdminDashboard';
 import { GuidedQuoteBuilder } from './GuidedQuoteBuilder';
 import { useFlow } from './useFlow';
 
 const ORNEK =
   'Müşteri 4 sunucu istiyor, her birine 200 GB premium disk, aylık 2 TB internet trafiği, önüne uygulama load balancer koyalım.';
 
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (
+        element: HTMLElement,
+        options: {
+          sitekey: string;
+          theme: 'auto';
+          size: 'flexible';
+          callback: (token: string) => void;
+          'expired-callback': () => void;
+          'error-callback': () => void;
+        },
+      ) => string;
+      remove: (widgetId: string) => void;
+    };
+  }
+}
+
+function TurnstileWidget({
+  siteKey,
+  resetKey,
+  onToken,
+}: {
+  siteKey: string;
+  resetKey: number;
+  onToken: (token: string | null) => void;
+}) {
+  const host = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    let widgetId: string | undefined;
+    let cancelled = false;
+    const render = (): void => {
+      if (cancelled || !host.current || !window.turnstile) return;
+      widgetId = window.turnstile.render(host.current, {
+        sitekey: siteKey,
+        theme: 'auto',
+        size: 'flexible',
+        callback: (token) => onToken(token),
+        'expired-callback': () => onToken(null),
+        'error-callback': () => onToken(null),
+      });
+    };
+
+    if (window.turnstile) {
+      render();
+    } else {
+      const source = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+      let script = document.querySelector<HTMLScriptElement>(`script[src="${source}"]`);
+      if (!script) {
+        script = document.createElement('script');
+        script.src = source;
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+      }
+      script.addEventListener('load', render, { once: true });
+    }
+
+    return () => {
+      cancelled = true;
+      if (widgetId && window.turnstile) window.turnstile.remove(widgetId);
+      onToken(null);
+    };
+  }, [siteKey, resetKey, onToken]);
+
+  return <div className="turnstile-box" ref={host} aria-label="Robot doğrulaması" />;
+}
+
 export default function App() {
+  return window.location.pathname.startsWith('/admin') ? <AdminDashboard /> : <CustomerApp />;
+}
+
+function CustomerApp() {
   const [me, setMe] = useState<Me | null>(null);
   const [authConfig, setAuthConfig] = useState<AuthConfig | null>(null);
   const [booting, setBooting] = useState(true);
@@ -31,7 +106,12 @@ export default function App() {
       setMe(null);
       // Oturum yoksa giriş formunun şeklini öğren.
       try {
-        setAuthConfig(await api.authConfig());
+        const config = await api.authConfig();
+        setAuthConfig(config);
+        if (config.automatic) {
+          await api.login({});
+          setMe(await api.me());
+        }
       } catch {
         setAuthConfig(null);
       }
@@ -114,20 +194,53 @@ function Workspace({
   onSpend: () => void;
 }) {
   const [text, setText] = useState('');
-  const [customer, setCustomer] = useState<CustomerCrmContext>({ phoneE164: '' });
+  const [customer, setCustomer] = useState<{
+    phoneE164: string;
+    name?: string;
+    company?: string;
+    privacyConsent: boolean;
+  }>({ phoneE164: '', privacyConsent: false });
+  const [formError, setFormError] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileReset, setTurnstileReset] = useState(0);
   const { view, error, starting, start, answer, edit, reset } = useFlow();
 
-  const crmCustomer = customer.phoneE164.trim()
+  const crmCustomer: CustomerCrmContext | undefined =
+    customer.phoneE164.trim() && customer.privacyConsent && me.privacyNoticeVersion
     ? {
         phoneE164: customer.phoneE164,
         ...(customer.name?.trim() ? { name: customer.name.trim() } : {}),
         ...(customer.company?.trim() ? { company: customer.company.trim() } : {}),
+        privacyConsent: true,
+        privacyNoticeVersion: me.privacyNoticeVersion,
       }
     : undefined;
+  const beginFlow = (salesText: string): void => {
+    setFormError(null);
+    if (customer.phoneE164.trim() && !customer.privacyConsent) {
+      setFormError('Telefon bilgisini CRM’e kaydetmek için veri işleme onayı gereklidir.');
+      return;
+    }
+    if (customer.phoneE164.trim() && !me.privacyNoticeVersion) {
+      setFormError('Gizlilik bildirimi sürümü yapılandırılmadığı için müşteri kaydı alınamıyor.');
+      return;
+    }
+    if (me.turnstileSiteKey && !turnstileToken) {
+      setFormError('Devam etmek için robot doğrulamasını tamamlayın.');
+      return;
+    }
+    const proof = turnstileToken ?? undefined;
+    if (me.turnstileSiteKey) {
+      setTurnstileToken(null);
+      setTurnstileReset((current) => current + 1);
+    }
+    void start(salesText, crmCustomer, proof);
+  };
   const resetWorkspace = (): void => {
     reset();
     setText('');
-    setCustomer({ phoneE164: '' });
+    setCustomer({ phoneE164: '', privacyConsent: false });
+    setFormError(null);
   };
 
   // Akış bitince kalan bütçeyi tazele — satışçı ne harcadığını görsün.
@@ -210,11 +323,34 @@ function Workspace({
                 Telefon girilirse ihtiyaç ve Calculator sonucu otomatik olarak aynı müşteri fırsatına
                 bağlanır. Bu bilgiler LLM’e gönderilmez.
               </p>
+              <label className="privacy-consent">
+                <input
+                  type="checkbox"
+                  checked={customer.privacyConsent}
+                  onChange={(event) =>
+                    setCustomer((previous) => ({
+                      ...previous,
+                      privacyConsent: event.target.checked,
+                    }))
+                  }
+                />
+                <span>
+                  İletişim bilgilerimin teklifin hazırlanması ve satış takibi amacıyla işlenmesini
+                  kabul ediyorum. Bildirim: {me.privacyNoticeVersion ?? 'yapılandırılmadı'}
+                </span>
+              </label>
             </details>
+          )}
+          {me.turnstileSiteKey && (
+            <TurnstileWidget
+              siteKey={me.turnstileSiteKey}
+              resetKey={turnstileReset}
+              onToken={setTurnstileToken}
+            />
           )}
           <GuidedQuoteBuilder
             starting={starting}
-            onStart={(guidedText) => void start(guidedText, crmCustomer)}
+            onStart={beginFlow}
             onEditText={(guidedText) => {
               setText(guidedText);
               requestAnimationFrame(() =>
@@ -237,7 +373,7 @@ function Workspace({
           <div className="row">
             <button
               disabled={starting || text.trim().length === 0}
-              onClick={() => start(text, crmCustomer)}
+              onClick={() => beginFlow(text)}
             >
               {starting ? 'Başlatılıyor…' : 'Teklif hazırla'}
             </button>
@@ -261,7 +397,7 @@ function Workspace({
               <span key={service}>{service}</span>
             ))}
           </div>
-          {error && <p className="error small">{error}</p>}
+          {(formError || error) && <p className="error small">{formError ?? error}</p>}
         </div>
       )}
 
@@ -302,7 +438,11 @@ function Workspace({
                 summary={gate.summary}
                 publishEnabled={me.publishEnabled}
                 onDecide={(approved) =>
-                  void answer(gate.id, { approved, approvedBy: me.displayName })
+                  void answer(gate.id, {
+                    approved,
+                    publish: approved && me.publishEnabled,
+                    approvedBy: me.displayName,
+                  })
                 }
               />
             </>

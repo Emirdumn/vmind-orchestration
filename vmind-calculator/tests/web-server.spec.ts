@@ -17,11 +17,15 @@ import { RuleEngine } from '../src/core/rules/engine.js';
 import { BudgetLedger } from '../src/web/budget.js';
 import {
   DisabledAuthProvider,
+  PublicGuestAuthProvider,
   SharedSecretAuthProvider,
   type AuthProvider,
 } from '../src/web/auth.js';
+import { AdminApiAuth } from '../src/web/admin-auth.js';
+import { PublicAccessGuard } from '../src/web/public-access.js';
 import { FlowSession, FlowSessionRegistry } from '../src/web/flow-session.js';
 import { createAgentServer, parseLocalLlmCredential } from '../src/web/server.js';
+import type { RuntimeStore } from '../src/web/runtime-store.js';
 import { FakeLlm } from './fake-llm.js';
 import type { ApiEnvelope, Flavor, Product, VolumeType } from '../src/core/catalog/types.js';
 
@@ -82,7 +86,14 @@ describe('yerel LLM anahtari dosyasi', () => {
  * siralamasinin aynisi test edilir.
  */
 async function startServer(
-  options: { withLlm?: boolean; allowPublish?: boolean; auth?: AuthProvider } = {},
+  options: {
+    withLlm?: boolean;
+    allowPublish?: boolean;
+    auth?: AuthProvider;
+    publicAccess?: PublicAccessGuard;
+    adminAuth?: AdminApiAuth;
+    runtimeStore?: RuntimeStore;
+  } = {},
 ): Promise<void> {
   const withLlm = options.withLlm ?? true;
   costSinks = [];
@@ -91,6 +102,9 @@ async function startServer(
     catalog,
     rules,
     auth: options.auth ?? new SharedSecretAuthProvider(PASSWORD),
+    ...(options.adminAuth ? { adminAuth: options.adminAuth } : {}),
+    ...(options.publicAccess ? { publicAccess: options.publicAccess } : {}),
+    ...(options.runtimeStore ? { runtimeStore: options.runtimeStore } : {}),
     budget,
     registry,
     ...(options.allowPublish !== undefined ? { allowPublish: options.allowPublish } : {}),
@@ -209,6 +223,139 @@ describe('Yetkilendirme', () => {
   });
 });
 
+describe('Yönetim API sınırı', () => {
+  const adminKey = 'test-admin-key-with-more-than-thirty-two-characters';
+  const opportunity = {
+    opportunityId: '11111111-1111-4111-8111-111111111111',
+    contactId: '22222222-2222-4222-8222-222222222222',
+    phoneE164: '+905551111111',
+    name: 'Test',
+    company: null,
+    communicationStatus: 'opted_in',
+    consentUpdatedAt: new Date(0).toISOString(),
+    consentNoticeVersion: '2026-08-14',
+    consentSource: 'Website',
+    customerNeed: '2 sunucu',
+    recommendedService: 'Compute',
+    stage: 'Qualified',
+    estimatedAmountMinor: 10000,
+    currency: 'TRY',
+    owner: 'unassigned',
+    nextFollowUp: null,
+    source: 'Website',
+    createdAt: new Date(0).toISOString(),
+    updatedAt: new Date(0).toISOString(),
+    calculation: null,
+  };
+  const store: RuntimeStore = {
+    init: async () => {},
+    assertCanSpend: async () => {},
+    remaining: async () => ({ total: 5, user: 1 }),
+    snapshot: async () => ({
+      day: '2026-08-14', totalUsd: 0, perUserUsd: {},
+      limits: { dailyTotalUsd: 5, dailyPerUserUsd: 1 }, writeFailures: 0,
+    }),
+    reconcileLegacyBudget: async () => {},
+    startRun: async () => { throw new Error('bu testte çağrılmamalı'); },
+    appendInteraction: async () => {},
+    recordUsage: async () => {},
+    finishRun: async () => {},
+    adminOverview: async () => ({
+      generatedAt: new Date(0).toISOString(), principals: 1,
+      runs: { total: 2, running: 0, completed: 1, failed: 1 },
+      estimates: { total: 1, published: 0 },
+      crm: { contacts: 1, opportunities: 1, openOpportunities: 1 },
+      today: { llmCalls: 2, inputTokens: 100, outputTokens: 50, costUsd: 0.01 },
+    }),
+    adminRuns: async () => [],
+    adminRunDetail: async () => null,
+    adminDailyUsage: async () => [],
+    adminOpportunities: async () => [opportunity],
+    adminUpdateOpportunity: async (_id, update) => ({ ...opportunity, ...update }),
+    close: async () => {},
+  };
+
+  it('yapılandırılmamış yönetim yüzeyini kapalı tutuyor', async () => {
+    expect((await fetch(`${base}/api/admin/overview`)).status).toBe(404);
+  });
+
+  it('normal site çerezi admin yetkisi vermiyor; ayrı Bearer gerekiyor', async () => {
+    close();
+    await startServer({ adminAuth: new AdminApiAuth(adminKey), runtimeStore: store });
+    const cookie = await login();
+    expect((await fetch(`${base}/api/admin/overview`, { headers: withCookie(cookie) })).status).toBe(401);
+    expect((await fetch(`${base}/api/admin/overview`, {
+      headers: { Authorization: 'Bearer wrong-key' },
+    })).status).toBe(401);
+    const response = await fetch(`${base}/api/admin/overview`, {
+      headers: { Authorization: `Bearer ${adminKey}` },
+    });
+    expect(response.status).toBe(200);
+    expect((await json(response)).today.costUsd).toBe(0.01);
+  });
+
+  it('CRM güncellemesini alan ve aşama listesiyle sınırlandırıyor', async () => {
+    close();
+    await startServer({ adminAuth: new AdminApiAuth(adminKey), runtimeStore: store });
+    const headers = { Authorization: `Bearer ${adminKey}`, 'Content-Type': 'application/json' };
+    const invalid = await fetch(`${base}/api/admin/opportunities/${opportunity.opportunityId}`, {
+      method: 'PATCH', headers, body: JSON.stringify({ stage: 'Hacked' }),
+    });
+    expect(invalid.status).toBe(400);
+    const updated = await fetch(`${base}/api/admin/opportunities/${opportunity.opportunityId}`, {
+      method: 'PATCH', headers, body: JSON.stringify({ stage: 'Proposal Sent', owner: 'Emir' }),
+    });
+    expect(updated.status).toBe(200);
+    expect((await json(updated)).stage).toBe('Proposal Sent');
+  });
+});
+
+describe('Public müşteri oturumu', () => {
+  it('şifresiz ama ayrı cookie kimliği ve IP-hash akış limiti kullanır', async () => {
+    close();
+    registry = new FlowSessionRegistry();
+    await startServer({
+      auth: new PublicGuestAuthProvider(),
+      publicAccess: new PublicAccessGuard({
+        ipHashSecret: 'public-test-secret'.padEnd(32, 'x'),
+        requestLimitPerMinute: 50,
+        flowLimitPerHour: 1,
+        privacyNoticeVersion: '2026-08-14',
+      }),
+    });
+
+    const configResponse = await fetch(`${base}/api/auth/config`);
+    expect(configResponse.status).toBe(200);
+    expect(await json(configResponse)).toMatchObject({
+      kind: 'public-guest',
+      automatic: true,
+      privacyNoticeVersion: '2026-08-14',
+    });
+
+    const loginResponse = await fetch(`${base}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}',
+    });
+    expect(loginResponse.status).toBe(200);
+    const cookie = (loginResponse.headers.get('set-cookie') ?? '').split(';')[0] ?? '';
+    expect(cookie).toContain('vmind_agent_session=');
+    const me = await fetch(`${base}/api/me`, { headers: withCookie(cookie) });
+    expect(me.status).toBe(200);
+    expect((await json(me)).displayName).toBe('Ziyaretçi');
+
+    const flow = () => fetch(`${base}/api/flow`, {
+      method: 'POST',
+      headers: { ...withCookie(cookie), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ salesText: '2 sunucu' }),
+    });
+    expect((await flow()).status).toBe(202);
+    const limited = await flow();
+    expect(limited.status).toBe(429);
+    expect((await json(limited)).scope).toBe('public-access');
+  });
+});
+
 describe('Akis ucu', () => {
   it('LLM yoksa 503 ve sebebi soyluyor', async () => {
     close();
@@ -241,10 +388,30 @@ describe('Akis ucu', () => {
       headers: { ...withCookie(cookie), 'Content-Type': 'application/json' },
       body: JSON.stringify({
         salesText: '2 sunucu, premium disk',
-        customer: { phoneE164: '0555 123 45 67', name: 'Deniz', company: 'Örnek AŞ' },
+        customer: {
+          phoneE164: '0555 123 45 67',
+          name: 'Deniz',
+          company: 'Örnek AŞ',
+          privacyConsent: true,
+          privacyNoticeVersion: '2026-08-14',
+        },
       }),
     });
     expect(response.status).toBe(202);
+  });
+
+  it('CRM telefonu açık veri işleme onayı olmadan kabul edilmez', async () => {
+    const cookie = await login();
+    const response = await fetch(`${base}/api/flow`, {
+      method: 'POST',
+      headers: { ...withCookie(cookie), 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        salesText: '2 sunucu',
+        customer: { phoneE164: '0555 123 45 67' },
+      }),
+    });
+    expect(response.status).toBe(400);
+    expect((await json(response)).error).toMatch(/onayı/);
   });
 
   it('gecersiz CRM telefonu akis baslatmadan 400 doner', async () => {
@@ -451,6 +618,27 @@ describe('Yayinlama izni', () => {
     const body = await json(await fetch(`${base}/api/me`, { headers: withCookie(cookie) }));
     // Arayuz bunu onay ekraninda gosterir: "kalici kayit olusur".
     expect(body.publishEnabled).toBe(true);
+  });
+
+  it('global yayın açık olsa bile public ziyaretçiye kalıcı yayın yetkisi verilmez', async () => {
+    close();
+    const guestAuth = new PublicGuestAuthProvider();
+    await startServer({
+      allowPublish: true,
+      auth: guestAuth,
+      publicAccess: new PublicAccessGuard({
+        ipHashSecret: 'public-test-secret'.padEnd(32, 'x'),
+        privacyNoticeVersion: '2026-08-14',
+      }),
+    });
+    const loginResponse = await fetch(`${base}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}',
+    });
+    const cookie = (loginResponse.headers.get('set-cookie') ?? '').split(';')[0] ?? '';
+    const body = await json(await fetch(`${base}/api/me`, { headers: withCookie(cookie) }));
+    expect(body.publishEnabled).toBe(false);
   });
 });
 

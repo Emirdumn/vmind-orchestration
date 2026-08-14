@@ -29,12 +29,28 @@ services:
       # sunucu platforma sorarak DOĞRULAR. Kimliğin kaynağı VMind.
       WEB_AUTH_MODE: ${WEB_AUTH_MODE:-vmind-token}
 
+      # public-guest: müşteri şifre görmez; her tarayıcı ayrı HttpOnly oturum
+      # alır. IP ham olarak saklanmaz, HMAC hash yalnız hız/kota kapısında
+      # bellekte kullanılır. Turnstile secret tarayıcıya hiçbir zaman gitmez.
+      WEB_PUBLIC_IP_HASH_SECRET: ${WEB_PUBLIC_IP_HASH_SECRET:-}
+      WEB_PUBLIC_REQUESTS_PER_MINUTE: ${WEB_PUBLIC_REQUESTS_PER_MINUTE:-120}
+      WEB_PUBLIC_FLOWS_PER_HOUR: ${WEB_PUBLIC_FLOWS_PER_HOUR:-5}
+      WEB_TRUST_PROXY: ${WEB_TRUST_PROXY:-}
+      WEB_PRIVACY_NOTICE_VERSION: ${WEB_PRIVACY_NOTICE_VERSION:-}
+      TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
+      TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:-}
+      TURNSTILE_EXPECTED_HOSTNAME: ${TURNSTILE_EXPECTED_HOSTNAME:-}
+      WEB_PUBLIC_ALLOW_NO_TURNSTILE: ${WEB_PUBLIC_ALLOW_NO_TURNSTILE:-}
+
       # Yalnızca WEB_AUTH_MODE=shared-secret için (yerel deneme). Bu ikisi
       # listelenmezse konteynere HİÇ ulaşmaz: `.env` yalnızca compose'un kendi
       # değişken yorumlaması içindir, otomatik olarak konteynere geçmez —
       # sunucu da açılmayı reddeder. Sunulan bir seçeneğin çalışması gerekir.
       WEB_SHARED_PASSWORD: ${WEB_SHARED_PASSWORD:-}
       WEB_ALLOW_WEAK_AUTH: ${WEB_ALLOW_WEAK_AUTH:-}
+
+      # PostgreSQL yönetim API'si. Normal müşteri çerezi bu uçlara yetmez.
+      WEB_ADMIN_API_KEY: ${WEB_ADMIN_API_KEY:-}
 
       # OpenClaw/vGPT icin insandan bagimsiz Bearer servis hesabi.
       # Anahtari WhatsApp mesajina yazmayin; OpenClaw secret/env ayarina koyun.

@@ -56,6 +56,7 @@ import {
   type Identity,
   type ServiceApiKeyAuth,
 } from './auth.js';
+import { adminApiAuthFromEnv, type AdminApiAuth } from './admin-auth.js';
 import { FlowCapacityError, FlowSession, FlowSessionRegistry } from './flow-session.js';
 import {
   RuntimeStoreUnavailableError,
@@ -69,6 +70,11 @@ import {
   type CrmCustomerContext,
   type CrmSync,
 } from './crm-sync.js';
+import {
+  PublicAccessError,
+  publicAccessFromEnv,
+  type PublicAccessGuard,
+} from './public-access.js';
 
 const SESSION_COOKIE = 'vmind_agent_session';
 const MAX_BODY_BYTES = 64 * 1024;
@@ -78,6 +84,10 @@ export interface ServerDeps {
   catalog: Catalog;
   rules: RuleEngine;
   auth: AuthProvider;
+  /** Site/müşteri oturumundan ayrı, yalnızca yönetim API'sine ait Bearer sınırı. */
+  adminAuth?: AdminApiAuth;
+  /** Public müşteri modunda IP-hash limitleri ve Turnstile doğrulaması. */
+  publicAccess?: PublicAccessGuard;
   // OpenClaw gibi makine istemcileri icin cerezden bagimsiz Bearer kimligi.
   serviceAuth?: ServiceApiKeyAuth;
   budget: BudgetLedger;
@@ -184,23 +194,57 @@ class HttpError extends Error {
 const str = (value: unknown, max: number): string | undefined =>
   typeof value === 'string' && value.length > 0 && value.length <= max ? value : undefined;
 
+const UUID_PATTERN = '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}';
+const CRM_STAGES = new Set([
+  'New',
+  'Need Identified',
+  'Qualified',
+  'Calculation Created',
+  'Proposal Sent',
+  'Follow-up',
+  'Sales Contact Requested',
+  'Won',
+  'Lost',
+]);
+
+function boundedInteger(value: string | null, fallback: number, min: number, max: number): number {
+  if (value === null || value.trim() === '') return fallback;
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed < min || parsed > max) {
+    throw new HttpError(400, `Sayısal parametre ${min}-${max} aralığında olmalıdır.`);
+  }
+  return parsed;
+}
+
 function customerContext(value: unknown): CrmCustomerContext | undefined {
   if (value === undefined) return undefined;
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     throw new HttpError(400, 'customer bir JSON nesnesi olmalıdır.');
   }
   const input = value as Record<string, unknown>;
-  const extras = Object.keys(input).filter((key) => !['phoneE164', 'name', 'company'].includes(key));
+  const extras = Object.keys(input).filter(
+    (key) =>
+      !['phoneE164', 'name', 'company', 'privacyConsent', 'privacyNoticeVersion'].includes(key),
+  );
   if (extras.length > 0) throw new HttpError(400, 'customer bilinmeyen alan içeriyor.');
   const rawPhone = str(input['phoneE164'], 32);
   const phoneE164 = rawPhone ? normalizeCustomerPhone(rawPhone) : null;
   if (!phoneE164) throw new HttpError(400, 'Müşteri telefonu geçerli değil.');
   const name = str(input['name'], 160)?.trim();
   const company = str(input['company'], 240)?.trim();
+  if (input['privacyConsent'] !== true) {
+    throw new HttpError(400, 'Müşteri iletişim bilgisini kaydetmek için veri işleme onayı gerekli.');
+  }
+  const privacyNoticeVersion = str(input['privacyNoticeVersion'], 64)?.trim();
+  if (!privacyNoticeVersion || !/^[A-Za-z0-9._-]+$/.test(privacyNoticeVersion)) {
+    throw new HttpError(400, 'Gizlilik bildirimi sürümü geçersiz.');
+  }
   return {
     phoneE164,
     ...(name ? { name } : {}),
     ...(company ? { company } : {}),
+    privacyConsent: true,
+    privacyNoticeVersion,
   };
 }
 
@@ -216,6 +260,13 @@ function requestChannel(req: IncomingMessage, identity: Identity): string {
 // ---------------------------------------------------------------------------
 
 export function createAgentServer(deps: ServerDeps) {
+  const mayPublish = (identity: Identity): boolean => {
+    if (deps.allowPublish !== true) return false;
+    if (identity.userId.startsWith('guest:')) return false;
+    if (identity.actorType === 'service') return identity.canPublish === true;
+    return true;
+  };
+
   const requireIdentity = (req: IncomingMessage): Identity => {
     const identity =
       deps.auth.resolve(readCookie(req, SESSION_COOKIE)) ??
@@ -230,10 +281,110 @@ export function createAgentServer(deps: ServerDeps) {
     pathname: string,
   ): Promise<boolean> {
     const method = req.method ?? 'GET';
+    deps.publicAccess?.assertRequest(req);
+
+    // --- yönetim API'si: müşteri/site oturumundan bağımsız ----------------
+    if (pathname.startsWith('/api/admin')) {
+      if (!deps.adminAuth) throw new HttpError(404, 'Yönetim API’si yapılandırılmamış.');
+      if (!deps.adminAuth.accepts(req.headers.authorization)) {
+        res.setHeader('WWW-Authenticate', 'Bearer realm="vmind-admin"');
+        throw new HttpError(401, 'Geçerli yönetim Bearer anahtarı gerekli.');
+      }
+      if (!deps.runtimeStore) {
+        throw new HttpError(503, 'Yönetim API’si için PostgreSQL kullanım defteri gerekli.');
+      }
+
+      const url = new URL(req.url ?? '/', 'http://localhost');
+      if (pathname === '/api/admin/overview' && method === 'GET') {
+        sendJson(res, 200, await deps.runtimeStore.adminOverview());
+        return true;
+      }
+      if (pathname === '/api/admin/runs' && method === 'GET') {
+        const limit = boundedInteger(url.searchParams.get('limit'), 50, 1, 200);
+        sendJson(res, 200, { items: await deps.runtimeStore.adminRuns(limit) });
+        return true;
+      }
+      const runMatch = new RegExp(`^/api/admin/runs/(${UUID_PATTERN})$`, 'i').exec(pathname);
+      if (runMatch && method === 'GET') {
+        const detail = await deps.runtimeStore.adminRunDetail(runMatch[1]!);
+        if (!detail) throw new HttpError(404, 'Çalıştırma bulunamadı.');
+        sendJson(res, 200, detail);
+        return true;
+      }
+      if (pathname === '/api/admin/usage' && method === 'GET') {
+        const days = boundedInteger(url.searchParams.get('days'), 30, 1, 366);
+        sendJson(res, 200, { items: await deps.runtimeStore.adminDailyUsage(days) });
+        return true;
+      }
+      if (pathname === '/api/admin/opportunities' && method === 'GET') {
+        const limit = boundedInteger(url.searchParams.get('limit'), 50, 1, 200);
+        const stage = url.searchParams.get('stage')?.trim() || undefined;
+        if (stage && !CRM_STAGES.has(stage)) throw new HttpError(400, 'Geçersiz CRM aşaması.');
+        sendJson(res, 200, {
+          items: await deps.runtimeStore.adminOpportunities(limit, stage),
+        });
+        return true;
+      }
+      const opportunityMatch = new RegExp(
+        `^/api/admin/opportunities/(${UUID_PATTERN})$`,
+        'i',
+      ).exec(pathname);
+      if (opportunityMatch && method === 'PATCH') {
+        const body = await readJsonBody(req);
+        const extras = Object.keys(body).filter(
+          (key) => !['stage', 'owner', 'nextFollowUp'].includes(key),
+        );
+        if (extras.length > 0) throw new HttpError(400, 'Bilinmeyen güncelleme alanı.');
+        const stage = body['stage'] === undefined ? undefined : str(body['stage'], 64);
+        if (body['stage'] !== undefined && (!stage || !CRM_STAGES.has(stage))) {
+          throw new HttpError(400, 'Geçersiz CRM aşaması.');
+        }
+        const owner = body['owner'] === undefined ? undefined : str(body['owner'], 160)?.trim();
+        if (body['owner'] !== undefined && !owner) throw new HttpError(400, 'owner geçersiz.');
+        const nextFollowUp =
+          body['nextFollowUp'] === undefined
+            ? undefined
+            : body['nextFollowUp'] === null
+              ? null
+              : str(body['nextFollowUp'], 10);
+        if (
+          body['nextFollowUp'] !== undefined &&
+          nextFollowUp !== null &&
+          (!nextFollowUp || !/^\d{4}-\d{2}-\d{2}$/.test(nextFollowUp))
+        ) {
+          throw new HttpError(400, 'nextFollowUp YYYY-MM-DD biçiminde veya null olmalıdır.');
+        }
+        if (stage === undefined && owner === undefined && nextFollowUp === undefined) {
+          throw new HttpError(400, 'Güncellenecek en az bir alan gerekli.');
+        }
+        const updated = await deps.runtimeStore.adminUpdateOpportunity(
+          opportunityMatch[1]!,
+          {
+            ...(stage !== undefined ? { stage } : {}),
+            ...(owner !== undefined ? { owner } : {}),
+            ...(nextFollowUp !== undefined ? { nextFollowUp } : {}),
+          },
+        );
+        if (!updated) throw new HttpError(404, 'Fırsat bulunamadı.');
+        sendJson(res, 200, updated);
+        return true;
+      }
+      throw new HttpError(404, 'Bilinmeyen yönetim ucu.');
+    }
 
     // --- giriş formunun şekli (kimlik gerekmez) ---------------------------
     if (pathname === '/api/auth/config' && method === 'GET') {
-      sendJson(res, 200, { kind: deps.auth.kind, fields: deps.auth.loginFields });
+      sendJson(res, 200, {
+        kind: deps.auth.kind,
+        fields: deps.auth.loginFields,
+        automatic: deps.auth.kind === 'public-guest',
+        ...(deps.publicAccess?.turnstileSiteKey
+          ? { turnstileSiteKey: deps.publicAccess.turnstileSiteKey }
+          : {}),
+        ...(deps.publicAccess
+          ? { privacyNoticeVersion: deps.publicAccess.privacyNoticeVersion }
+          : {}),
+      });
       return true;
     }
 
@@ -251,7 +402,8 @@ export function createAgentServer(deps: ServerDeps) {
       }
       res.setHeader(
         'Set-Cookie',
-        `${SESSION_COOKIE}=${result.sessionToken}; HttpOnly; SameSite=Strict; Path=/; Max-Age=28800` +
+        `${SESSION_COOKIE}=${result.sessionToken}; HttpOnly; SameSite=Strict; Path=/; ` +
+          `Max-Age=${deps.auth.kind === 'public-guest' ? 86400 : 28800}` +
           (process.env['WEB_INSECURE_COOKIE'] === '1' ? '' : '; Secure'),
       );
       sendJson(res, 200, { displayName: result.identity.displayName });
@@ -280,9 +432,14 @@ export function createAgentServer(deps: ServerDeps) {
         // Arayüz bunu göstererek satışçıya onayın ne anlama geldiğini söyler:
         // açıkken onay kalıcı kayıt oluşturur, kapalıyken yalnızca dry-run.
         publishEnabled:
-          deps.allowPublish === true &&
-          (identity.actorType !== 'service' || identity.canPublish === true),
+          mayPublish(identity),
         crmEnabled: Boolean(deps.crmSync),
+        ...(deps.publicAccess?.turnstileSiteKey
+          ? { turnstileSiteKey: deps.publicAccess.turnstileSiteKey }
+          : {}),
+        ...(deps.publicAccess
+          ? { privacyNoticeVersion: deps.publicAccess.privacyNoticeVersion }
+          : {}),
       });
       return true;
     }
@@ -304,6 +461,12 @@ export function createAgentServer(deps: ServerDeps) {
 
     if (pathname === '/api/flow' && method === 'POST') {
       const identity = requireIdentity(req);
+      await deps.publicAccess?.assertFlowStart(
+        req,
+        typeof req.headers['x-turnstile-token'] === 'string'
+          ? req.headers['x-turnstile-token']
+          : undefined,
+      );
       const body = await readJsonBody(req);
       const salesText = str(body['salesText'], MAX_SALES_TEXT);
       const customer = customerContext(body['customer']);
@@ -378,21 +541,28 @@ export function createAgentServer(deps: ServerDeps) {
         if (!gateId) throw new HttpError(400, 'gateId gerekli.');
         let payload = body['payload'];
         const activeGate = session.view().gate;
-        const requestsPublish =
+        const approvalPayload =
           activeGate?.kind === 'approve' &&
           payload !== null &&
           typeof payload === 'object' &&
-          !Array.isArray(payload) &&
-          (payload as Record<string, unknown>)['approved'] === true;
-        if (requestsPublish && identity.actorType === 'service') {
-          if (identity.canPublish !== true) {
+          !Array.isArray(payload)
+            ? (payload as Record<string, unknown>)
+            : undefined;
+        if (approvalPayload?.['approved'] === true) {
+          // Geriye uyum: `publish` verilmemiş onay eski istemcide yayın talebiydi.
+          const requestsPublish = approvalPayload['publish'] !== false;
+          if (requestsPublish && !mayPublish(identity)) {
             throw new HttpError(
               403,
-              'Bu servis anahtari kalici teklif yayinlama yetkisine sahip degil.',
+              'Bu kullanıcı veya servis kalıcı VMind teklifi yayınlama yetkisine sahip değil.',
             );
           }
-          // Servis istemcisi approvedBy alaninda baska birini taklit edemez.
-          payload = { approved: true, approvedBy: identity.displayName };
+          // Hiçbir istemci approvedBy alanında başka birini taklit edemez.
+          payload = {
+            approved: true,
+            publish: requestsPublish,
+            approvedBy: identity.displayName,
+          };
         }
         if (deps.runtimeStore && activeGate?.id === gateId) {
           await deps.runtimeStore.appendInteraction(
@@ -457,8 +627,7 @@ export function createAgentServer(deps: ServerDeps) {
     // durumda bile insan onayı olmadan `publish.save` reddeder.
     const client = new PlatformApiClient({
       allowWrites:
-        deps.allowPublish === true &&
-        (identity.actorType !== 'service' || identity.canPublish === true),
+        mayPublish(identity),
       ...(identity.vmindToken ? { apiKey: identity.vmindToken } : {}),
     });
     const ctx = createToolContext(deps.catalog, deps.rules, {
@@ -670,7 +839,12 @@ export function createAgentServer(deps: ServerDeps) {
       'X-Content-Type-Options': 'nosniff',
       // Arayüz tek origin'den servis edilir; harici kaynak yüklemesi yok.
       'Content-Security-Policy':
-        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'",
+        deps.publicAccess?.turnstileSiteKey
+          ? "default-src 'self'; script-src 'self' https://challenges.cloudflare.com; " +
+            "frame-src https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; " +
+            "img-src 'self' data:; connect-src 'self' https://challenges.cloudflare.com"
+          : "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
+            "img-src 'self' data:; connect-src 'self'",
       'Referrer-Policy': 'same-origin',
     });
     res.end(body);
@@ -694,6 +868,13 @@ export function createAgentServer(deps: ServerDeps) {
       } catch (error) {
         if (error instanceof HttpError) {
           sendJson(res, error.status, { error: error.message });
+          return;
+        }
+        if (error instanceof PublicAccessError) {
+          if (error.retryAfterSeconds) {
+            res.setHeader('Retry-After', String(error.retryAfterSeconds));
+          }
+          sendJson(res, error.status, { error: error.message, scope: 'public-access' });
           return;
         }
         if (error instanceof BudgetExceededError) {
@@ -815,6 +996,8 @@ export async function startFromEnv(root: string): Promise<void> {
   loadLocalLlmCredential(root);
   const { catalog, rules } = loadCatalogAndRules(root);
   const auth = createAuthProvider(authConfigFromEnv());
+  const adminAuth = adminApiAuthFromEnv();
+  const publicAccess = publicAccessFromEnv(auth.kind);
   const serviceAuth = serviceApiKeyAuthFromEnv();
   const limits = limitsFromEnv();
   const budget = new BudgetLedger(limits, process.env['BUDGET_FILE'] ?? DEFAULT_LEDGER_PATH);
@@ -850,6 +1033,8 @@ export async function startFromEnv(root: string): Promise<void> {
     catalog,
     rules,
     auth,
+    ...(adminAuth ? { adminAuth } : {}),
+    ...(publicAccess ? { publicAccess } : {}),
     ...(serviceAuth ? { serviceAuth } : {}),
     budget,
     ...(runtimeStore ? { runtimeStore } : {}),
@@ -873,6 +1058,10 @@ export async function startFromEnv(root: string): Promise<void> {
   server.listen(port, host, () => {
     console.log(`VMind Teklif Ajanı — http://${host}:${port}`);
     console.log(`  kimlik doğrulama : ${auth.kind}`);
+    console.log(`  yönetim API'si   : ${adminAuth ? 'ayrı Bearer anahtarıyla açık' : 'kapalı'}`);
+    console.log(
+      `  public koruma      : ${publicAccess ? `IP-hash limit${publicAccess.turnstileSiteKey ? ' + Turnstile' : ' (yerel bypass)'}` : 'kapalı'}`,
+    );
     console.log(
       serviceAuth
         ? `  servis hesabi      : ${serviceAuth.identity.displayName} (${serviceAuth.identity.canPublish ? 'yayinlama yetkili' : 'taslak yetkili'})`

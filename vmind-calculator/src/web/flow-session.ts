@@ -165,10 +165,10 @@ export class FlowSession {
   onApprove = (
     summary: PublishSummary,
     editor?: ApprovalEditHandler,
-  ): Promise<{ approved: boolean; approvedBy?: string }> => {
+  ): Promise<{ approved: boolean; approvedBy?: string; publish?: boolean }> => {
     this.approvalEditor = editor ?? null;
     this.approvalEditCount = 0;
-    return this.gate<{ approved: boolean; approvedBy?: string }>(
+    return this.gate<{ approved: boolean; approvedBy?: string; publish?: boolean }>(
       { kind: 'approve', id: randomUUID(), summary },
       // ⛔ Zaman aşımı ONAY DEĞİLDİR. Cevap gelmezse yayınlanmaz.
       () => ({ approved: false }),

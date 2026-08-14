@@ -273,6 +273,8 @@ try {
       phone_e164: testPhone,
       name: "Site Test Müşterisi",
       company: "Örnek AŞ",
+      communication_status: "opted_in",
+      consent_notice_version: "2026-08-14",
     },
     opportunity: {
       customer_need: "Site üzerinden ayrı bir uygulama sunucusu ihtiyacı.",
@@ -292,6 +294,16 @@ try {
     [tenantId, siteFirst.opportunity.opportunity_id],
   );
   assert.equal(siteSource.rows[0].source, "Website");
+  const siteConsent = await pool.query(
+    `SELECT communication_status, consent_notice_version, consent_source
+       FROM crm.contacts WHERE tenant_id = $1 AND contact_id = $2`,
+    [tenantId, siteFirst.contact_id],
+  );
+  assert.deepEqual(siteConsent.rows[0], {
+    communication_status: "opted_in",
+    consent_notice_version: "2026-08-14",
+    consent_source: "Website",
+  });
 
   // stats() tenant'a göre saydığı için taze tenant'ta sayılar deterministik.
   const stats = await store.stats();

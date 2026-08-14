@@ -95,6 +95,10 @@ a.cta:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
 .customer-context summary { cursor: pointer; font-size: 13px; font-weight: 700; }
 .customer-context summary span { color: var(--muted); font-weight: 400; }
 .customer-context p { margin: 9px 0 0; }
+.privacy-consent { display: flex; gap: 9px; align-items: flex-start; margin-top: 12px;
+  font-size: 12px; line-height: 1.45; color: var(--muted); }
+.privacy-consent input { width: auto; margin-top: 2px; }
+.turnstile-box { min-height: 65px; margin: 14px 0; }
 
 .guided-builder { padding-bottom: 20px; border-bottom: 1px solid var(--line); }
 .guided-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
@@ -225,6 +229,26 @@ tr.total td { border-bottom: 0; font-weight: 700; padding-top: 12px; }
 .error { border-left: 3px solid var(--blocker); padding-left: 12px; color: var(--blocker); }
 .muted { color: var(--muted); }
 .small { font-size: 12.5px; }
+.tiny { font-size: 10px; }
+
+.admin-app { max-width: 1400px; }
+.admin-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px; margin: 18px 0; }
+.admin-metrics > div { background: var(--panel); border: 1px solid var(--line);
+  border-radius: 12px; padding: 16px; display: grid; gap: 5px; }
+.admin-metrics span, .admin-metrics small { color: var(--muted); }
+.admin-metrics strong { font-size: 24px; }
+.admin-section { margin-top: 16px; }
+.admin-table-wrap { overflow-x: auto; }
+.admin-table { min-width: 850px; }
+.admin-table td { vertical-align: top; }
+.admin-table input, .admin-table select { min-width: 150px; margin: 3px 0; }
+.admin-table button { margin-top: 3px; }
+.admin-need { max-width: 420px; white-space: normal; }
+.spread { justify-content: space-between; }
+.admin-message { border-left: 3px solid var(--accent); padding: 8px 12px; margin: 8px 0; }
+.admin-message pre, .admin-section details pre { white-space: pre-wrap; overflow-wrap: anywhere;
+  max-height: 420px; overflow: auto; }
 
 .login { max-width: 420px; margin: 12vh auto; }
 .login label { display: block; margin-bottom: 12px; }

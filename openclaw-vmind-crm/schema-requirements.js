@@ -35,6 +35,10 @@ export const CRM_SCHEMA_REQUIREMENTS = Object.freeze([
     version: "001_platform_foundation.sql",
     checksum: "0bb5760fd341c3a3a100414387c871bdd898b1771b8e77eef12a3d17f4e7a219",
   }),
+  Object.freeze({
+    version: "004_contact_consent_audit.sql",
+    checksum: "b7565be05e730ee9ba52c6e78b20149cd0d1ddbee820eb77dac1c6046e7ce738",
+  }),
 ]);
 
 /** Şema beklentisi karşılanmadığında fırlatılır. Bağlantı hatasından ayrıdır. */

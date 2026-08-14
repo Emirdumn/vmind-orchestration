@@ -33,12 +33,16 @@ export function useFlow() {
     };
   }, []);
 
-  const start = useCallback(async (salesText: string, customer?: CustomerCrmContext) => {
+  const start = useCallback(async (
+    salesText: string,
+    customer?: CustomerCrmContext,
+    turnstileToken?: string,
+  ) => {
     setError(null);
     setView(null);
     setStarting(true);
     try {
-      const { sessionId: id } = await api.startFlow(salesText, customer);
+      const { sessionId: id } = await api.startFlow(salesText, customer, turnstileToken);
       if (!alive.current) return;
       setSessionId(id);
     } catch (caught) {

@@ -189,17 +189,46 @@ export class PostgresCRMStore {
   async ensureContact(client, phone, params, now) {
     const name = optionalText(params.name, "Ad", 160);
     const company = optionalText(params.company, "Şirket", 240);
+    const optedIn = params.communication_status === "opted_in";
+    const consentNoticeVersion = optedIn
+      ? optionalText(params.consent_notice_version, "Gizlilik bildirimi sürümü", 64)
+      : null;
+    const consentSource = optedIn
+      ? optionalText(params.consent_source, "Onay kaynağı", 80)
+      : null;
     return one(client, `
       INSERT INTO crm.contacts (
         contact_id, tenant_id, phone_e164, name, company,
-        communication_status, created_at, updated_at
-      ) VALUES ($1, $2, $3, $4, $5, 'not_requested', $6, $6)
+        communication_status, consent_updated_at, consent_notice_version,
+        consent_source, created_at, updated_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $10)
       ON CONFLICT (tenant_id, phone_e164) DO UPDATE
       SET name = COALESCE(EXCLUDED.name, crm.contacts.name),
           company = COALESCE(EXCLUDED.company, crm.contacts.company),
+          communication_status = CASE
+            WHEN EXCLUDED.communication_status = 'opted_in' THEN 'opted_in'
+            ELSE crm.contacts.communication_status
+          END,
+          consent_updated_at = COALESCE(EXCLUDED.consent_updated_at, crm.contacts.consent_updated_at),
+          consent_notice_version = COALESCE(
+            EXCLUDED.consent_notice_version,
+            crm.contacts.consent_notice_version
+          ),
+          consent_source = COALESCE(EXCLUDED.consent_source, crm.contacts.consent_source),
           updated_at = EXCLUDED.updated_at
       RETURNING *
-    `, [randomUUID(), this.tenantId, phone, name, company, now]);
+    `, [
+      randomUUID(),
+      this.tenantId,
+      phone,
+      name,
+      company,
+      optedIn ? "opted_in" : "not_requested",
+      optedIn ? now : null,
+      consentNoticeVersion,
+      consentSource,
+      now,
+    ]);
   }
 
   async enqueue(client, entityType, entityId, idField, payload, now) {
@@ -227,6 +256,8 @@ export class PostgresCRMStore {
       Company: contact.company ?? "",
       "Communication Status": contact.communication_status,
       "Consent Updated At": iso(contact.consent_updated_at) ?? "",
+      "Consent Notice Version": contact.consent_notice_version ?? "",
+      "Consent Source": contact.consent_source ?? "",
       "Created At": iso(contact.created_at),
       "Updated At": iso(contact.updated_at),
     }), now);

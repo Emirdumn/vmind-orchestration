@@ -2,9 +2,9 @@
  * FAZ 0 — otomatik migration kapalı + şema doğrulama testleri.
  *
  * Beş senaryo:
- *   1. Gerekli 001 mevcut            → store hazır
- *   2. 001 yok                       → net şema hatası, migration UYGULANMAZ
- *   3. 001 checksum yanlış           → net hata
+ *   1. Gerekli migration'lar mevcut  → store hazır
+ *   2. Şema yok                      → net şema hatası, migration UYGULANMAZ
+ *   3. Gerekli checksum yanlış       → net hata
  *   4. SQL dizininde uygulanmamış ek → store onu UYGULAMAZ
  *   5. PostgreSQL erişilemiyor       → süreç ayakta, CRM güvenli hata
  *
@@ -42,6 +42,7 @@ if (!BASE_URL) {
 // .pathname yüzde-kodlamayı çözmez; dizin adında boşluk var.
 const SQL_DIR = fileURLToPath(new URL("./sql/", import.meta.url));
 const FOUNDATION = "001_platform_foundation.sql";
+const CONSENT_AUDIT = "004_contact_consent_audit.sql";
 const adminPool = new Pool({ connectionString: BASE_URL });
 const olusturulan = [];
 const gecici = [];
@@ -66,15 +67,20 @@ function geciciDizin(dosyalar) {
 }
 
 const foundationSql = readFileSync(join(SQL_DIR, FOUNDATION), "utf8");
+const consentAuditSql = readFileSync(join(SQL_DIR, CONSENT_AUDIT), "utf8");
+const requiredMigrations = {
+  [FOUNDATION]: foundationSql,
+  [CONSENT_AUDIT]: consentAuditSql,
+};
 const sonuc = [];
 
 // ---------------------------------------------------------------------------
-// 1) Gerekli 001 mevcut → store hazır
+// 1) Gerekli migration'lar mevcut → store hazır
 // ---------------------------------------------------------------------------
 {
   const db = await taze("s1_hazir");
   const pool = new Pool({ connectionString: db.url });
-  await applyPostgresMigrations(pool, { directory: geciciDizin({ [FOUNDATION]: foundationSql }) });
+  await applyPostgresMigrations(pool, { directory: geciciDizin(requiredMigrations) });
 
   const store = new PostgresCRMStore({ pool, migrate: false });
   await store.ready();
@@ -83,11 +89,11 @@ const sonuc = [];
     store.schema,
     "migrate:false yolu şemayı DOĞRULAMALI; store.schema boş kaldı (doğrulama atlanmış olabilir)",
   );
-  assert.deepEqual(store.schema.verified, [FOUNDATION]);
-  assert.equal(store.schema.appliedCount, 1);
+  assert.deepEqual(store.schema.verified, [FOUNDATION, CONSENT_AUDIT]);
+  assert.equal(store.schema.appliedCount, 2);
   await store.close();
   await pool.end();
-  sonuc.push({ senaryo: 1, ad: "001 mevcut", sonuc: "store hazır" });
+  sonuc.push({ senaryo: 1, ad: "gerekli şema mevcut", sonuc: "store hazır" });
 }
 
 // ---------------------------------------------------------------------------
@@ -121,7 +127,7 @@ const sonuc = [];
 {
   const db = await taze("s3_checksum");
   const pool = new Pool({ connectionString: db.url });
-  await applyPostgresMigrations(pool, { directory: geciciDizin({ [FOUNDATION]: foundationSql }) });
+  await applyPostgresMigrations(pool, { directory: geciciDizin(requiredMigrations) });
 
   // Kayıtlı özet bozulur: dosya değişmiş gibi.
   await pool.query("UPDATE platform.schema_migrations SET checksum = $1 WHERE version = $2", [
@@ -144,14 +150,14 @@ const sonuc = [];
 //
 // Bu senaryonun gücü şurada: gerçek `sql/` dizininde 002 ve 003 DURUYOR.
 // Store hâlâ `applyPostgresMigrations` çağırsaydı, varsayılan dizinden
-// ikisini de uygulardı. Uygulamıyorsa garanti seçeneğe değil YAPIYA bağlıdır.
+// 002 ve 003'ü de uygulardı. Uygulamıyorsa garanti seçeneğe değil YAPIYA bağlıdır.
 // ---------------------------------------------------------------------------
 {
   const db = await taze("s4_varsayilan");
   const pool = new Pool({ connectionString: db.url });
 
-  // Geçici dizinden YALNIZ 001 uygulanır; 002/003 bilerek dışarıda bırakılır.
-  await applyPostgresMigrations(pool, { directory: geciciDizin({ [FOUNDATION]: foundationSql }) });
+  // Yalnız zorunlu 001+004 uygulanır; 002/003 bilerek dışarıda bırakılır.
+  await applyPostgresMigrations(pool, { directory: geciciDizin(requiredMigrations) });
 
   // DİKKAT: `migrate: false` BİLEREK verilmiyor — varsayılan da güvenli olmalı.
   const store = new PostgresCRMStore({ pool });
@@ -163,8 +169,8 @@ const sonuc = [];
   );
   assert.deepEqual(
     uygulanmis.rows.map((r) => r.version),
-    [FOUNDATION],
-    "platform.schema_migrations yalnız 001 içermeli",
+    [FOUNDATION, CONSENT_AUDIT],
+    "platform.schema_migrations yalnız zorunlu migration'ları içermeli",
   );
 
   // 002'nin tablosu ve 003'ün view'ı oluşmamalı.
@@ -180,7 +186,7 @@ const sonuc = [];
 
   await store.close();
   await pool.end();
-  sonuc.push({ senaryo: 4, ad: "varsayılan kurucu", sonuc: "migration uygulanmadı, yalnız 001" });
+  sonuc.push({ senaryo: 4, ad: "varsayılan kurucu", sonuc: "ek migration uygulanmadı" });
 }
 
 // ---------------------------------------------------------------------------
@@ -247,10 +253,12 @@ const sonuc = [];
 // ---------------------------------------------------------------------------
 {
   const { createHash } = await import("node:crypto");
-  const gercek = createHash("sha256").update(foundationSql).digest("hex");
-  const manifest = CRM_SCHEMA_REQUIREMENTS.find((r) => r.version === FOUNDATION);
-  assert.equal(manifest.checksum, gercek, "manifest checksum'ı sql/001 ile uyuşmuyor");
-  sonuc.push({ senaryo: 6, ad: "manifest ↔ sql/001", sonuc: "uyumlu" });
+  for (const [version, sql] of Object.entries(requiredMigrations)) {
+    const gercek = createHash("sha256").update(sql).digest("hex");
+    const manifest = CRM_SCHEMA_REQUIREMENTS.find((r) => r.version === version);
+    assert.equal(manifest.checksum, gercek, `manifest checksum'ı ${version} ile uyuşmuyor`);
+  }
+  sonuc.push({ senaryo: 6, ad: "manifest ↔ zorunlu SQL", sonuc: "uyumlu" });
 }
 
 // ---------------------------------------------------------------------------
@@ -261,13 +269,13 @@ const sonuc = [];
   const pool = new Pool({ connectionString: db.url });
   await applyPostgresMigrations(pool, {
     directory: geciciDizin({
-      [FOUNDATION]: foundationSql,
+      ...requiredMigrations,
       "090_ileri_uyumlu.sql": "CREATE TABLE platform.ileri_ornek (x int);",
     }),
   });
   const rapor = await verifyAppliedSchema(pool);
-  assert.deepEqual(rapor.verified, [FOUNDATION]);
-  assert.equal(rapor.appliedCount, 2, "ileri migration sayılır ama engellemez");
+  assert.deepEqual(rapor.verified, [FOUNDATION, CONSENT_AUDIT]);
+  assert.equal(rapor.appliedCount, 3, "ileri migration sayılır ama engellemez");
   await pool.end();
   sonuc.push({ senaryo: 7, ad: "ileri uyumlu migration", sonuc: "reddedilmedi" });
 }

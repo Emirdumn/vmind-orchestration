@@ -55,7 +55,7 @@ export interface LoginResult {
 
 export interface AuthProvider {
   /** Arayüzde gösterilecek ad ve giriş formunun şekli. */
-  readonly kind: 'shared-secret' | 'vmind-token' | 'disabled';
+  readonly kind: 'shared-secret' | 'vmind-token' | 'public-guest' | 'disabled';
   /** Giriş formunda ne isteneceğini arayüze anlatır. */
   readonly loginFields: ReadonlyArray<{ name: string; label: string; secret: boolean }>;
   /** Girişi dener. Başarısızsa `null` — sebep söylenmez (kullanıcı sayımı yapılmasın). */
@@ -64,6 +64,45 @@ export interface AuthProvider {
   resolve(sessionToken: string | undefined): Identity | null;
   /** Oturumu kapatır. */
   logout(sessionToken: string): void;
+}
+
+// ---------------------------------------------------------------------------
+// 3) Public ziyaretçi — şifresiz ama kişi ve kota ayrımı korunur
+// ---------------------------------------------------------------------------
+
+/**
+ * Müşteri-facing site için otomatik, rastgele ziyaretçi oturumu.
+ *
+ * Bu `disabled` modu değildir: her tarayıcı ayrı, iptal edilebilir bir HttpOnly
+ * oturum ve ayrı kota anahtarı alır. Cookie silerek yeni kimlik alınabilir;
+ * bunun maliyet sınırını aşması `PublicAccessGuard` IP-hash akış limitiyle
+ * engellenir. Ham IP bu sağlayıcıya veya PostgreSQL'e hiç verilmez.
+ */
+export class PublicGuestAuthProvider implements AuthProvider {
+  readonly kind = 'public-guest' as const;
+  readonly loginFields = [] as const;
+  private readonly store: SessionStore;
+
+  constructor(options: { sessionTtlMs?: number } = {}) {
+    this.store = new SessionStore(options.sessionTtlMs ?? 24 * 60 * 60 * 1000);
+  }
+
+  async login(_input: Record<string, string> = {}): Promise<LoginResult> {
+    const suffix = randomBytes(16).toString('hex');
+    const identity: Identity = {
+      userId: `guest:${suffix}`,
+      displayName: 'Ziyaretçi',
+    };
+    return { identity, sessionToken: this.store.create(identity) };
+  }
+
+  resolve(sessionToken: string | undefined): Identity | null {
+    return this.store.resolve(sessionToken);
+  }
+
+  logout(sessionToken: string): void {
+    this.store.delete(sessionToken);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -369,7 +408,7 @@ function shortHash(input: string): string {
 // ---------------------------------------------------------------------------
 
 export interface AuthConfig {
-  mode: 'shared-secret' | 'vmind-token' | 'disabled';
+  mode: 'shared-secret' | 'vmind-token' | 'public-guest' | 'disabled';
   sharedPassword?: string;
   /** true ise paylaşılan şifre reddedilir — internete açık kurulumlar için. */
   requireStrongAuth: boolean;
@@ -377,9 +416,15 @@ export interface AuthConfig {
 
 export function authConfigFromEnv(env: NodeJS.ProcessEnv = process.env): AuthConfig {
   const mode = (env['WEB_AUTH_MODE'] ?? 'vmind-token').trim();
-  if (mode !== 'shared-secret' && mode !== 'vmind-token' && mode !== 'disabled') {
+  if (
+    mode !== 'shared-secret' &&
+    mode !== 'vmind-token' &&
+    mode !== 'public-guest' &&
+    mode !== 'disabled'
+  ) {
     throw new Error(
-      `WEB_AUTH_MODE geçersiz: "${mode}". "vmind-token", "shared-secret" veya "disabled" olmalı.`,
+      `WEB_AUTH_MODE geçersiz: "${mode}". "vmind-token", "shared-secret", ` +
+        `"public-guest" veya "disabled" olmalı.`,
     );
   }
   return {
@@ -395,6 +440,7 @@ export function authConfigFromEnv(env: NodeJS.ProcessEnv = process.env): AuthCon
 
 export function createAuthProvider(config: AuthConfig): AuthProvider {
   if (config.mode === 'vmind-token') return new VmindTokenAuthProvider();
+  if (config.mode === 'public-guest') return new PublicGuestAuthProvider();
 
   if (config.mode === 'disabled') {
     if (config.requireStrongAuth) {
@@ -420,7 +466,7 @@ export function createAuthProvider(config: AuthConfig): AuthProvider {
 }
 
 // ---------------------------------------------------------------------------
-// 3) Kimliksiz yerel gelistirme — acik izin olmadan olusturulamaz
+// 4) Kimliksiz yerel gelistirme — acik izin olmadan olusturulamaz
 // ---------------------------------------------------------------------------
 
 export class DisabledAuthProvider implements AuthProvider {

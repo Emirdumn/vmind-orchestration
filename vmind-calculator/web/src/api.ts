@@ -12,8 +12,11 @@ export interface AuthField {
 }
 
 export interface AuthConfig {
-  kind: 'shared-secret' | 'vmind-token' | 'disabled';
+  kind: 'shared-secret' | 'vmind-token' | 'public-guest' | 'disabled';
   fields: AuthField[];
+  automatic?: boolean;
+  turnstileSiteKey?: string;
+  privacyNoticeVersion?: string;
 }
 
 export interface Me {
@@ -24,12 +27,16 @@ export interface Me {
   rules: number;
   publishEnabled: boolean;
   crmEnabled: boolean;
+  turnstileSiteKey?: string;
+  privacyNoticeVersion?: string;
 }
 
 export interface CustomerCrmContext {
   phoneE164: string;
   name?: string;
   company?: string;
+  privacyConsent: true;
+  privacyNoticeVersion: string;
 }
 
 export interface FlowEvent {
@@ -197,6 +204,88 @@ export interface SessionView {
   spentUsd: number;
 }
 
+export interface AdminOverview {
+  generatedAt: string;
+  principals: number;
+  runs: { total: number; running: number; completed: number; failed: number };
+  estimates: { total: number; published: number };
+  crm: { contacts: number; opportunities: number; openOpportunities: number };
+  today: { llmCalls: number; inputTokens: number; outputTokens: number; costUsd: number };
+}
+
+export interface AdminRun {
+  runId: string;
+  startedAt: string;
+  finishedAt: string | null;
+  channel: string | null;
+  provider: string;
+  model: string;
+  status: string;
+  resultStage: string | null;
+  published: boolean;
+  principalType: string | null;
+  principalKey: string | null;
+  displayName: string | null;
+  llmCalls: number;
+  inputTokens: number;
+  outputTokens: number;
+  costUsd: number;
+  toolCalls: number;
+  rejectedToolCalls: number;
+  estimateStatus: string | null;
+  currency: string | null;
+  monthlyTotal: number | null;
+  errorCode: string | null;
+}
+
+export interface AdminRunDetail {
+  run: AdminRun;
+  messages: Array<{
+    direction: string;
+    contentRedacted: string | null;
+    metadata: Record<string, unknown>;
+    createdAt: string;
+  }>;
+  auditEvents: Array<{
+    eventSeq: number;
+    eventType: string;
+    summary: string;
+    detail: Record<string, unknown>;
+    occurredAt: string;
+  }>;
+}
+
+export interface AdminOpportunity {
+  opportunityId: string;
+  contactId: string;
+  phoneE164: string;
+  name: string | null;
+  company: string | null;
+  communicationStatus: string;
+  consentUpdatedAt: string | null;
+  consentNoticeVersion: string | null;
+  consentSource: string | null;
+  customerNeed: string;
+  recommendedService: string | null;
+  stage: string;
+  estimatedAmountMinor: number | null;
+  currency: string | null;
+  owner: string;
+  nextFollowUp: string | null;
+  source: string;
+  createdAt: string;
+  updatedAt: string;
+  calculation: null | {
+    externalCalculationId: string;
+    calculatorUrl: string;
+    configurationSummary: string;
+    amountMinor: number;
+    currency: string;
+    version: number;
+    createdAt: string;
+  };
+}
+
 export class ApiError extends Error {
   constructor(
     readonly status: number,
@@ -234,6 +323,13 @@ async function call<T>(path: string, init: RequestInit = {}): Promise<T> {
   return body as T;
 }
 
+function adminCall<T>(apiKey: string, path: string, init: RequestInit = {}): Promise<T> {
+  return call<T>(path, {
+    ...init,
+    headers: { Authorization: `Bearer ${apiKey}`, ...(init.headers ?? {}) },
+  });
+}
+
 export const api = {
   authConfig: () => call<AuthConfig>('/api/auth/config'),
 
@@ -247,9 +343,14 @@ export const api = {
 
   me: () => call<Me>('/api/me'),
 
-  startFlow: (salesText: string, customer?: CustomerCrmContext) =>
+  startFlow: (
+    salesText: string,
+    customer?: CustomerCrmContext,
+    turnstileToken?: string,
+  ) =>
     call<{ sessionId: string }>('/api/flow', {
       method: 'POST',
+      ...(turnstileToken ? { headers: { 'X-Turnstile-Token': turnstileToken } } : {}),
       body: JSON.stringify({ salesText, ...(customer ? { customer } : {}) }),
     }),
 
@@ -280,6 +381,29 @@ export const api = {
 
   close: (sessionId: string) =>
     call<{ ok: true }>(`/api/flow/${sessionId}/close`, { method: 'POST' }),
+};
+
+export const adminApi = {
+  overview: (apiKey: string) => adminCall<AdminOverview>(apiKey, '/api/admin/overview'),
+  runs: (apiKey: string, limit = 50) =>
+    adminCall<{ items: AdminRun[] }>(apiKey, `/api/admin/runs?limit=${limit}`),
+  run: (apiKey: string, runId: string) =>
+    adminCall<AdminRunDetail>(apiKey, `/api/admin/runs/${encodeURIComponent(runId)}`),
+  opportunities: (apiKey: string, limit = 50) =>
+    adminCall<{ items: AdminOpportunity[] }>(
+      apiKey,
+      `/api/admin/opportunities?limit=${limit}`,
+    ),
+  updateOpportunity: (
+    apiKey: string,
+    opportunityId: string,
+    update: { stage?: string; owner?: string; nextFollowUp?: string | null },
+  ) =>
+    adminCall<AdminOpportunity>(
+      apiKey,
+      `/api/admin/opportunities/${encodeURIComponent(opportunityId)}`,
+      { method: 'PATCH', body: JSON.stringify(update) },
+    ),
 };
 
 /** Fiyatları Türkçe biçimde gösterir. */

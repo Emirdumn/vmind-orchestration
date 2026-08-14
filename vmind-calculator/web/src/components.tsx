@@ -794,7 +794,7 @@ export function ApproveGate({
           }
           onClick={() => decide(true)}
         >
-          Onaylıyorum
+          {publishEnabled ? 'Onaylıyor ve yayınlıyorum' : 'Onaylıyor, taslağı tamamlıyorum'}
         </button>
       </div>
     </div>

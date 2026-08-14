@@ -82,6 +82,8 @@ try {
       phone_e164: "0555 123 45 67",
       name: "Deniz",
       company: "Örnek AŞ",
+      communication_status: "opted_in",
+      consent_notice_version: "2026-08-14",
     },
     opportunity: {
       customer_need: "İki uygulama sunucusu, premium disk ve App Load Balancer.",
@@ -99,6 +101,7 @@ try {
 
   const normalized = normalizeSiteQuotePayload(payload);
   assert.equal(normalized.customer.phone_e164, "+905551234567");
+  assert.equal(normalized.customer.communication_status, "opted_in");
   assert.equal(normalized.calculation.currency, "TRY");
 
   const first = await syncSiteQuote(store, payload);
@@ -118,13 +121,23 @@ try {
   assert.equal(store.db.prepare("SELECT COUNT(*) AS n FROM opportunities").get().n, 1);
   assert.equal(store.db.prepare("SELECT COUNT(*) AS n FROM calculations").get().n, 1);
   assert.equal(store.db.prepare("SELECT source FROM opportunities").get().source, "Website");
+  const consent = store.db
+    .prepare("SELECT communication_status, consent_notice_version, consent_source FROM contacts")
+    .get();
+  assert.equal(consent.communication_status, "opted_in");
+  assert.equal(consent.consent_notice_version, "2026-08-14");
+  assert.equal(consent.consent_source, "Website");
 
   // Hesaplama henuz yayinlanmadiysa yine tek opportunity kaydi olusur.
   const secondFlow = randomUUID();
   const needOnly = await syncSiteQuote(store, {
     event_id: `site-quote:${secondFlow}`,
     flow_session_id: secondFlow,
-    customer: { phone_e164: "+905551234567" },
+    customer: {
+      phone_e164: "+905551234567",
+      communication_status: "opted_in",
+      consent_notice_version: "2026-08-14",
+    },
     opportunity: {
       customer_need: "Yeni ve ayri bir GPU sunucu ihtiyaci.",
       recommended_service: "GPU Cloud",
@@ -140,8 +153,26 @@ try {
     /bilinmeyen alan/,
   );
   assert.throws(
-    () => normalizeSiteQuotePayload({ ...payload, customer: { phone_e164: "123" } }),
+    () => normalizeSiteQuotePayload({
+      ...payload,
+      customer: {
+        phone_e164: "123",
+        communication_status: "opted_in",
+        consent_notice_version: "2026-08-14",
+      },
+    }),
     /E\.164/,
+  );
+  assert.throws(
+    () => normalizeSiteQuotePayload({
+      ...payload,
+      customer: {
+        phone_e164: "+905551234567",
+        communication_status: "not_requested",
+        consent_notice_version: "2026-08-14",
+      },
+    }),
+    /açık iletişim onayı/,
   );
 
   process.stdout.write(

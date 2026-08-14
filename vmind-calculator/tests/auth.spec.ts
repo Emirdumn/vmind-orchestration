@@ -7,6 +7,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import {
+  PublicGuestAuthProvider,
   SharedSecretAuthProvider,
   VmindTokenAuthProvider,
   authConfigFromEnv,
@@ -169,6 +170,25 @@ describe('VmindTokenAuthProvider', () => {
   });
 });
 
+describe('PublicGuestAuthProvider', () => {
+  it('her yeni ziyaretçiye ayrı ve çözülebilir kota kimliği verir', async () => {
+    const provider = new PublicGuestAuthProvider();
+    const first = await provider.login({});
+    const second = await provider.login({});
+    expect(first.identity.userId).toMatch(/^guest:[0-9a-f]{32}$/);
+    expect(second.identity.userId).not.toBe(first.identity.userId);
+    expect(provider.resolve(first.sessionToken)?.userId).toBe(first.identity.userId);
+    expect(provider.loginFields).toEqual([]);
+  });
+
+  it('çıkış yapılan ziyaretçi oturumu tekrar kullanılamaz', async () => {
+    const provider = new PublicGuestAuthProvider();
+    const result = await provider.login({});
+    provider.logout(result.sessionToken);
+    expect(provider.resolve(result.sessionToken)).toBeNull();
+  });
+});
+
 describe('Saglayici secimi — varsayilan GUVENLI taraf', () => {
   it('varsayilan mod vmind-token', () => {
     expect(authConfigFromEnv({}).mode).toBe('vmind-token');
@@ -198,6 +218,12 @@ describe('Saglayici secimi — varsayilan GUVENLI taraf', () => {
       WEB_ALLOW_WEAK_AUTH: '1',
     });
     expect(createAuthProvider(config).kind).toBe('shared-secret');
+  });
+
+  it('public-guest güçlü auth bayrağını düşürmeden kurulabilir', () => {
+    const provider = createAuthProvider(authConfigFromEnv({ WEB_AUTH_MODE: 'public-guest' }));
+    expect(provider.kind).toBe('public-guest');
+    expect(provider).toBeInstanceOf(PublicGuestAuthProvider);
   });
 
   it('shared-secret sifresiz calismaz', () => {

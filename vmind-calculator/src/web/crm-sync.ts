@@ -8,6 +8,8 @@ export interface CrmCustomerContext {
   phoneE164: string;
   name?: string;
   company?: string;
+  privacyConsent: true;
+  privacyNoticeVersion: string;
 }
 
 export interface CrmSyncInput {
@@ -132,6 +134,8 @@ export function buildCrmQuotePayload(input: CrmSyncInput): Record<string, unknow
       phone_e164: phone,
       ...(text(input.customer.name, 160) ? { name: text(input.customer.name, 160) } : {}),
       ...(text(input.customer.company, 240) ? { company: text(input.customer.company, 240) } : {}),
+      communication_status: 'opted_in',
+      consent_notice_version: input.customer.privacyNoticeVersion,
     },
     opportunity: {
       customer_need: requirementSummary(input.result),

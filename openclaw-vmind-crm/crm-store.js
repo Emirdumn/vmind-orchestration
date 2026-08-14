@@ -223,6 +223,8 @@ export class CRMStore {
         company TEXT,
         communication_status TEXT NOT NULL DEFAULT 'not_requested',
         consent_updated_at TEXT,
+        consent_notice_version TEXT,
+        consent_source TEXT,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL
       );
@@ -295,6 +297,15 @@ export class CRMStore {
       CREATE INDEX IF NOT EXISTS sync_outbox_pending_idx
         ON sync_outbox(status, next_attempt_at, created_at);
     `);
+    const contactColumns = new Set(
+      this.db.prepare("PRAGMA table_info(contacts)").all().map((column) => column.name),
+    );
+    if (!contactColumns.has("consent_notice_version")) {
+      this.db.exec("ALTER TABLE contacts ADD COLUMN consent_notice_version TEXT");
+    }
+    if (!contactColumns.has("consent_source")) {
+      this.db.exec("ALTER TABLE contacts ADD COLUMN consent_source TEXT");
+    }
   }
 
   transaction(fn) {
@@ -316,21 +327,54 @@ export class CRMStore {
   ensureContact(phone, params, now) {
     const name = optionalText(params.name, "Ad", 160);
     const company = optionalText(params.company, "Şirket", 240);
+    const optedIn = params.communication_status === "opted_in";
+    const consentNoticeVersion = optedIn
+      ? optionalText(params.consent_notice_version, "Gizlilik bildirimi sürümü", 64)
+      : null;
+    const consentSource = optedIn ? optionalText(params.consent_source, "Onay kaynağı", 80) : null;
     const existing = this.db.prepare("SELECT * FROM contacts WHERE phone_e164 = ?").get(phone);
     if (existing) {
       this.db.prepare(`
         UPDATE contacts
-        SET name = COALESCE(?, name), company = COALESCE(?, company), updated_at = ?
+        SET name = COALESCE(?, name),
+            company = COALESCE(?, company),
+            communication_status = CASE WHEN ? THEN 'opted_in' ELSE communication_status END,
+            consent_updated_at = CASE WHEN ? THEN ? ELSE consent_updated_at END,
+            consent_notice_version = COALESCE(?, consent_notice_version),
+            consent_source = COALESCE(?, consent_source),
+            updated_at = ?
         WHERE contact_id = ?
-      `).run(name, company, now, existing.contact_id);
+      `).run(
+        name,
+        company,
+        optedIn ? 1 : 0,
+        optedIn ? 1 : 0,
+        now,
+        consentNoticeVersion,
+        consentSource,
+        now,
+        existing.contact_id,
+      );
       return this.db.prepare("SELECT * FROM contacts WHERE contact_id = ?").get(existing.contact_id);
     }
     const contactId = randomUUID();
     this.db.prepare(`
       INSERT INTO contacts (
-        contact_id, phone_e164, name, company, communication_status, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, 'not_requested', ?, ?)
-    `).run(contactId, phone, name, company, now, now);
+        contact_id, phone_e164, name, company, communication_status,
+        consent_updated_at, consent_notice_version, consent_source, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      contactId,
+      phone,
+      name,
+      company,
+      optedIn ? "opted_in" : "not_requested",
+      optedIn ? now : null,
+      consentNoticeVersion,
+      consentSource,
+      now,
+      now,
+    );
     return this.db.prepare("SELECT * FROM contacts WHERE contact_id = ?").get(contactId);
   }
 
@@ -351,6 +395,8 @@ export class CRMStore {
       Company: contact.company ?? "",
       "Communication Status": contact.communication_status,
       "Consent Updated At": contact.consent_updated_at ?? "",
+      "Consent Notice Version": contact.consent_notice_version ?? "",
+      "Consent Source": contact.consent_source ?? "",
       "Created At": contact.created_at,
       "Updated At": contact.updated_at,
     }), now);

@@ -80,8 +80,14 @@ export interface OrchestratorCallbacks {
     answers: QuestionAnswer[],
     ctx: ToolContext,
   ) => Promise<void | { unresolvedRuleIds?: string[] }>;
-  /** Onay ekrani. false donerse yayinlanmaz. */
-  onApprove?: (summary: PublishSummary) => Promise<{ approved: boolean; approvedBy?: string }>;
+  /**
+   * Onay ve kalıcı yayın ayrı kararlardır. `publish:false`, teknik olarak
+   * onaylanmış ama VMind'a yazılmayan müşteri/public taslağıdır.
+   * Geriye uyum için `publish` verilmezse onay kalıcı yayın ister.
+   */
+  onApprove?: (
+    summary: PublishSummary,
+  ) => Promise<{ approved: boolean; approvedBy?: string; publish?: boolean }>;
   /** Akis olaylarini izlemek icin (loglama / UI). */
   onEvent?: (event: FlowEvent) => void;
 }
@@ -472,6 +478,21 @@ export class Orchestrator {
     const approvedBy = decision.approvedBy ?? 'bilinmeyen';
     approvalTools.grant(ctx, { approvedBy });
     trail?.approval(approvedBy);
+
+    if (decision.publish === false) {
+      emit('done', 'Teklif onaylandı; kalıcı yayın yetkisi kullanılmadan taslak tamamlandı.');
+      return {
+        stage: 'done',
+        ...(spec ? { spec } : {}),
+        ...(draft ? { draft } : {}),
+        audit,
+        price,
+        assumptions,
+        rounds,
+        published: false,
+        events,
+      };
+    }
 
     // --- 8. YAYINLA + MUTABAKAT ------------------------------------------
     emit('publish', 'Teklif platforma kaydediliyor.');
