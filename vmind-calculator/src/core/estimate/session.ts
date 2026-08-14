@@ -108,7 +108,71 @@ export class EstimateSession {
       // Secili para biriminde fiyati yoksa platformun hesaplayicisi coker.
       this.catalog.assertPriceable(code, this.state.currency);
     }
+    this.validateProductRoles(service, validated);
     return validated;
+  }
+
+  /**
+   * Var olan ama yanlış yerde kullanılan kod da yanlış fiyat üretir. Özellikle
+   * fiyat kataloğundaki, Calculator flavor seçicisinde görünmeyen rezerve
+   * compute ürünleri burada kesin olarak kapanır.
+   */
+  private validateProductRoles(service: ServiceCode, data: Record<string, unknown>): void {
+    const object = (value: unknown): Record<string, unknown> | undefined =>
+      value !== null && typeof value === 'object' && !Array.isArray(value)
+        ? value as Record<string, unknown>
+        : undefined;
+    const code = (value: unknown): string | undefined =>
+      typeof value === 'string' && value ? value : undefined;
+    const expect = (value: unknown, services: readonly string[]): void => {
+      const productCode = code(value);
+      if (productCode) this.catalog.assertProductService(productCode, services);
+    };
+    const expectNetworkParts = (value: unknown): void => {
+      const part = object(value);
+      if (!part) return;
+      expect(object(part['floatingIp'])?.['productCode'], ['NETWORK']);
+      expect(object(part['network'])?.['productCode'], ['NETWORK']);
+    };
+
+    switch (service) {
+      case 'compute':
+        this.catalog.assertSelectableFlavor(String(data['productCode']));
+        expect(object(data['storage'])?.['productCode'], ['VOLUME']);
+        expect(object(data['backup'])?.['productCode'], ['VOLUME']);
+        expect(object(data['network'])?.['productCode'], ['NETWORK']);
+        expect(object(data['floatingIp'])?.['productCode'], ['NETWORK']);
+        expectNetworkParts(data['router']);
+        break;
+      case 'kubernetes': {
+        const master = object(data['master']);
+        const worker = object(data['worker']);
+        this.catalog.assertSelectableFlavor(String(master?.['productCode']));
+        this.catalog.assertSelectableFlavor(String(worker?.['productCode']));
+        expect(object(master?.['storage'])?.['productCode'], ['VOLUME']);
+        expect(object(worker?.['storage'])?.['productCode'], ['VOLUME']);
+        break;
+      }
+      case 'storage':
+      case 'backup':
+        expect(data['productCode'], ['VOLUME']);
+        break;
+      case 'data-transfer':
+      case 'floating-ip':
+        expect(data['productCode'], ['NETWORK']);
+        break;
+      case 'load-balancer':
+        expect(data['productCode'], ['LOAD_BALANCER']);
+        expect(object(data['network'])?.['productCode'], ['NETWORK']);
+        break;
+      case 'object-storage':
+        expect(object(data['storage'])?.['productCode'], ['OBJECT_STORAGE']);
+        expect(object(data['network'])?.['productCode'], ['NETWORK']);
+        break;
+      case 'router':
+        expectNetworkParts(data);
+        break;
+    }
   }
 
   setName(name: string): EstimateState {

@@ -31,6 +31,29 @@ export class UnknownProductCodeError extends Error {
   }
 }
 
+export class UnavailableFlavorError extends Error {
+  constructor(readonly productCode: string) {
+    super(
+      `"${productCode}" etkin/public instance listesinde yok. Fiyat kataloğunda bulunsa bile ` +
+        'Calculator bu flavor seçimini sunmuyor; yalnız catalog.searchFlavors çıktısı kullanılabilir.',
+    );
+    this.name = 'UnavailableFlavorError';
+  }
+}
+
+export class ProductServiceMismatchError extends Error {
+  constructor(
+    readonly productCode: string,
+    readonly actualService: string,
+    readonly expectedServices: readonly string[],
+  ) {
+    super(
+      `"${productCode}" ${actualService} ürünüdür; burada ${expectedServices.join(' | ')} gerekir.`,
+    );
+    this.name = 'ProductServiceMismatchError';
+  }
+}
+
 export class Catalog {
   private readonly byCode: Map<string, Product>;
   readonly products: readonly Product[];
@@ -82,6 +105,24 @@ export class Catalog {
       );
     }
     return product;
+  }
+
+  assertProductService(productCode: string, expectedServices: readonly string[]): Product {
+    const product = this.byCode.get(productCode);
+    if (!product) throw new UnknownProductCodeError(productCode);
+    if (!expectedServices.includes(product.service)) {
+      throw new ProductServiceMismatchError(productCode, product.service, expectedServices);
+    }
+    return product;
+  }
+
+  /** Calculator'ın gerçek flavor seçicisinde bulunmayan compute ürününü reddeder. */
+  assertSelectableFlavor(productCode: string): Flavor {
+    const flavor = this.flavors.find((candidate) => candidate.id === productCode);
+    if (!flavor || flavor.isDisabled || !flavor.isPublic) {
+      throw new UnavailableFlavorError(productCode);
+    }
+    return flavor;
   }
 
   priceOf(productCode: string, currency: Currency): number | undefined {

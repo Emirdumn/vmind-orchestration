@@ -202,6 +202,25 @@ describe('Faz 3.B — yerel state tool\'lari', () => {
     expect(() => session.setCurrency('EUR' as never)).toThrow();
   });
 
+  it('fiyat kataloğunda olup Calculator flavor seçicisinde olmayan compute ürününü reddediyor', () => {
+    const reserved = catalog.unselectableComputeProducts()[0];
+    expect(reserved).toBeDefined();
+    expect(() => ctx.session.addItem('compute', {
+      productCode: reserved!.productCode, count: 1,
+    })).toThrow(/instance listesinde yok/i);
+  });
+
+  it('var olan ürün kodunu yanlış servis rolünde kullanmayı reddediyor', () => {
+    expect(() => ctx.session.addItem('load-balancer', {
+      productCode: CODE.flavorMedium,
+    })).toThrow(/LOAD_BALANCER gerekir/);
+    expect(() => ctx.session.addItem('compute', {
+      productCode: CODE.flavorMedium,
+      count: 1,
+      storage: { productCode: CODE.netOut, size: 100, unit: 'GB' },
+    })).toThrow(/VOLUME gerekir/);
+  });
+
   it('price.calculate tutar ve satir kirilimi donduruyor', async () => {
     await callTool(ctx, 'estimate.addItem', { service: 'compute', data: goodCompute });
     const price = (await callTool(ctx, 'price.calculate', {})) as {

@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit",
     "snapshot:catalog": "tsx scripts/snapshot-catalog.ts",
     "drift": "tsx scripts/catalog-drift.ts",
+    "inventory:check": "tsx scripts/inventory-check.ts",
     "mcp": "tsx src/mcp/server.ts",
     "eval": "tsx evals/run-eval.ts",
     "demo": "tsx scripts/demo.ts",
